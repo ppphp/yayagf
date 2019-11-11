@@ -1,20 +1,19 @@
 package server
 
 import (
-	"context"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
+	"time"
 
-	"github.com/fsnotify/fsnotify"
 	"github.com/mitchellh/cli"
+	"github.com/ppphp/quartz"
 )
 
 type Command struct {
-	watcher *fsnotify.Watcher
+	watcher *quartz.Quartz
 	pwd     string
-	ctx     context.Context
-	cancel  func()
 }
 
 func (c *Command) Help() string {
@@ -26,51 +25,32 @@ func (c *Command) Synopsis() string {
 }
 
 func (c *Command) Run(args []string) int {
-	defer c.watcher.Close()
+	c.watcher.Begin()
+	defer c.watcher.Stop()
 	for {
 		select {
-		case event, ok := <-c.watcher.Events:
+		case event, ok := <-c.watcher.Event:
 			if !ok {
 				continue
 			}
 			log.Printf("event: %v\n", event)
 
-			if event.Op&fsnotify.Write == fsnotify.Write {
-				log.Println("modified file:", event.Name)
-			}
-			cmd := exec.Cmd{
-				Path: c.pwd,
-				Args: []string{"go", "test", "./..."},
-				Env:  os.Environ(),
-			}
-			if err := cmd.Run(); err != nil {
-				log.Printf("err: %v\n", err)
-				continue
-			}
-			if c.cancel != nil {
-				c.cancel()
-			}
-			ctx, f := context.WithCancel(c.ctx)
-			go func(ctx context.Context) {
-				cmd := exec.Cmd{
-					Path: c.pwd,
-					Args: []string{"go", "build", "./cmd/..."},
-					Env:  os.Environ(),
-				}
+			/*
+				cmd := exec.Command("go", "test", "./...")
 				if err := cmd.Run(); err != nil {
-					if c.cancel != nil {
-						log.Printf("err: %v\n", err)
-						c.cancel()
-					}
+					log.Printf("test err: %v \n", err)
+					continue
 				}
-			}(ctx)
-			c.cancel = f
-
-		case err, ok := <-c.watcher.Errors:
-			if !ok {
+			*/
+			f, err := ioutil.TempFile("/tmp", "*")
+			if err != nil {
+			}
+			f.Close()
+			cmd := exec.Command("go", "build", "-o", f.Name(), "./cmd/...")
+			if err := cmd.Run(); err != nil {
+				log.Printf("build to %v err: %v\n", f.Name(), err)
 				continue
 			}
-			log.Printf("error: %v\n", err)
 		}
 	}
 
@@ -78,15 +58,14 @@ func (c *Command) Run(args []string) int {
 }
 
 func CommandFactory() (cli.Command, error) {
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		return nil, err
-	}
 	pwd, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
-	watcher.Add(pwd)
-	c := &Command{watcher: watcher, pwd: pwd, ctx: context.Background()}
+	watcher, err := quartz.NewQuartz(pwd, time.Second)
+	if err != nil {
+		return nil, err
+	}
+	c := &Command{watcher: watcher, pwd: pwd}
 	return c, nil
 }
