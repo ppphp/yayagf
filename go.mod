@@ -6,3 +6,5 @@ require (
 	github.com/mitchellh/cli v1.0.0
 	github.com/ppphp/quartz v0.0.0-20191111105708-ee277a6130a3
 )
+
+replace github.com/ppphp/quartz => ../quartz
