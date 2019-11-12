@@ -52,18 +52,41 @@ func (c *Command) Run(args []string) int {
 		fmt.Println(err.Error())
 		return 1
 	} else {
-		f.Write([]byte(`package main
+		f.Write([]byte(fmt.Sprintf(`
+package main
 
 import (
-	"fmt"
+	"github.com/gin-gonic/gin"
+	"%v/app/router"
 )
 
 func main() {
-	fmt.Printf("Hello, world!\n")
+	r := gin.Default()
+
+	router.AddRoute(r)
+
+	r.Run()
 }
+`, filepath.Join(dir, file))))
+	}
+	if err := os.Mkdir(filepath.Join(name, "app", "router"), 0744); err != nil {
+		fmt.Println(err.Error())
+		return 1
+	}
+	if f, err := os.OpenFile(filepath.Join(name, "app", "router", "router.go"), os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644); err != nil {
+		fmt.Println(err.Error())
+		return 1
+	} else {
+		f.Write([]byte(fmt.Sprintf(`
+package router
 
+import (
+	"github.com/gin-gonic/gin"
+)
 
-		`))
+func AddRoute(r *gin.Engine) {
+}
+`)))
 	}
 
 	return 0

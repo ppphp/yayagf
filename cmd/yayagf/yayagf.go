@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/mitchellh/cli"
-	"github.com/ppphp/yayagf/cmd/generate"
-	"github.com/ppphp/yayagf/cmd/new"
-	"github.com/ppphp/yayagf/cmd/server"
+	"gitlab.papegames.com/fengche/yayagf/cmd/generate"
+	"gitlab.papegames.com/fengche/yayagf/cmd/new"
+	"gitlab.papegames.com/fengche/yayagf/cmd/server"
 )
 
 func main() {

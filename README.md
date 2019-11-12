@@ -29,4 +29,13 @@ go into any go project
 
 ### yayagf generate
 
+it should take the advantage of gin and go-micro, but they are not the perfect tool.
+
 WIP
+
+#### router
+
+#### serializer
+
+####
+
