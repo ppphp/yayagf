@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/mitchellh/cli"
-	"github.com/ppphp/quartz"
+	"gitlab.papegames.com/fengche/quartz"
 )
 
 type Command struct {
@@ -23,7 +23,7 @@ func (c *Command) Help() string {
 }
 
 func (c *Command) Synopsis() string {
-	return ""
+	return "monitor your change, rebuild and run app"
 }
 
 func (c *Command) Run(args []string) int {
@@ -48,7 +48,7 @@ func (c *Command) Run(args []string) int {
 			if err != nil {
 			}
 			f.Close()
-			cmd := exec.Command("go", "build", "-o", f.Name(), "./cmd/yayagf")
+			cmd := exec.Command("go", "build", "-o", f.Name(), "./")
 			var o, e bytes.Buffer
 			cmd.Stdout = &o
 			cmd.Stderr = &e
@@ -64,8 +64,8 @@ func (c *Command) Run(args []string) int {
 			c.cmd = exec.Command(f.Name())
 			go func() {
 				var o, e bytes.Buffer
-				c.cmd.Stdout = &o
-				c.cmd.Stderr = &e
+				c.cmd.Stdout = os.Stdout
+				c.cmd.Stderr = os.Stderr
 				if err := c.cmd.Run(); err != nil {
 					log.Printf("run %v err: %v, err: %v, out: %v\n", f.Name(), err, e.String(), o.String())
 				}

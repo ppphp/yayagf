@@ -6,7 +6,7 @@
 all: build test
 
 build:
-	GOPROXY=https://goproxy.io go build ./cmd/yayagf
+	go build ./cmd/yayagf
 
 test:
 	go test ...
