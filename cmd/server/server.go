@@ -29,6 +29,7 @@ func (c *Command) Synopsis() string {
 func (c *Command) Run(args []string) int {
 	c.watcher.Begin()
 	defer c.watcher.Stop()
+	lastName := ""
 	for {
 		select {
 		case event, ok := <-c.watcher.Event:
@@ -56,6 +57,20 @@ func (c *Command) Run(args []string) int {
 				log.Printf("build to %v err: %v, err: %v, out: %v\n", f.Name(), err, e.String(), o.String())
 				continue
 			}
+			f1, err1 := ioutil.ReadFile(f.Name())
+			if err1 != nil {
+				continue
+			}
+			if lastName != "" {
+				f2, err2 := ioutil.ReadFile(lastName)
+				if err2 != nil {
+					continue
+				}
+				if bytes.Equal(f1, f2) {
+					continue
+				}
+			}
+			lastName = f.Name()
 			if c.cmd != nil && c.cmd.Process != nil {
 				if err := c.cmd.Process.Kill(); err != nil {
 					log.Printf("kill %v err: %v", c.cmd.Process.Pid, err)
