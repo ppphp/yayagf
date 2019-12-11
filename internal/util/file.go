@@ -8,8 +8,19 @@ import (
 
 var ErrNoRoot = errors.New("cannot find root")
 
+// find dir contains go.mod
 func FindAppRoot(path string) (string, error) {
-
+	if _, err := os.Open(filepath.Join(path, "go.mod")); err == os.ErrNotExist {
+		if path != "/" {
+			return FindAppRoot(filepath.Dir(path))
+		} else {
+			return "", errors.New("no project, sb")
+		}
+	} else if err != nil {
+		return "", err
+	} else {
+		return path, nil
+	}
 	return "", nil
 }
 
@@ -33,4 +44,8 @@ func CreateFile(path string, force bool) (*os.File, error) {
 		o |= os.O_TRUNC
 	}
 	return os.OpenFile(path, o, 0644)
+}
+
+func CreateDir(path string, force bool) error {
+	return createDir(path)
 }

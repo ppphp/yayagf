@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"log"
@@ -11,7 +11,7 @@ import (
 	"gitlab.papegames.com/fengche/yayagf/cmd/server"
 )
 
-func main() {
+func Main() {
 	c := cli.NewCLI("yayagf", "HEAD")
 
 	c.Args = os.Args[1:]

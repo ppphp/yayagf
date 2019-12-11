@@ -10,6 +10,7 @@ import (
 
 	"github.com/mitchellh/cli"
 	"gitlab.papegames.com/fengche/quartz"
+	"gitlab.papegames.com/fengche/yayagf/internal/util"
 )
 
 type Command struct {
@@ -27,6 +28,9 @@ func (c *Command) Synopsis() string {
 }
 
 func (c *Command) Run(args []string) int {
+	wd, _ := os.Getwd()
+	root, _ := util.FindAppRoot(wd)
+	os.Chdir(root)
 	c.watcher.Begin()
 	defer c.watcher.Stop()
 	lastName := ""

@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"gitlab.papegames.com/fengche/yayagf/internal/util"
+
 	"github.com/mitchellh/cli"
 )
 
@@ -87,6 +89,13 @@ import (
 func AddRoute(r *gin.Engine) {
 }
 `)))
+	}
+	util.CreateDir("app/swagger", false)
+	os.Chdir(filepath.Join("app/swagger"))
+
+	{
+		cmd := exec.Command("swagger", "init", "spec")
+		cmd.Run()
 	}
 
 	return 0

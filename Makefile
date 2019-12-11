@@ -6,7 +6,7 @@
 all: build test
 
 build:
-	go build ./cmd/yayagf
+	go build
 
 test:
 	go test ...
