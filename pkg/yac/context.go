@@ -26,8 +26,14 @@ func (c *Context) ClientIP() string {
 			}
 		}
 	}
-	if clientIP == "" {
-		return strings.TrimSpace(c.Request.Header.Get("X-Real-Ip"))
+
+	realIP := strings.TrimSpace(c.Request.Header.Get("X-Real-Ip"))
+	if realIP != "" {
+		return realIP
+	}
+	remoteIP := strings.Split(c.Request.RemoteAddr, ":")
+	if len(remoteIP) > 0 {
+		return remoteIP[0]
 	}
 	return ""
 }
