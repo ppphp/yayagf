@@ -2,12 +2,11 @@ package command
 
 import (
 	"io"
-	"os"
 	"os/exec"
 	"time"
 )
 
-func GoCommand(bin string, args []string, out io.Writer, err io.Writer) *os.Process {
+func GoCommand(bin string, args []string, out io.Writer, err io.Writer) *exec.Cmd {
 	cmd := exec.Command(bin, args...)
 	cmd.Stdout = out
 	cmd.Stderr = err
@@ -17,5 +16,17 @@ func GoCommand(bin string, args []string, out io.Writer, err io.Writer) *os.Proc
 	}()
 	time.Sleep(time.Second)
 
-	return cmd.Process
+	return cmd
+}
+
+func DoCommand(bin string, args []string, out io.Writer, err io.Writer) error {
+	cmd := exec.Command(bin, args...)
+	cmd.Stdout = out
+	cmd.Stderr = err
+
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
+	return nil
 }

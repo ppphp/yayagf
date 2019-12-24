@@ -9,15 +9,15 @@ import (
 	"time"
 
 	"github.com/mitchellh/cli"
-	"gitlab.papegames.com/fengche/quartz"
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
 	"gitlab.papegames.com/fengche/yayagf/internal/util"
+	"gitlab.papegames.com/fringe/quartz"
 )
 
 type Command struct {
 	watcher *quartz.Quartz
 	pwd     string
-	pcs     *os.Process
+	cmd     *exec.Cmd
 }
 
 func (c *Command) Help() string {
@@ -54,11 +54,8 @@ func (c *Command) Run(args []string) int {
 			if err != nil {
 			}
 			f.Close()
-			cmd := exec.Command("go", "build", "-o", f.Name(), "./")
 			var o, e bytes.Buffer
-			cmd.Stdout = &o
-			cmd.Stderr = &e
-			if err := cmd.Run(); err != nil {
+			if err := command.DoCommand("go", []string{"build", "-o", f.Name(), "./"}, &o, &e); err != nil {
 				log.Printf("build to %v err: %v, err: %v, out: %v\n", f.Name(), err, e.String(), o.String())
 				continue
 			}
@@ -78,12 +75,12 @@ func (c *Command) Run(args []string) int {
 				}
 				lastName = f.Name()
 			}
-			if c.pcs != nil {
-				if err := c.pcs.Kill(); err != nil {
-					log.Printf("kill %v err: %v", c.pcs.Pid, err)
+			if c.cmd != nil && c.cmd.Process != nil {
+				if err := c.cmd.Process.Kill(); err != nil {
+					log.Printf("kill %v err: %v", c.cmd.Process.Pid, err)
 				}
 			}
-			c.pcs = command.GoCommand(f.Name(), nil, os.Stdout, os.Stderr)
+			c.cmd = command.GoCommand(f.Name(), nil, os.Stdout, os.Stderr)
 		}
 	}
 
