@@ -10,13 +10,14 @@ import (
 
 	"github.com/mitchellh/cli"
 	"gitlab.papegames.com/fengche/quartz"
+	"gitlab.papegames.com/fengche/yayagf/internal/command"
 	"gitlab.papegames.com/fengche/yayagf/internal/util"
 )
 
 type Command struct {
 	watcher *quartz.Quartz
 	pwd     string
-	cmd     *exec.Cmd
+	pcs     *os.Process
 }
 
 func (c *Command) Help() string {
@@ -77,20 +78,12 @@ func (c *Command) Run(args []string) int {
 				}
 				lastName = f.Name()
 			}
-			if c.cmd != nil && c.cmd.Process != nil {
-				if err := c.cmd.Process.Kill(); err != nil {
-					log.Printf("kill %v err: %v", c.cmd.Process.Pid, err)
+			if c.pcs != nil {
+				if err := c.pcs.Kill(); err != nil {
+					log.Printf("kill %v err: %v", c.pcs.Pid, err)
 				}
 			}
-			c.cmd = exec.Command(f.Name())
-			go func() {
-				var o, e bytes.Buffer
-				c.cmd.Stdout = os.Stdout
-				c.cmd.Stderr = os.Stderr
-				if err := c.cmd.Run(); err != nil {
-					log.Printf("run %v err: %v, err: %v, out: %v\n", f.Name(), err, e.String(), o.String())
-				}
-			}()
+			c.pcs = command.GoCommand(f.Name(), nil, os.Stdout, os.Stderr)
 		}
 	}
 
