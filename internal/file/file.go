@@ -1,4 +1,4 @@
-package util
+package file
 
 import (
 	"errors"
@@ -44,6 +44,20 @@ func CreateFile(path string, force bool) (*os.File, error) {
 		o |= os.O_TRUNC
 	}
 	return os.OpenFile(path, o, 0644)
+}
+
+func CreateFileWithContent(path string, content string) error {
+	f, err := CreateFile(path, false)
+	if err != nil {
+		return err
+	}
+	if _, err := f.Write([]byte(content)); err != nil {
+		return err
+	}
+	if err := f.Close(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func CreateDir(path string, force bool) error {

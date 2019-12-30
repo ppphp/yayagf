@@ -10,7 +10,7 @@ import (
 
 	"github.com/mitchellh/cli"
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
-	"gitlab.papegames.com/fengche/yayagf/internal/util"
+	"gitlab.papegames.com/fengche/yayagf/internal/file"
 	"gitlab.papegames.com/fringe/quartz"
 )
 
@@ -30,7 +30,7 @@ func (c *Command) Synopsis() string {
 
 func (c *Command) Run(args []string) int {
 	wd, _ := os.Getwd()
-	root, _ := util.FindAppRoot(wd)
+	root, _ := file.FindAppRoot(wd)
 	os.Chdir(root)
 	c.watcher.Begin()
 	defer c.watcher.Stop()

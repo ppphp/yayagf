@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/mitchellh/cli"
-	"gitlab.papegames.com/fengche/yayagf/internal/util"
+	"gitlab.papegames.com/fengche/yayagf/internal/file"
 )
 
 type Command struct {
@@ -32,11 +32,11 @@ func (c *Command) Run(args []string) int {
 		if err != nil {
 			log.Panic(err)
 		}
-		root, err := util.FindAppRoot(pwd)
+		root, err := file.FindAppRoot(pwd)
 		if err != nil {
 			log.Panic(err)
 		}
-		f, err := util.CreateFile(filepath.Join(root, "migrates"), false)
+		f, err := file.CreateFile(filepath.Join(root, "migrates"), false)
 		if err != nil {
 			log.Panic(err)
 		}

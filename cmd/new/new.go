@@ -3,10 +3,10 @@ package new
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 
-	"gitlab.papegames.com/fengche/yayagf/internal/util"
+	"gitlab.papegames.com/fengche/yayagf/internal/command"
+	"gitlab.papegames.com/fengche/yayagf/internal/file"
 
 	"github.com/mitchellh/cli"
 )
@@ -27,34 +27,26 @@ func (c *Command) Run(args []string) int {
 		fmt.Println("no project name")
 		return 1
 	}
-	dir, file := filepath.Split(args[0])
-	name, err := filepath.Abs(filepath.Clean(file))
+	namespace, name := filepath.Split(args[0])
+	mod := filepath.Join(namespace, name)
+	dir, err := filepath.Abs(filepath.Clean(name))
 	if err != nil {
 		fmt.Println(err.Error())
 		return 1
 	}
-	if err := os.Mkdir(name, 0744); err != nil {
+	file.CreateDir(dir, false)
+	if err := os.Mkdir(dir, 0744); err != nil {
 		fmt.Println(err.Error())
 		return 1
 	}
-	if err := os.Chdir(name); err != nil {
-		fmt.Println(err.Error())
-		return 1
-	}
-
-	cmd := exec.Command("go", "mod", "init", filepath.Join(dir, file))
-	cmd.Run()
-
-	if err := os.Mkdir(filepath.Join(name, "app"), 0744); err != nil {
+	if err := os.Chdir(dir); err != nil {
 		fmt.Println(err.Error())
 		return 1
 	}
 
-	if f, err := os.OpenFile("main.go", os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644); err != nil {
-		fmt.Println(err.Error())
-		return 1
-	} else {
-		f.Write([]byte(fmt.Sprintf(`
+	command.DoCommand("go", []string{"mod", "init", mod}, nil, nil)
+
+	file.CreateFileWithContent(filepath.Join(name, "app", "main.go"), fmt.Sprintf(`
 package main
 
 import (
@@ -69,17 +61,8 @@ func main() {
 
 	r.Run()
 }
-`, filepath.Join(dir, file))))
-	}
-	if err := os.Mkdir(filepath.Join(name, "app", "router"), 0744); err != nil {
-		fmt.Println(err.Error())
-		return 1
-	}
-	if f, err := os.OpenFile(filepath.Join(name, "app", "router", "router.go"), os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644); err != nil {
-		fmt.Println(err.Error())
-		return 1
-	} else {
-		f.Write([]byte(fmt.Sprintf(`
+`, mod))
+	file.CreateFileWithContent(filepath.Join(name, "app", "router", "router.go"), fmt.Sprintf(`
 package router
 
 import (
@@ -88,15 +71,10 @@ import (
 
 func AddRoute(r *gin.Engine) {
 }
-`)))
-	}
-	util.CreateDir("app/swagger", false)
-	os.Chdir(filepath.Join("app/swagger"))
+`))
+	file.CreateDir("app/swagger", false)
 
-	{
-		cmd := exec.Command("swagger", "init", "spec")
-		cmd.Run()
-	}
+	command.DoCommand("swagger", []string{"init", "spec"}, nil, nil)
 
 	return 0
 }
