@@ -59,7 +59,7 @@ func (c *Command) Run(args []string) int {
 				log.Printf("build to %v err: %v, err: %v, out: %v\n", f.Name(), err, e.String(), o.String())
 				continue
 			}
-			if !c.cmd.ProcessState.Exited() {
+			if c.cmd != nil && c.cmd.ProcessState != nil && !c.cmd.ProcessState.Exited() {
 				f1, err1 := ioutil.ReadFile(f.Name())
 				if err1 != nil {
 					continue
