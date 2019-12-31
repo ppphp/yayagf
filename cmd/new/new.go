@@ -49,17 +49,34 @@ func (c *Command) Run(args []string) int {
 	log.Printf("init mod")
 	command.DoCommand("go", []string{"mod", "init", mod}, nil, nil)
 
-	log.Printf("create %v", filepath.Join(dir, "app", "main.go"))
-	file.CreateFileWithContent(filepath.Join(dir, "app", "main.go"), fmt.Sprintf(`
+	log.Printf("create %v", filepath.Join(dir, "main.go"))
+	file.CreateFileWithContent(filepath.Join(dir, "main.go"), fmt.Sprintf(`
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"%v/app/router"
 )
 
+// @title Swagger Example API
+// @version 1.0
+// @description This is a sample server Petstore server.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host petstore.swagger.io
+// @BasePath /v2
 func main() {
 	r := gin.Default()
+
+	r.Use(cors.Default())
 
 	router.AddRoute(r)
 
@@ -71,18 +88,23 @@ func main() {
 package router
 
 import (
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"github.com/gin-gonic/gin"
+	_ "%v/app/docs"
 )
 
 func AddRoute(r *gin.Engine) {
+	url := ginSwagger.URL("http://localhost:3000/v1/docs/doc.json") // The url pointing to API definition
+	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 }
-`)); err != nil {
+`), mod); err != nil {
 		log.Println(err.Error())
 		return 1
 	}
 
 	log.Printf("init swagger")
-	command.DoCommand("swagger", []string{"init", "spec"}, nil, nil)
+	command.DoCommand("swag", []string{"init", "spec", "-o", "app/docs"}, nil, nil)
 
 	log.Printf("init git")
 	command.DoCommand("git", []string{"init"}, nil, nil)

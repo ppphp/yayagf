@@ -31,6 +31,8 @@ func (c *Command) Synopsis() string {
 func (c *Command) Run(args []string) int {
 	wd, _ := os.Getwd()
 	root, _ := file.FindAppRoot(wd)
+	os.Setenv("GOPROXY", "https://goproxy.io")
+	os.Setenv("GOPRIVATE", "https://gitlab.papegames.com")
 	os.Chdir(root)
 	c.watcher.Begin()
 	defer c.watcher.Stop()
