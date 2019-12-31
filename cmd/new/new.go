@@ -36,7 +36,10 @@ func (c *Command) Run(args []string) int {
 		return 1
 	}
 	log.Printf("create %v", dir)
-	file.CreateDir(dir, false)
+	if err := file.CreateDir(dir, false); err != nil {
+		fmt.Println(err.Error())
+		return 1
+	}
 	log.Printf("chdir %v", dir)
 	if err := os.Chdir(dir); err != nil {
 		fmt.Println(err.Error())
@@ -64,7 +67,7 @@ func main() {
 }
 `, mod))
 	log.Printf("create %v", filepath.Join(dir, "app", "router", "router.go"))
-	file.CreateFileWithContent(filepath.Join(name, "app", "router", "router.go"), fmt.Sprintf(`
+	if err := file.CreateFileWithContent(filepath.Join(dir, "app", "router", "router.go"), fmt.Sprintf(`
 package router
 
 import (
@@ -73,10 +76,16 @@ import (
 
 func AddRoute(r *gin.Engine) {
 }
-`))
+`)); err != nil {
+		log.Println(err.Error())
+		return 1
+	}
 
 	log.Printf("init swagger")
 	command.DoCommand("swagger", []string{"init", "spec"}, nil, nil)
+
+	log.Printf("init git")
+	command.DoCommand("git", []string{"init"}, nil, nil)
 
 	return 0
 }
