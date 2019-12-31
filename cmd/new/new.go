@@ -2,6 +2,7 @@ package new
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -34,19 +35,19 @@ func (c *Command) Run(args []string) int {
 		fmt.Println(err.Error())
 		return 1
 	}
+	log.Printf("create %v", dir)
 	file.CreateDir(dir, false)
-	if err := os.Mkdir(dir, 0744); err != nil {
-		fmt.Println(err.Error())
-		return 1
-	}
+	log.Printf("chdir %v", dir)
 	if err := os.Chdir(dir); err != nil {
 		fmt.Println(err.Error())
 		return 1
 	}
 
+	log.Printf("init mod")
 	command.DoCommand("go", []string{"mod", "init", mod}, nil, nil)
 
-	file.CreateFileWithContent(filepath.Join(name, "app", "main.go"), fmt.Sprintf(`
+	log.Printf("create %v", filepath.Join(dir, "app", "main.go"))
+	file.CreateFileWithContent(filepath.Join(dir, "app", "main.go"), fmt.Sprintf(`
 package main
 
 import (
@@ -62,6 +63,7 @@ func main() {
 	r.Run()
 }
 `, mod))
+	log.Printf("create %v", filepath.Join(dir, "app", "router", "router.go"))
 	file.CreateFileWithContent(filepath.Join(name, "app", "router", "router.go"), fmt.Sprintf(`
 package router
 
@@ -72,8 +74,8 @@ import (
 func AddRoute(r *gin.Engine) {
 }
 `))
-	file.CreateDir("app/swagger", false)
 
+	log.Printf("init swagger")
 	command.DoCommand("swagger", []string{"init", "spec"}, nil, nil)
 
 	return 0
