@@ -98,7 +98,7 @@ func AddRoute(r *gin.Engine) {
 	url := ginSwagger.URL("http://localhost:3000/v1/docs/doc.json") // The url pointing to API definition
 	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 }
-`), mod); err != nil {
+`, mod)); err != nil {
 		log.Println(err.Error())
 		return 1
 	}
