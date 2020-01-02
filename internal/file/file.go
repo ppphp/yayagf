@@ -10,7 +10,7 @@ var ErrNoRoot = errors.New("cannot find root")
 
 // find dir contains go.mod
 func FindAppRoot(path string) (string, error) {
-	if _, err := os.Open(filepath.Join(path, "go.mod")); err == os.ErrNotExist {
+	if _, err := os.Open(filepath.Join(path, "go.mod")); os.IsNotExist(err) {
 		if path != "/" {
 			return FindAppRoot(filepath.Dir(path))
 		} else {

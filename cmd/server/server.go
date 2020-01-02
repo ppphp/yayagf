@@ -57,10 +57,12 @@ func (c *Command) Run(args []string) int {
 			}
 			f.Close()
 			var o, e bytes.Buffer
-			if err := command.DoCommand("swag", []string{"init", "-o", "app/docs"}, &o, &e); err != nil {
-				log.Printf("swag to %v err: %v, err: %v, out: %v\n", "app/docs", e.String(), o.String())
-				continue
-			}
+			/*
+				if err := command.DoCommand("swag", []string{"init", "-o", "app/docs"}, &o, &e); err != nil {
+					log.Printf("swag to %v err: %v, err: %v, out: %v\n", "app/docs", e.String(), o.String())
+					continue
+				}
+			*/
 			if err := command.DoCommand("go", []string{"build", "-o", f.Name(), "./"}, &o, &e); err != nil {
 				log.Printf("build to %v err: %v, err: %v, out: %v\n", f.Name(), err, e.String(), o.String())
 				continue
