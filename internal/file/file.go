@@ -8,7 +8,7 @@ import (
 
 var ErrNoRoot = errors.New("cannot find root")
 
-func GetAppRoot()(string, error) {
+func GetAppRoot() (string, error) {
 	pwd, err := os.Getwd()
 	if err != nil {
 		return "", err

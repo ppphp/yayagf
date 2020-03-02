@@ -3,11 +3,12 @@ package _package
 import (
 	"bytes"
 	"fmt"
+	"log"
+	"path/filepath"
+
 	"github.com/mitchellh/cli"
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
-	"log"
-	"path/filepath"
 )
 
 type Command struct {
@@ -30,7 +31,7 @@ func (c *Command) Run(args []string) int {
 	}
 	out, errs := &bytes.Buffer{}, &bytes.Buffer{}
 	if err := command.DoCommand("docker", []string{"build", "-t", fmt.Sprintf("docker.papegames.com/%v", name), "."}, out, errs); err != nil {
-		log.Fatalf("docker build failed: ", errs.String())
+		log.Fatalf("docker build failed: %v", errs.String())
 		return 1
 	}
 	if err := command.DoCommand("docker", []string{"save", fmt.Sprintf("docker.papegames.com/%v", name), "-o", fmt.Sprintf("%v.tar", name)}, out, errs); err != nil {

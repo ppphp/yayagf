@@ -7,8 +7,8 @@ import (
 	"github.com/mitchellh/cli"
 	"gitlab.papegames.com/fengche/yayagf/cmd/generate"
 	"gitlab.papegames.com/fengche/yayagf/cmd/interactive"
-	_package "gitlab.papegames.com/fengche/yayagf/cmd/package"
 	"gitlab.papegames.com/fengche/yayagf/cmd/new"
+	_package "gitlab.papegames.com/fengche/yayagf/cmd/package"
 	"gitlab.papegames.com/fengche/yayagf/cmd/server"
 )
 
