@@ -1,6 +1,7 @@
 package new
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"os"
@@ -103,11 +104,31 @@ func AddRoute(r *gin.Engine) {
 		return 1
 	}
 
+	out, errs := &bytes.Buffer{}, &bytes.Buffer{}
 	log.Printf("init swagger")
-	command.DoCommand("swag", []string{"init", "spec", "-o", "app/docs"}, nil, nil)
+	if err := command.DoCommand("swag", []string{"init", "spec", "-o", "app/docs"}, out, errs); err != nil {
+		log.Fatalf("swag failed %v", errs.String())
+		return 1
+	}
 
 	log.Printf("init git")
-	command.DoCommand("git", []string{"init"}, nil, nil)
+	if err := command.DoCommand("git", []string{"init"}, out, errs); err != nil {
+		log.Fatalf("git failed %v", errs.String())
+		return 1
+	}
+
+	log.Printf("init docker")
+	if err := file.CreateFileWithContent(filepath.Join(dir, "Dockerfile"), fmt.Sprintf(`
+FROM golang as builder
+
+ADD %v /
+
+CMD ["/%v"]
+
+`, name, name)); err != nil {
+		log.Fatalf("docker failed %v", errs.String())
+		return 1
+	}
 
 	return 0
 }

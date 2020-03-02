@@ -7,6 +7,7 @@ import (
 	"github.com/mitchellh/cli"
 	"gitlab.papegames.com/fengche/yayagf/cmd/generate"
 	"gitlab.papegames.com/fengche/yayagf/cmd/interactive"
+	_package "gitlab.papegames.com/fengche/yayagf/cmd/package"
 	"gitlab.papegames.com/fengche/yayagf/cmd/new"
 	"gitlab.papegames.com/fengche/yayagf/cmd/server"
 )
@@ -19,6 +20,7 @@ func Main() {
 		"server":      server.CommandFactory,
 		"new":         new.CommandFactory,
 		"generate":    generate.CommandFactory,
+		"package":     _package.CommandFactory,
 		"interactive": interactive.CommandFactory,
 	}
 	exitStatus, err := c.Run()

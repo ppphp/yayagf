@@ -1,4 +1,5 @@
 # yayagf
+
 yet another yet another go web framework
 
 ## install
@@ -19,7 +20,21 @@ go is fast, so performance is not a really big thing.
 
 ### yayagf new
 
-type `yayagf new gitlab.papegames.com/fengche/abc` will generate a folder with abc
+type `yayagf new gitlab.papegames.com/fengche/abc` will generate a folder named abc
+
+a project structure is like this
+
+project_root
+-app
+--controller
+--model
+--ent
+--serializer // TODO
+--docs // TODO
+-config_file1 // TODO
+-config_file2 // TODO
+-project_root.yml // TODO
+-Dockerfile // TODO
 
 ### yayagf server
 
@@ -29,13 +44,12 @@ go into any go project
 
 ### yayagf generate
 
-it should take the advantage of gin and go-micro, but they are not the perfect tool.
-
-WIP
+generate a http server scaffold.
 
 #### router
 
 #### serializer
 
-####
+#### model (ent)
 
+#### docs (swagger) // TODO
