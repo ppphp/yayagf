@@ -1,10 +1,7 @@
 package cmd
 
 import (
-	"log"
-	"os"
-
-	"github.com/mitchellh/cli"
+	"github.com/spf13/cobra"
 	"gitlab.papegames.com/fengche/yayagf/cmd/generate"
 	"gitlab.papegames.com/fengche/yayagf/cmd/interactive"
 	"gitlab.papegames.com/fengche/yayagf/cmd/new"
@@ -12,20 +9,16 @@ import (
 	"gitlab.papegames.com/fengche/yayagf/cmd/server"
 )
 
-func Main() {
-	c := cli.NewCLI("yayagf", "HEAD")
+var RootCmd = &cobra.Command{
+	Short: "yet another yet another go framework cli interface",
+	Long:  `yet another yet another go framework cli interface just like rails`,
+}
 
-	c.Args = os.Args[1:]
-	c.Commands = map[string]cli.CommandFactory{
-		"server":      server.CommandFactory,
-		"new":         new.CommandFactory,
-		"generate":    generate.CommandFactory,
-		"package":     _package.CommandFactory,
-		"interactive": interactive.CommandFactory,
-	}
-	exitStatus, err := c.Run()
-	if err != nil {
-		log.Println(err)
-	}
-	os.Exit(exitStatus)
+func init() {
+	RootCmd.AddCommand(new.Command, server.Command, interactive.Command, _package.Command, generate.Command)
+}
+
+// Execute executes the root command.
+func Execute() error {
+	return RootCmd.Execute()
 }

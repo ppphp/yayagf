@@ -7,24 +7,20 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/spf13/cobra"
+
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
-
-	"github.com/mitchellh/cli"
 )
 
-type Command struct {
+var Command = &cobra.Command{
+	Use: "new",
+	Run: func(cmd *cobra.Command, args []string) {
+		run(args)
+	},
 }
 
-func (c *Command) Help() string {
-	return ""
-}
-
-func (c *Command) Synopsis() string {
-	return "init a yayagf project"
-}
-
-func (c *Command) Run(args []string) int {
+func run(args []string) int {
 	if len(args) == 0 {
 		fmt.Println("no project name")
 		return 1
@@ -131,9 +127,4 @@ CMD ["/%v"]
 	}
 
 	return 0
-}
-
-func CommandFactory() (cli.Command, error) {
-	c := &Command{}
-	return c, nil
 }

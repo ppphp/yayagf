@@ -8,27 +8,35 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/mitchellh/cli"
+	"github.com/spf13/cobra"
+
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
 	"gitlab.papegames.com/fringe/quartz"
 )
 
-type Command struct {
-	watcher *quartz.Quartz
-	pwd     string
-	cmd     *exec.Cmd
+var Command = &cobra.Command{
+	Use: "server",
+	Run: func(cmd *cobra.Command, args []string) {
+		run(args)
+	},
 }
 
-func (c *Command) Help() string {
-	return ""
-}
-
-func (c *Command) Synopsis() string {
-	return "monitor your change, rebuild and run app"
-}
-
-func (c *Command) Run(args []string) int {
+func run(args []string) int {
+	type Command struct {
+		watcher *quartz.Quartz
+		pwd     string
+		cmd     *exec.Cmd
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		return 1
+	}
+	watcher, err := quartz.NewQuartz(pwd, time.Second)
+	if err != nil {
+		return 1
+	}
+	c := &Command{watcher: watcher, pwd: pwd}
 	wd, _ := os.Getwd()
 	root, _ := file.FindAppRoot(wd)
 	os.Setenv("GOPROXY", "https://goproxy.io")
@@ -93,17 +101,4 @@ func (c *Command) Run(args []string) int {
 	}
 
 	return 0
-}
-
-func CommandFactory() (cli.Command, error) {
-	pwd, err := os.Getwd()
-	if err != nil {
-		return nil, err
-	}
-	watcher, err := quartz.NewQuartz(pwd, time.Second)
-	if err != nil {
-		return nil, err
-	}
-	c := &Command{watcher: watcher, pwd: pwd}
-	return c, nil
 }

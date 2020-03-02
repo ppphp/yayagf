@@ -6,23 +6,20 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/mitchellh/cli"
+	"github.com/spf13/cobra"
+
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
 )
 
-type Command struct {
+var Command = &cobra.Command{
+	Use: "package",
+	Run: func(cmd *cobra.Command, args []string) {
+		run(args)
+	},
 }
 
-func (c *Command) Help() string {
-	return ""
-}
-
-func (c *Command) Synopsis() string {
-	return "package"
-}
-
-func (c *Command) Run(args []string) int {
+func run(args []string) int {
 	root, err := file.GetAppRoot()
 	name := filepath.Base(root)
 	if err != nil {
@@ -40,9 +37,4 @@ func (c *Command) Run(args []string) int {
 	}
 
 	return 0
-}
-
-func CommandFactory() (cli.Command, error) {
-	c := &Command{}
-	return c, nil
 }

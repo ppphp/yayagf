@@ -1,26 +1,17 @@
 package interactive
 
 import (
-	"github.com/mitchellh/cli"
+	"github.com/spf13/cobra"
 )
 
-type Command struct {
+var Command = &cobra.Command{
+	Use: "interactive",
+	Run: func(cmd *cobra.Command, args []string) {
+		run(args)
+	},
 }
 
-func (c *Command) Help() string {
-	return ""
-}
-
-func (c *Command) Synopsis() string {
-	return "init a yayagf project"
-}
-
-func (c *Command) Run(args []string) int {
+func run(args []string) int {
 	panic("WIP")
 	return 0
-}
-
-func CommandFactory() (cli.Command, error) {
-	c := &Command{}
-	return c, nil
 }
