@@ -53,6 +53,7 @@ package main
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"log"
 	"%v/app/router"
 	"%v/app/config"
 )
@@ -84,7 +85,7 @@ func main() {
 
 	r.Run()
 }
-`, mod))
+`, mod, mod))
 	log.Printf("create %v", filepath.Join(dir, "app", "router", "router.go"))
 	if err := file.CreateFileWithContent(filepath.Join(dir, "app", "router", "router.go"), fmt.Sprintf(`
 package router
