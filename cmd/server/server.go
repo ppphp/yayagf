@@ -30,6 +30,7 @@ func run(args []string) int {
 	}
 	pwd, err := os.Getwd()
 	if err != nil {
+		log.Printf("pwd error: %v", err.Error())
 		return 1
 	}
 	watcher, err := quartz.NewQuartz(pwd, time.Second)
@@ -37,10 +38,17 @@ func run(args []string) int {
 		return 1
 	}
 	c := &Command{watcher: watcher, pwd: pwd}
-	wd, _ := os.Getwd()
-	root, _ := file.FindAppRoot(wd)
+	root, err := file.GetAppRoot()
+	if err != nil {
+		log.Printf("GetAppRoot error: %v", err.Error())
+		return 1
+	}
+	// specify build params
 	os.Setenv("GOPROXY", "https://goproxy.io")
+	os.Setenv("GOSUMDB", "off")
 	os.Setenv("GOPRIVATE", "https://gitlab.papegames.com")
+
+	// begin watch
 	os.Chdir(root)
 	c.watcher.Begin()
 	defer c.watcher.Stop()

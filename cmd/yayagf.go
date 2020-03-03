@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"gitlab.papegames.com/fengche/yayagf/cmd/generate"
 	"gitlab.papegames.com/fengche/yayagf/cmd/interactive"
+	"gitlab.papegames.com/fengche/yayagf/cmd/model"
 	"gitlab.papegames.com/fengche/yayagf/cmd/new"
 	_package "gitlab.papegames.com/fengche/yayagf/cmd/package"
 	"gitlab.papegames.com/fengche/yayagf/cmd/server"
@@ -15,7 +16,14 @@ var RootCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(new.Command, server.Command, interactive.Command, _package.Command, generate.Command)
+	RootCmd.AddCommand(
+		new.Command,
+		server.Command,
+		interactive.Command,
+		_package.Command,
+		generate.Command, generate.AliasCommand,
+		model.Command,
+	)
 }
 
 // Execute executes the root command.
