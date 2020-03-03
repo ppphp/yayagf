@@ -32,7 +32,7 @@ func LoadEnv(conf interface{}) {
 	for i := 0; i < val.NumField(); i++ {
 		name := val.Type().Field(i).Name
 		v, ok := os.LookupEnv(strings.ToUpper(name))
-		if ok {
+		if ok && v != "" {
 			switch val.Type().Field(i).Type.Kind() {
 			case reflect.Struct:
 				// TODO

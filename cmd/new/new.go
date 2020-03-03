@@ -126,5 +126,14 @@ CMD ["/%v"]
 		return 1
 	}
 
+	log.Printf("init ent")
+	if err := os.Chdir(filepath.Join(dir, "app")); err != nil {
+		log.Printf("chdir failed: %v", err.Error())
+		return 1
+	}
+	if err := command.DoCommand("ent", []string{"init",}, out, errs); err != nil {
+		log.Fatalf("ent init failed: %v", errs.String())
+		return 1
+	}
 	return 0
 }
