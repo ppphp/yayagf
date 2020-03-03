@@ -54,6 +54,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"%v/app/router"
+	"%v/app/config"
 )
 
 // @title Swagger Example API
@@ -77,6 +78,10 @@ func main() {
 
 	router.AddRoute(r)
 
+	if err := config.LoadConfig(); err != nil {
+		log.Fatal(err)
+	}
+
 	r.Run()
 }
 `, mod))
@@ -96,6 +101,55 @@ func AddRoute(r *gin.Engine) {
 	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 }
 `, mod)); err != nil {
+		log.Println(err.Error())
+		return 1
+	}
+	if err := file.CreateFileWithContent(filepath.Join(dir, "app", "config", "config.go"), `
+package config
+
+import (
+	"gitlab.papegames.com/fengche/yayagf/pkg/config"
+	"log"
+	"sync"
+)
+
+var lock sync.RWMutex
+
+type Config struct {
+	DB   string
+	Port int
+}
+
+var conf = new(Config)
+
+// only support ini like config
+func LoadConfig() error {
+	lock.Lock()
+	defer lock.Unlock()
+	if err := config.LoadTomlFile("conf.toml", conf); err != nil {
+		log.Fatal(err)
+	}
+
+	config.LoadEnv(conf)
+
+	log.Println(conf)
+	return nil
+}
+
+func GetConfig() Config {
+	lock.RLock()
+	defer lock.RUnlock()
+	return *conf
+}
+
+`); err != nil {
+		log.Println(err.Error())
+		return 1
+	}
+	if err := file.CreateFileWithContent(filepath.Join(dir, "conf.toml"), `
+db=""
+port=8080
+`); err != nil {
 		log.Println(err.Error())
 		return 1
 	}
@@ -131,7 +185,7 @@ CMD ["/%v"]
 		log.Printf("chdir failed: %v", err.Error())
 		return 1
 	}
-	if err := command.DoCommand("ent", []string{"init",}, out, errs); err != nil {
+	if err := command.DoCommand("entc", []string{"init",}, out, errs); err != nil {
 		log.Fatalf("ent init failed: %v", errs.String())
 		return 1
 	}

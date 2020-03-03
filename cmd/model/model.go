@@ -28,7 +28,7 @@ func run(args []string) int {
 		return 1
 	}
 	out, errs := &bytes.Buffer{}, &bytes.Buffer{}
-	if err := command.DoCommand("ent", []string{"init",}, out, errs); err != nil {
+	if err := command.DoCommand("entc", []string{"init",}, out, errs); err != nil {
 		log.Fatalf("ent init failed: %v", errs.String())
 		return 1
 	}
