@@ -167,6 +167,13 @@ port=8080
 		log.Fatalf("git failed %v", errs.String())
 		return 1
 	}
+	if err := file.CreateFileWithContent(filepath.Join(dir, ".gitignore"), fmt.Sprintf(`
+%v
+%v.tar
+`, name, name)); err != nil {
+		log.Fatalf("gitignore failed %v", errs.String())
+		return 1
+	}
 
 	log.Printf("init docker")
 	if err := file.CreateFileWithContent(filepath.Join(dir, "Dockerfile"), fmt.Sprintf(`

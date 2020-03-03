@@ -46,7 +46,7 @@ func run(args []string) int {
 	// specify build params
 	os.Setenv("GOPROXY", "https://goproxy.io")
 	os.Setenv("GOSUMDB", "off")
-	os.Setenv("GOPRIVATE", "https://gitlab.papegames.com")
+	os.Setenv("GOPRIVATE", "https://gitlab.papegames.com/*")
 
 	// begin watch
 	os.Chdir(root)
