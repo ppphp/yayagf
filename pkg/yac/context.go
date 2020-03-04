@@ -1,6 +1,9 @@
 package yac
 
 import (
+	"fmt"
+	"github.com/sirupsen/logrus"
+	"math/rand"
 	"net"
 	"strings"
 
@@ -10,10 +13,13 @@ import (
 type Context struct {
 	*gin.Context
 	eventID string
+	Logger  *logrus.Logger
 }
 
+var Logger = logrus.New()
+
 func FromGin(c *gin.Context) *Context {
-	ctx := &Context{Context: c}
+	ctx := &Context{Context: c, eventID: fmt.Sprint(rand.Int63()), Logger: Logger}
 	return ctx
 }
 

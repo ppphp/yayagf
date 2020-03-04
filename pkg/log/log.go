@@ -113,7 +113,7 @@ func Ginrus(logger loggerEntryWithFields) gin.HandlerFunc {
 		if !c.IsWebsocket() {
 			data, err := c.GetRawData()
 			if err != nil {
-				c.Errors = append(c.Errors, &gin.Error{Err: err})
+				c.Error(err)
 			} else {
 				req = string(data)
 			}
