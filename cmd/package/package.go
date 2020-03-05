@@ -3,10 +3,11 @@ package _package
 import (
 	"bytes"
 	"fmt"
-	"log"
-	"path/filepath"
-
 	"github.com/spf13/cobra"
+	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
 
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
@@ -26,8 +27,24 @@ func run(args []string) int {
 		log.Printf("get project name failed: %v", err.Error())
 		return 1
 	}
+
+	priB, err := ioutil.ReadFile(os.Getenv("HOME") + "/.ssh/id_rsa")
+	if err != nil {
+		log.Println(err)
+	}
+	priS := string(priB)
+	os.Setenv("pri", priS)
+
+	pubB, err := ioutil.ReadFile(os.Getenv("HOME") + "/.ssh/id_rsa.pub")
+	if err != nil {
+		log.Println(err)
+	}
+	pubS := string(pubB)
+	os.Setenv("pub", pubS)
+
 	out, errs := &bytes.Buffer{}, &bytes.Buffer{}
-	if err := command.DoCommand("docker", []string{"build", "-t", fmt.Sprintf("docker.papegames.com/%v", name), "."}, out, errs); err != nil {
+
+	if err := command.DoCommand("docker", []string{"build", "-t", fmt.Sprintf("docker.papegames.com/%v", name), ".", "--build-arg", "pri", "--build-arg", "pub"}, out, errs); err != nil {
 		log.Fatalf("docker build failed: %v", errs.String())
 		return 1
 	}
