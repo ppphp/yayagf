@@ -45,3 +45,14 @@ func LoadEnv(conf interface{}) {
 		}
 	}
 }
+
+// only support ini like config
+func LoadConfig(conf interface{}) error {
+	if err := LoadTomlFile("conf.toml", conf); err != nil {
+		log.Fatal(err)
+	}
+
+	LoadEnv(conf)
+
+	return nil
+}
