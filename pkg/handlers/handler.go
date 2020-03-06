@@ -10,15 +10,15 @@ type Handler struct {
 	handler http.Handler
 }
 
-func (h *Handler) GetPath() string {
+func (h Handler) GetPath() string {
 	return h.path
 }
 
-func (h *Handler) GetHTTPHandler() http.Handler {
+func (h Handler) GetHTTPHandler() http.Handler {
 	return h.handler
 }
 
-func (h *Handler) GetGinHandler() gin.HandlerFunc {
+func (h Handler) GetGinHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		h.handler.ServeHTTP(c.Writer, c.Request)
 	}
