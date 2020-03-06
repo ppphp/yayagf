@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"io/ioutil"
+	"mime"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -17,7 +19,18 @@ func ServeStaticDirectory(dir string) ([]Handler, error) {
 		if info.IsDir() {
 			return nil
 		}
-		hs = append(hs, Handler{path: strings.TrimPrefix(path, dir), handler: http.FileServer(http.Dir(path))})
+		d, err := ioutil.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		m := mime.TypeByExtension(filepath.Ext(info.Name()))
+		hs = append(hs, Handler{
+			path: strings.TrimPrefix(path, dir),
+			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Add("Content-Type", m)
+				w.Write(d)
+			})},
+		)
 		return nil
 	}); err != nil {
 		return nil, err
