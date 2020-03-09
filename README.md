@@ -36,13 +36,19 @@ project_root
 -project_root.yml // TODO
 -Dockerfile // TODO
 
-### yayagf server
+### yayagf server // FIXME
 
-go into any go project 
+two steps
 
-`yayagf server` will monitor the code, recompile the code when compilable and run.
+1. go into any go project 
 
-### yayagf generate
+2. `yayagf server` will monitor the code, recompile the code when compilable and run.
+
+### yayagf package //TODO
+
+
+
+### yayagf generate //TODO
 
 generate a http server scaffold.
 
@@ -53,3 +59,54 @@ generate a http server scaffold.
 #### model (ent)
 
 #### docs (swagger) // TODO
+
+## packages
+
+### config loader
+
+```go
+package main
+import (
+    "gitlab.papegames.com/fengche/yayagf/pkg/config"
+    "log"
+)
+
+func main() {
+    var conf struct {
+        A int
+        B string
+    }
+    config.LoadConfig(&conf)
+    log.Println(conf)
+}
+```
+
+
+### util handlers
+
+```go
+package main
+import (
+    "gitlab.papegames.com/fengche/yayagf/pkg/handlers"
+    "log"
+)
+
+func main() {
+    // a static router
+	if ss, err := handlers.ServeStaticDirectory(config.GetConfig().Static); err != nil {
+		log.Println(err)
+	} else {
+		for _, s := range ss {
+			r.GET(s.GetPath(), s.GetGinHandler())
+			if filepath.Clean(s.GetPath()) == "/index.html" {
+				r.GET("/", s.GetGinHandler())
+			}
+		}
+	}
+
+	// a pprof generator
+	for _, s := range handlers.PProfHandlers {
+		r.Group("pprof").GET(s.GetPath(), s.GetGinHandler())
+	}
+}
+```
