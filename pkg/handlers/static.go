@@ -37,3 +37,12 @@ func ServeStaticDirectory(dir string) ([]Handler, error) {
 	}
 	return hs, nil
 }
+
+func MountStaticHandlerToGin(path string,r GinRouter) error{
+	if ss, err := ServeStaticDirectory(path); err != nil {
+		return err
+	} else {
+		Handlers(ss).MountToEndpoint(r)
+	}
+	return nil
+}

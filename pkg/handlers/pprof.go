@@ -18,3 +18,7 @@ var PProfHandlers = []Handler{
 	{path:"/mutex", handler:pprof.Handler("mutex")},
 	{path:"/threadcreate", handler:pprof.Handler("threadcreate")},
 }
+
+func MountPProfHandlerToGin(r GinRouter) {
+	Handlers(PProfHandlers).MountToEndpoint(r)
+}

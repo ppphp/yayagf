@@ -3,7 +3,21 @@ package handlers
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"path/filepath"
 )
+
+type Handlers []Handler
+
+type GinRouter interface  {GET(string, ...gin.HandlerFunc)}
+
+func (h Handlers) MountToEndpoint(r GinRouter) {
+	for _, s := range h {
+		r.GET(s.GetPath(), s.GetGinHandler())
+		if filepath.Clean(s.GetPath()) == "/index.html" {
+			r.GET("/", s.GetGinHandler())
+		}
+	}
+}
 
 type Handler struct {
 	path    string
