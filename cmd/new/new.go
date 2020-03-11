@@ -157,7 +157,7 @@ port=8080
 
 	out, errs := &bytes.Buffer{}, &bytes.Buffer{}
 	log.Printf("init swagger")
-	if err := command.DoCommand("swag", []string{"init", "spec", "-o", "app/docs"}, out, errs); err != nil {
+	if err := command.DoCommand("swag", []string{"init", "--output", "app/doc"}, out, errs); err != nil {
 		log.Fatalf("swag failed %v", errs.String())
 		return 1
 	}
