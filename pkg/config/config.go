@@ -1,16 +1,17 @@
 package config
 
 import (
-	"github.com/BurntSushi/toml"
 	"io/ioutil"
 	"log"
 	"os"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/BurntSushi/toml"
 )
 
-func LoadTomlFile(name string, conf interface{}) error{
+func LoadTomlFile(name string, conf interface{}) error {
 	f, err := os.Open(name)
 	if err != nil {
 		log.Println("conf.toml, not found")

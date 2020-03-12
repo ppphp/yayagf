@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"gitlab.papegames.com/fengche/yayagf/cmd/doc"
 	"gitlab.papegames.com/fengche/yayagf/cmd/generate"
 	"gitlab.papegames.com/fengche/yayagf/cmd/interactive"
 	"gitlab.papegames.com/fengche/yayagf/cmd/model"
@@ -23,6 +24,7 @@ func init() {
 		_package.Command,
 		generate.Command, generate.AliasCommand,
 		model.Command,
+		doc.Command,
 	)
 }
 

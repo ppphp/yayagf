@@ -2,12 +2,13 @@ package model
 
 import (
 	"bytes"
-	"github.com/spf13/cobra"
-	"gitlab.papegames.com/fengche/yayagf/internal/command"
-	"gitlab.papegames.com/fengche/yayagf/internal/file"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/spf13/cobra"
+	"gitlab.papegames.com/fengche/yayagf/internal/command"
+	"gitlab.papegames.com/fengche/yayagf/internal/file"
 )
 
 var Command = &cobra.Command{
@@ -28,7 +29,7 @@ func run(args []string) int {
 		return 1
 	}
 	out, errs := &bytes.Buffer{}, &bytes.Buffer{}
-	if err := command.DoCommand("entc", []string{"init",}, out, errs); err != nil {
+	if err := command.DoCommand("entc", []string{"init"}, out, errs); err != nil {
 		log.Fatalf("ent init failed: %v", errs.String())
 		return 1
 	}

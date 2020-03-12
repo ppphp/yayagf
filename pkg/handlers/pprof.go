@@ -3,22 +3,24 @@ package handlers
 import (
 	"net/http"
 	"net/http/pprof"
+
+	"github.com/gin-gonic/gin"
 )
 
 var PProfHandlers = []Handler{
-	{path:"/", handler:http.HandlerFunc(pprof.Index)},
-	{path:"/cmdline", handler:http.HandlerFunc(pprof.Cmdline)},
-	{path:"/profile", handler:http.HandlerFunc(pprof.Profile)},
-	{path:"/symbol", handler:http.HandlerFunc(pprof.Symbol)},
-	{path:"/trace", handler:http.HandlerFunc(pprof.Trace)},
-	{path:"/allocs", handler:pprof.Handler("allocs")},
-	{path:"/block", handler:pprof.Handler("block")},
-	{path:"/goroutine", handler:pprof.Handler("goroutine")},
-	{path:"/heap", handler:pprof.Handler("heap")},
-	{path:"/mutex", handler:pprof.Handler("mutex")},
-	{path:"/threadcreate", handler:pprof.Handler("threadcreate")},
+	{path: "/", handler: http.HandlerFunc(pprof.Index)},
+	{path: "/cmdline", handler: http.HandlerFunc(pprof.Cmdline)},
+	{path: "/profile", handler: http.HandlerFunc(pprof.Profile)},
+	{path: "/symbol", handler: http.HandlerFunc(pprof.Symbol)},
+	{path: "/trace", handler: http.HandlerFunc(pprof.Trace)},
+	{path: "/allocs", handler: pprof.Handler("allocs")},
+	{path: "/block", handler: pprof.Handler("block")},
+	{path: "/goroutine", handler: pprof.Handler("goroutine")},
+	{path: "/heap", handler: pprof.Handler("heap")},
+	{path: "/mutex", handler: pprof.Handler("mutex")},
+	{path: "/threadcreate", handler: pprof.Handler("threadcreate")},
 }
 
-func MountPProfHandlerToGin(r GinRouter) {
+func MountPProfHandlerToGin(r gin.IRouter) {
 	Handlers(PProfHandlers).MountToEndpoint(r)
 }

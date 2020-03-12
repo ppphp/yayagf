@@ -6,19 +6,19 @@ import (
 )
 
 var Command = &cobra.Command{
-	Use: "generate",
+	Use:   "generate",
 	Short: "generate",
 }
 
 var AliasCommand = &cobra.Command{
-	Use: "g",
+	Use:   "g",
 	Short: "generate",
 }
 
 func init() {
 	Command.AddCommand(
 		model.Command,
-		)
+	)
 	AliasCommand.AddCommand(
 		model.Command,
 	)

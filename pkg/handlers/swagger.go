@@ -4,8 +4,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
-)
 
+	"github.com/gin-gonic/gin"
+)
 
 // serve on prefix/swagger.json
 func ServeSwaggerFile(swagger string) ([]Handler, error) {
@@ -15,16 +16,16 @@ func ServeSwaggerFile(swagger string) ([]Handler, error) {
 		return nil, err
 	}
 	hs := []Handler{{
-			path: "swagger.json",
-			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Header().Add("Content-Type", "application/json")
-				w.Write(d)
-			}),
-		}}
+		path: "swagger.json",
+		handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Add("Content-Type", "application/json")
+			w.Write(d)
+		}),
+	}}
 	return hs, nil
 }
 
-func MountSwaggerToGin(path string, router GinRouter) error{
+func MountSwaggerToGin(path string, router gin.IRouter) error {
 	if ss, err := ServeSwaggerFile(path); err != nil {
 		return err
 	} else {

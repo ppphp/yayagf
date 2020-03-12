@@ -2,10 +2,11 @@ package yac
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"math/rand"
 	"net"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/gin-gonic/gin"
 )

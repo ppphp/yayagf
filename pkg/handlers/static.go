@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 func ServeStaticDirectory(dir string) ([]Handler, error) {
@@ -38,7 +40,7 @@ func ServeStaticDirectory(dir string) ([]Handler, error) {
 	return hs, nil
 }
 
-func MountStaticHandlerToGin(path string,r GinRouter) error{
+func MountStaticHandlerToGin(path string, r gin.IRouter) error {
 	if ss, err := ServeStaticDirectory(path); err != nil {
 		return err
 	} else {

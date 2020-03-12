@@ -203,7 +203,7 @@ COPY --from=back /main/main .
 
 CMD ["/main/main"]
 
-`, )); err != nil {
+`)); err != nil {
 		log.Fatalf("docker failed %v", errs.String())
 		return 1
 	}
@@ -213,7 +213,7 @@ CMD ["/main/main"]
 		log.Printf("chdir failed: %v", err.Error())
 		return 1
 	}
-	if err := command.DoCommand("entc", []string{"init",}, out, errs); err != nil {
+	if err := command.DoCommand("entc", []string{"init"}, out, errs); err != nil {
 		log.Fatalf("ent init failed: %v", errs.String())
 		return 1
 	}
