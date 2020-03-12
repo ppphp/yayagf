@@ -21,8 +21,13 @@ func run(args []string) int {
 	if err != nil {
 		log.Fatal(err)
 	}
-	os.Chdir(root)
-	command.DoCommand("swag", []string{"init", "--output", "app/doc"}, nil, nil)
+	if err := os.Chdir(root); err != nil {
+		log.Fatal(err)
+	}
+
+	if err, _, e := command.DoCommand2("swag", "init", "--output", "app/doc"); err != nil {
+		log.Fatal(err, e)
+	}
 
 	return 0
 }
