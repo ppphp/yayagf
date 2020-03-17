@@ -8,21 +8,24 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/spf13/cobra"
-
+	"github.com/mitchellh/cli"
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
 	"gitlab.papegames.com/fringe/quartz"
 )
 
-var Command = &cobra.Command{
-	Use: "server",
-	Run: func(cmd *cobra.Command, args []string) {
-		run(args)
-	},
+type Command struct {
 }
 
-func run(args []string) int {
+func (c *Command) Help() string {
+	return ""
+}
+
+func (c *Command) Synopsis() string {
+	return "auto build a go project"
+}
+
+func (cx *Command) Run(args []string) int { // TODO: to be cx
 	type Command struct {
 		watcher *quartz.Quartz
 		pwd     string
@@ -109,4 +112,9 @@ func run(args []string) int {
 	}
 
 	return 0
+}
+
+func CommandFactory() (cli.Command, error) {
+	c := &Command{}
+	return c, nil
 }

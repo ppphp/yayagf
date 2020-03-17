@@ -8,20 +8,23 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/spf13/cobra"
-
+	"github.com/mitchellh/cli"
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
 )
 
-var Command = &cobra.Command{
-	Use: "package",
-	Run: func(cmd *cobra.Command, args []string) {
-		run(args)
-	},
+type Command struct {
 }
 
-func run(args []string) int {
+func (c *Command) Help() string {
+	return ""
+}
+
+func (c *Command) Synopsis() string {
+	return "package a go project"
+}
+
+func (c *Command) Run(args []string) int {
 	root, err := file.GetAppRoot()
 	name := filepath.Base(root)
 	if err != nil {
@@ -55,4 +58,9 @@ func run(args []string) int {
 	}
 
 	return 0
+}
+
+func CommandFactory() (cli.Command, error) {
+	c := &Command{}
+	return c, nil
 }

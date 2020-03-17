@@ -1,25 +1,23 @@
 package generate
 
 import (
-	"github.com/spf13/cobra"
-	"gitlab.papegames.com/fengche/yayagf/cmd/model"
+	"github.com/mitchellh/cli"
 )
 
-var Command = &cobra.Command{
-	Use:   "generate",
-	Short: "generate",
+type Command struct {
 }
 
-var AliasCommand = &cobra.Command{
-	Use:   "g",
-	Short: "generate",
+func (c *Command) Help() string {
+	return ""
 }
 
-func init() {
-	Command.AddCommand(
-		model.Command,
-	)
-	AliasCommand.AddCommand(
-		model.Command,
-	)
+func (c *Command) Synopsis() string {
+	return "generate blueprint for a yayagf project"
+}
+
+func (c *Command) Run(args []string) int { return 0 }
+
+func CommandFactory() (cli.Command, error) {
+	c := &Command{}
+	return c, nil
 }
