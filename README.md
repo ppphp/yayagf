@@ -8,8 +8,6 @@ yet another yet another go web framework
 
 ## what to use
 
-Everything I write is just stealing from rails.
-
 ### performance
 
 web framework should not treat the performance very important.
@@ -27,8 +25,8 @@ a project structure is like this
 project_root
 -app
 --controller
---model
---ent
+--crud
+--schema
 --serializer // TODO
 --docs // TODO
 -config_file1 // TODO
@@ -44,19 +42,39 @@ two steps
 
 2. `yayagf server` will monitor the code, recompile the code when compilable and run.
 
-### yayagf package //TODO
+### yayagf package
 
-
+package to docker, to be some others
 
 ### yayagf generate //TODO
 
 generate a http server scaffold.
 
-#### router
+```bash
+yayagf g commands
+yayagf generate commands
+```
 
-#### serializer
+#### schema (ent)
 
-#### model (ent)
+will generate schema in `app/schema`
+
+```bash
+yayagf g schema a
+```
+
+#### crud (ent)
+
+will generate crud files in `app/crud` according to `app/schema`
+
+```bash
+yayagf g curd
+yayagf g crud
+```
+
+#### router // TODO
+
+#### serializer // TODO
 
 #### docs (swagger) // TODO
 
