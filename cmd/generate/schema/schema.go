@@ -1,4 +1,4 @@
-package model
+package schema
 
 import (
 	"bytes"
@@ -23,8 +23,9 @@ func CommandFactory() (*cli.Command, error) {
 				log.Printf("chdir failed: %v", err.Error())
 				return 1, err
 			}
+
 			out, errs := &bytes.Buffer{}, &bytes.Buffer{}
-			if err := command.DoCommand("entc", []string{"init"}, out, errs); err != nil {
+			if err := command.DoCommand("entc", append([]string{"init"}, args...), out, errs); err != nil {
 				log.Fatalf("ent init failed: %v", errs.String())
 				return 1, err
 			}

@@ -1,12 +1,12 @@
 package cmd
 
 import (
+	"gitlab.papegames.com/fengche/yayagf/cmd/generate"
 	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 	"log"
 	"os"
 
 	"gitlab.papegames.com/fengche/yayagf/cmd/doc"
-	"gitlab.papegames.com/fengche/yayagf/cmd/model"
 	"gitlab.papegames.com/fengche/yayagf/cmd/new"
 	_package "gitlab.papegames.com/fengche/yayagf/cmd/package"
 	"gitlab.papegames.com/fengche/yayagf/cmd/server"
@@ -20,10 +20,9 @@ func Main() {
 	}
 
 	c.Commands = map[string]cli.CommandFactory{
-		"doc": doc.CommandFactory,
-		//"generate":    generate.CommandFactory,
+		"doc":      doc.CommandFactory,
+		"generate": generate.CommandFactory, "g": generate.CommandFactory,
 		//"interactive": interactive.CommandFactory,
-		"model":   model.CommandFactory,
 		"new":     new.CommandFactory,
 		"package": _package.CommandFactory,
 		"server":  server.CommandFactory,

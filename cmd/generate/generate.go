@@ -1,23 +1,17 @@
 package generate
 
 import (
-	"github.com/mitchellh/cli"
+	"gitlab.papegames.com/fengche/yayagf/cmd/generate/curd"
+	"gitlab.papegames.com/fengche/yayagf/cmd/generate/schema"
+	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 )
 
-type Command struct {
-}
-
-func (c *Command) Help() string {
-	return ""
-}
-
-func (c *Command) Synopsis() string {
-	return "generate blueprint for a yayagf project"
-}
-
-func (c *Command) Run(args []string) int { return 0 }
-
-func CommandFactory() (cli.Command, error) {
-	c := &Command{}
+func CommandFactory() (*cli.Command, error) {
+	c := &cli.Command{
+		Commands: map[string]cli.CommandFactory{
+			"schema": schema.CommandFactory, "s": schema.CommandFactory,
+			"crud": curd.CommandFactory,"curd": curd.CommandFactory,
+		},
+	}
 	return c, nil
 }
