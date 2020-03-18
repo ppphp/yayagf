@@ -12,4 +12,5 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.6
 	gitlab.papegames.com/fringe/quartz v0.0.0-20200103072440-229d00f9ada6
+	golang.org/x/tools v0.0.0-20191012152004-8de300cfc20a
 )

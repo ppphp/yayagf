@@ -7,50 +7,41 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/mitchellh/cli"
+	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
 )
 
-type Command struct {
-}
+func CommandFactory() (*cli.Command, error) {
+	c := &cli.Command{
+		Run: func(args []string) (int, error) {
+			if len(args) == 0 {
+				fmt.Println("no project name")
+				return 1, nil
+			}
+			namespace, name := filepath.Split(args[0])
+			mod := filepath.Join(namespace, name)
+			dir, err := filepath.Abs(filepath.Clean(name))
+			if err != nil {
+				fmt.Println(err.Error())
+				return 1, err
+			}
+			log.Printf("create %v", dir)
+			if err := file.CreateDir(dir, false); err != nil {
+				fmt.Println(err.Error())
+				return 1, err
+			}
+			log.Printf("chdir %v", dir)
+			if err := os.Chdir(dir); err != nil {
+				fmt.Println(err.Error())
+				return 1, err
+			}
 
-func (c *Command) Help() string {
-	return ""
-}
+			log.Printf("init mod")
+			command.DoCommand("go", []string{"mod", "init", mod}, nil, nil)
 
-func (c *Command) Synopsis() string {
-	return "init a yayagf project"
-}
-
-func (c *Command) Run(args []string) int {
-	if len(args) == 0 {
-		fmt.Println("no project name")
-		return 1
-	}
-	namespace, name := filepath.Split(args[0])
-	mod := filepath.Join(namespace, name)
-	dir, err := filepath.Abs(filepath.Clean(name))
-	if err != nil {
-		fmt.Println(err.Error())
-		return 1
-	}
-	log.Printf("create %v", dir)
-	if err := file.CreateDir(dir, false); err != nil {
-		fmt.Println(err.Error())
-		return 1
-	}
-	log.Printf("chdir %v", dir)
-	if err := os.Chdir(dir); err != nil {
-		fmt.Println(err.Error())
-		return 1
-	}
-
-	log.Printf("init mod")
-	command.DoCommand("go", []string{"mod", "init", mod}, nil, nil)
-
-	log.Printf("create %v", filepath.Join(dir, "main.go"))
-	file.CreateFileWithContent(filepath.Join(dir, "main.go"), fmt.Sprintf(`
+			log.Printf("create %v", filepath.Join(dir, "main.go"))
+			file.CreateFileWithContent(filepath.Join(dir, "main.go"), fmt.Sprintf(`
 package main
 
 import (
@@ -89,8 +80,8 @@ func main() {
 	r.Run()
 }
 `, mod, mod))
-	log.Printf("create %v", filepath.Join(dir, "app", "router", "router.go"))
-	if err := file.CreateFileWithContent(filepath.Join(dir, "app", "router", "router.go"), fmt.Sprintf(`
+			log.Printf("create %v", filepath.Join(dir, "app", "router", "router.go"))
+			if err := file.CreateFileWithContent(filepath.Join(dir, "app", "router", "router.go"), fmt.Sprintf(`
 package router
 
 import (
@@ -105,10 +96,10 @@ func AddRoute(r *gin.Engine) {
 	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 }
 `, mod)); err != nil {
-		log.Println(err.Error())
-		return 1
-	}
-	if err := file.CreateFileWithContent(filepath.Join(dir, "app", "config", "config.go"), `
+				log.Println(err.Error())
+				return 1, err
+			}
+			if err := file.CreateFileWithContent(filepath.Join(dir, "app", "config", "config.go"), `
 package config
 
 import (
@@ -147,39 +138,39 @@ func GetConfig() Config {
 }
 
 `); err != nil {
-		log.Println(err.Error())
-		return 1
-	}
-	if err := file.CreateFileWithContent(filepath.Join(dir, "conf.toml"), `
+				log.Println(err.Error())
+				return 1, err
+			}
+			if err := file.CreateFileWithContent(filepath.Join(dir, "conf.toml"), `
 db=""
 port=8080
 `); err != nil {
-		log.Println(err.Error())
-		return 1
-	}
+				log.Println(err.Error())
+				return 1, err
+			}
 
-	out, errs := &bytes.Buffer{}, &bytes.Buffer{}
-	log.Printf("init swagger")
-	if err := command.DoCommand("swag", []string{"init", "--output", "app/doc"}, out, errs); err != nil {
-		log.Fatalf("swag failed %v", errs.String())
-		return 1
-	}
+			out, errs := &bytes.Buffer{}, &bytes.Buffer{}
+			log.Printf("init swagger")
+			if err := command.DoCommand("swag", []string{"init", "--output", "app/doc"}, out, errs); err != nil {
+				log.Fatalf("swag failed %v", errs.String())
+				return 1, err
+			}
 
-	log.Printf("init git")
-	if err := command.DoCommand("git", []string{"init"}, out, errs); err != nil {
-		log.Fatalf("git failed %v", errs.String())
-		return 1
-	}
-	if err := file.CreateFileWithContent(filepath.Join(dir, ".gitignore"), fmt.Sprintf(`
+			log.Printf("init git")
+			if err := command.DoCommand("git", []string{"init"}, out, errs); err != nil {
+				log.Fatalf("git failed %v", errs.String())
+				return 1, err
+			}
+			if err := file.CreateFileWithContent(filepath.Join(dir, ".gitignore"), fmt.Sprintf(`
 %v
 %v.tar
 `, name, name)); err != nil {
-		log.Fatalf("gitignore failed %v", errs.String())
-		return 1
-	}
+				log.Fatalf("gitignore failed %v", errs.String())
+				return 1, err
+			}
 
-	log.Printf("init docker")
-	if err := file.CreateFileWithContent(filepath.Join(dir, "Dockerfile"), fmt.Sprintf(`
+			log.Printf("init docker")
+			if err := file.CreateFileWithContent(filepath.Join(dir, "Dockerfile"), fmt.Sprintf(`
 FROM golang as back
 
 ENV GOPROXY=https://goproxy.io
@@ -207,23 +198,21 @@ COPY --from=back /main/main .
 CMD ["/main/main"]
 
 `)); err != nil {
-		log.Fatalf("docker failed %v", errs.String())
-		return 1
-	}
+				log.Fatalf("docker failed %v", errs.String())
+				return 1, err
+			}
 
-	log.Printf("init ent")
-	if err := os.Chdir(filepath.Join(dir, "app")); err != nil {
-		log.Printf("chdir failed: %v", err.Error())
-		return 1
+			log.Printf("init ent")
+			if err := os.Chdir(filepath.Join(dir, "app")); err != nil {
+				log.Printf("chdir failed: %v", err.Error())
+				return 1, err
+			}
+			if err := command.DoCommand("entc", []string{"init"}, out, errs); err != nil {
+				log.Fatalf("ent init failed: %v", errs.String())
+				return 1, err
+			}
+			return 0, nil
+		},
 	}
-	if err := command.DoCommand("entc", []string{"init"}, out, errs); err != nil {
-		log.Fatalf("ent init failed: %v", errs.String())
-		return 1
-	}
-	return 0
-}
-
-func CommandFactory() (cli.Command, error) {
-	c := &Command{}
 	return c, nil
 }

@@ -4,39 +4,27 @@ import (
 	"log"
 	"os"
 
-	"github.com/mitchellh/cli"
+	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
 )
 
-type Command struct {
-}
+func CommandFactory() (*cli.Command, error) {
+	return &cli.Command{
+		Run: func(args []string) (int, error) {
+			root, err := file.GetAppRoot()
+			if err != nil {
+				log.Fatal(err)
+			}
+			if err := os.Chdir(root); err != nil {
+				log.Fatal(err)
+			}
 
-func (c *Command) Help() string {
-	return ""
-}
+			if err, _, e := command.DoCommand2("swag", "init", "--output", "app/doc"); err != nil {
+				log.Fatal(err, e)
+			}
 
-func (c *Command) Synopsis() string {
-	return "doc issue for a go project"
-}
-
-func (c *Command) Run(args []string) int {
-	root, err := file.GetAppRoot()
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := os.Chdir(root); err != nil {
-		log.Fatal(err)
-	}
-
-	if err, _, e := command.DoCommand2("swag", "init", "--output", "app/doc"); err != nil {
-		log.Fatal(err, e)
-	}
-
-	return 0
-}
-
-func CommandFactory() (cli.Command, error) {
-	c := &Command{}
-	return c, nil
+			return 0, nil
+		},
+	}, nil
 }
