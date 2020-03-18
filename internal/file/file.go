@@ -32,12 +32,8 @@ func FindAppRoot(path string) (string, error) {
 	return "", nil
 }
 
-func createDir(dir string) error {
-	return os.MkdirAll(dir, 0755)
-}
-
 func CreateFile(path string, force bool) (*os.File, error) {
-	if err := createDir(filepath.Dir(path)); err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
 		return nil, err
 	}
 	o := os.O_RDWR | os.O_CREATE
@@ -59,8 +55,4 @@ func CreateFileWithContent(path string, content string) error {
 		return err
 	}
 	return nil
-}
-
-func CreateDir(path string, force bool) error {
-	return createDir(path)
 }

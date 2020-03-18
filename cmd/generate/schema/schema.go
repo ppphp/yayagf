@@ -1,14 +1,13 @@
 package schema
 
 import (
-	"bytes"
+	"gitlab.papegames.com/fengche/yayagf/internal/ent"
 	"log"
-	"os"
 	"path/filepath"
+	"strings"
 
-	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
-	"gitlab.papegames.com/fengche/yayagf/internal/command"
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
+	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 )
 
 func CommandFactory() (*cli.Command, error) {
@@ -19,14 +18,11 @@ func CommandFactory() (*cli.Command, error) {
 				log.Printf("get project name failed: %v", err.Error())
 				return 1, err
 			}
-			if err := os.Chdir(filepath.Join(root, "app")); err != nil {
-				log.Printf("chdir failed: %v", err.Error())
-				return 1, err
+			schemas := []string{}
+			for _, a := range args {
+				schemas = append(schemas, strings.Title(a))
 			}
-
-			out, errs := &bytes.Buffer{}, &bytes.Buffer{}
-			if err := command.DoCommand("entc", append([]string{"init"}, args...), out, errs); err != nil {
-				log.Fatalf("ent init failed: %v", errs.String())
+			if err := ent.GenerateSchema(filepath.Join(root, "app", "schema"), schemas); err != nil {
 				return 1, err
 			}
 

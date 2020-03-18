@@ -27,7 +27,7 @@ func CommandFactory() (*cli.Command, error) {
 				return 1, err
 			}
 			log.Printf("create %v", dir)
-			if err := file.CreateDir(dir, false); err != nil {
+			if err := os.MkdirAll(dir, 0755); err != nil {
 				fmt.Println(err.Error())
 				return 1, err
 			}
@@ -202,15 +202,6 @@ CMD ["/main/main"]
 				return 1, err
 			}
 
-			log.Printf("init ent")
-			if err := os.Chdir(filepath.Join(dir, "app")); err != nil {
-				log.Printf("chdir failed: %v", err.Error())
-				return 1, err
-			}
-			if err := command.DoCommand("entc", []string{"init"}, out, errs); err != nil {
-				log.Fatalf("ent init failed: %v", errs.String())
-				return 1, err
-			}
 			return 0, nil
 		},
 	}

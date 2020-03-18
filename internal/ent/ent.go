@@ -61,7 +61,7 @@ func ({{ . }}) Edges() []ent.Edge {
 
 var DefaultConfig = &packages.Config{Mode: packages.NeedName}
 
-func GenerateCRUDFiles(path string) error {
+func GenerateCRUDFiles(path, target string) error {
 	type idType field.Type
 	var (
 		storage  string
@@ -69,13 +69,14 @@ func GenerateCRUDFiles(path string) error {
 		template []string
 		idtype   = idType(field.TypeInt)
 	)
-
+	storage = "sql"
 	opts := []entc.Option{entc.Storage(storage)}
 	for _, tmpl := range template {
 		opts = append(opts, entc.TemplateDir(tmpl))
 	}
 	// If the target directory is not inferred from
 	// the schema path, resolve its package path.
+	cfg.Target = target
 	if cfg.Target != "" {
 		pkgPath, err := PkgPath(DefaultConfig, cfg.Target)
 		if err != nil {
