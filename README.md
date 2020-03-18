@@ -44,11 +44,11 @@ two steps
 
 ### yayagf package
 
-package to docker, to be some others
+package to docker // TODO some others
 
-### yayagf generate //TODO
+### yayagf generate
 
-generate a http server scaffold.
+generate a component scaffold.
 
 ```bash
 yayagf g commands
@@ -72,11 +72,18 @@ yayagf g curd
 yayagf g crud
 ```
 
+#### doc (swagger)
+
+will generate crud files in `app/crud` according to `app/schema`
+
+```bash
+yayagf g doc
+```
+
+
 #### router // TODO
 
 #### serializer // TODO
-
-#### docs (swagger) // TODO
 
 ## packages
 

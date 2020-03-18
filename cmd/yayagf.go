@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 
-	"gitlab.papegames.com/fengche/yayagf/cmd/doc"
 	"gitlab.papegames.com/fengche/yayagf/cmd/new"
 	_package "gitlab.papegames.com/fengche/yayagf/cmd/package"
 	"gitlab.papegames.com/fengche/yayagf/cmd/server"
@@ -20,7 +19,6 @@ func Main() {
 	}
 
 	c.Commands = map[string]cli.CommandFactory{
-		"doc":      doc.CommandFactory,
 		"generate": generate.CommandFactory, "g": generate.CommandFactory,
 		//"interactive": interactive.CommandFactory,
 		"new":     new.CommandFactory,
