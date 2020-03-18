@@ -33,17 +33,7 @@ func FindAppRoot(path string) (string, error) {
 }
 
 func createDir(dir string) error {
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		if err := createDir(filepath.Dir(dir)); err != nil {
-			return err
-		}
-		if err := os.Mkdir(dir, 0755); err != nil {
-			return err
-		}
-	} else if err != nil {
-		return err
-	}
-	return nil
+	return os.MkdirAll(dir, 0755)
 }
 
 func CreateFile(path string, force bool) (*os.File, error) {
