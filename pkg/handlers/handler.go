@@ -18,6 +18,13 @@ func (h Handlers) MountToEndpoint(r gin.IRouter) {
 	}
 }
 
+// pprof prom meta
+func MountALotOfThingToEndpoint(r gin.IRouter) {
+	MountPProfHandlerToGin(r.Group("/pprof"))
+	MountMetaHandlerToGin(r.Group("/meta"))
+	MountPromHandlerToGin(r.Group("/prom"))
+}
+
 type Handler struct {
 	path    string
 	handler http.Handler

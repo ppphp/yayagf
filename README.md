@@ -14,6 +14,8 @@ web framework should not treat the performance very important.
 
 go is fast, so performance is not a really big thing.
 
+util now, it uses gin as framework.
+
 ## how to use
 
 ### yayagf new
@@ -86,6 +88,28 @@ yayagf g doc
 #### serializer // TODO
 
 ## packages
+
+### ent driver
+
+```go
+package main
+import (
+    "gitlab.papegames.com/fengche/yayagf/pkg/model"
+    "log"
+    "yourproject/ent"
+)
+
+func main() {
+	drv, err := model.Open("mysql", DBURL)
+	if err != nil {
+		log.Fatal(drv)
+	}
+	client := ent.NewClient(ent.Driver(drv))
+	if err := client.Schema.Create(context.Background()); err != nil {
+		log.Fatal(err)
+	}
+}
+```
 
 ### config loader
 
