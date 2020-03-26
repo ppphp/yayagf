@@ -32,7 +32,6 @@ func FindAppRoot(path string) (string, error) {
 	} else {
 		return path, nil
 	}
-	return "", nil
 }
 
 func CreateFile(path string, force bool) (*os.File, error) {

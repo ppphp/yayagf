@@ -17,7 +17,6 @@ func (c *Command) Synopsis() string {
 
 func (c *Command) Run(args []string) int {
 	panic("WIP")
-	return 0
 }
 
 func CommandFactory() (cli.Command, error) {
