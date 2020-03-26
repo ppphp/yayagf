@@ -17,7 +17,8 @@ func CommandFactory() (*cli.Command, error) {
 				log.Printf("get project name failed: %v", err.Error())
 				return 1, err
 			}
-			if err := ent.GenerateCRUDFiles(filepath.Join(root, "app", "schema"), filepath.Join(root, "app", "crud")); err != nil {
+			mod, err := file.GetMod(root)
+			if err := ent.GenerateCRUDFiles(mod, filepath.Join(root, "app", "schema"), filepath.Join(root, "app", "crud")); err != nil {
 				return 1, err
 			}
 

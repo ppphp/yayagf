@@ -61,7 +61,7 @@ func ({{ . }}) Edges() []ent.Edge {
 
 var DefaultConfig = &packages.Config{Mode: packages.NeedName}
 
-func GenerateCRUDFiles(path, target string) error {
+func GenerateCRUDFiles(mod, path, target string) error {
 	type idType field.Type
 	var (
 		storage  string
@@ -85,6 +85,7 @@ func GenerateCRUDFiles(path, target string) error {
 		cfg.Package = pkgPath
 	}
 	cfg.IDType = &field.TypeInfo{Type: field.Type(idtype)}
+	cfg.Package = mod // TODO: well test
 	err := entc.Generate(path, &cfg, opts...)
 	if err != nil {
 		return err
