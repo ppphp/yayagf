@@ -22,10 +22,10 @@ format:
   artifacts:
     untracked: true
 
-lint_code:
-  stage: test
-  script:
-    - golangci-lint run ./...
+#lint_code:
+#  stage: test
+#  script:
+#    - golangci-lint run ./...
 
 sonar_analyze:
   stage: test
