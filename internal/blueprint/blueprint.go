@@ -7,7 +7,7 @@ var blueprints = []Blueprint{}
 func AddBlueprint(name, template string) {
 	b := Blueprint{
 		Name: name,
-		Tpl:  template.New(),
+		//Tpl:  template.New(),
 	}
 	blueprints = append(blueprints, b)
 }

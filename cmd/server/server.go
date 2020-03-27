@@ -102,7 +102,7 @@ func CommandFactory() (*cli.Command, error) {
 				}
 			}
 
-			return 0, nil
+			//return 0, nil
 		},
 	}
 	return c, nil
