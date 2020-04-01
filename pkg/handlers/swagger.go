@@ -25,11 +25,21 @@ func ServeSwaggerFile(swagger string) ([]Handler, error) {
 	return hs, nil
 }
 
-func MountSwaggerToGin(path string, router gin.IRouter) error {
+func MountSwaggerFileToGin(path string, router gin.IRouter) error {
 	if ss, err := ServeSwaggerFile(path); err != nil {
 		return err
 	} else {
 		Handlers(ss).MountToEndpoint(router)
 		return nil
 	}
+}
+
+func MountSwaggerStringToGin(swagger string, router gin.IRouter) {
+	Handlers([]Handler{{
+		path: "swagger.json",
+		handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Add("Content-Type", "application/json")
+			w.Write([]byte(swagger))
+		}),
+	}}).MountToEndpoint(router)
 }
