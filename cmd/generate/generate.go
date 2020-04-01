@@ -11,6 +11,7 @@ func CommandFactory() (*cli.Command, error) {
 	c := &cli.Command{
 		Commands: map[string]cli.CommandFactory{
 			"schema": schema.CommandFactory, "s": schema.CommandFactory,
+			"model": schema.CommandFactory,
 			"crud": curd.CommandFactory, "curd": curd.CommandFactory,
 			"doc": doc.CommandFactory, "docs": doc.CommandFactory,
 		},

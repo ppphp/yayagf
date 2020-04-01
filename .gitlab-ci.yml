@@ -15,7 +15,6 @@ stages:
 format:
   stage: test
   script:
-    - go fmt $(go list ./... | grep -v /vendor/)
     - go vet $(go list ./... | grep -v /vendor/)
     - go test -race -cover -coverprofile=./coverage.data $(go list ./... | grep -v /vendor/)
     - go tool cover -html=./coverage.data -o ./coverage.html
@@ -30,9 +29,11 @@ format:
 sonar_analyze:
   stage: test
   script:
-    - wget -P / https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
-    - unzip /sonar-scanner-cli-4.2.0.1873-linux.zip -C /opt
-    - /opt/sonar-scanner-4.2.0.1873-linux/bin/sonar-scanner -Dsonar.analysis.mode=preview -Dsonar.projectKey=gitlab:$CI_COMMIT_REF_NAME:$CI_PROJECT_NAME -Dsonar.projectName=gitlab:$CI_COMMIT_REF_NAME:$CI_PROJECT_NAME -Dsonar.projectVersion=1.0.$CI_PIPELINE_ID -Dsonar.issuesReport.html.enable=true -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
+    - wget -P / https://dl.min.io/client/mc/release/linux-amd64/mc
+    - chmod +x mc
+    - ./mc --help
+    # wget here
+#    - /opt/sonar-scanner-4.2.0.1873-linux/bin/sonar-scanner -Dsonar.analysis.mode=preview -Dsonar.projectKey=gitlab:$CI_COMMIT_REF_NAME:$CI_PROJECT_NAME -Dsonar.projectName=gitlab:$CI_COMMIT_REF_NAME:$CI_PROJECT_NAME -Dsonar.projectVersion=1.0.$CI_PIPELINE_ID -Dsonar.issuesReport.html.enable=true -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
 
 
 compile:

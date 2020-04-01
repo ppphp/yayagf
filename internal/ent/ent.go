@@ -85,7 +85,7 @@ func GenerateCRUDFiles(mod, path, target string) error {
 		cfg.Package = pkgPath
 	}
 	cfg.IDType = &field.TypeInfo{Type: field.Type(idtype)}
-	cfg.Package = mod // TODO: well test
+	cfg.Package = filepath.Join(mod, "app", "crud") // TODO: well test
 	err := entc.Generate(path, &cfg, opts...)
 	if err != nil {
 		return err

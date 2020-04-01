@@ -3,13 +3,13 @@ package new
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 
-	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
-	"gitlab.papegames.com/fengche/yayagf/internal/file"
+	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 )
 
 func CommandFactory() (*cli.Command, error) {
@@ -41,7 +41,7 @@ func CommandFactory() (*cli.Command, error) {
 			command.DoCommand("go", []string{"mod", "init", mod}, nil, nil)
 
 			log.Printf("create %v", filepath.Join(dir, "main.go"))
-			file.CreateFileWithContent(filepath.Join(dir, "main.go"), fmt.Sprintf(`
+			ioutil.WriteFile(filepath.Join(dir, "main.go"), []byte(fmt.Sprintf(`
 package main
 
 import (
@@ -79,27 +79,22 @@ func main() {
 
 	r.Run()
 }
-`, mod, mod))
+`, mod, mod)), 0755)
 			log.Printf("create %v", filepath.Join(dir, "app", "router", "router.go"))
-			if err := file.CreateFileWithContent(filepath.Join(dir, "app", "router", "router.go"), fmt.Sprintf(`
+			if err := ioutil.WriteFile(filepath.Join(dir, "app", "router", "router.go"), []byte(fmt.Sprintf(`
 package router
 
 import (
-	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"github.com/gin-gonic/gin"
-	_ "%v/app/docs"
 )
 
 func AddRoute(r *gin.Engine) {
-	url := ginSwagger.URL("http://localhost:3000/v1/docs/doc.json") // The url pointing to API definition
-	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 }
-`, mod)); err != nil {
+`)), 0755); err != nil {
 				log.Println(err.Error())
 				return 1, err
 			}
-			if err := file.CreateFileWithContent(filepath.Join(dir, "app", "config", "config.go"), `
+			if err := ioutil.WriteFile(filepath.Join(dir, "app", "config", "config.go"), []byte(`
 package config
 
 import (
@@ -137,14 +132,14 @@ func GetConfig() Config {
 	return *conf
 }
 
-`); err != nil {
+`), 0755); err != nil {
 				log.Println(err.Error())
 				return 1, err
 			}
-			if err := file.CreateFileWithContent(filepath.Join(dir, "conf.toml"), `
+			if err := ioutil.WriteFile(filepath.Join(dir, "conf.toml"), []byte(`
 db=""
 port=8080
-`); err != nil {
+`), 0755); err != nil {
 				log.Println(err.Error())
 				return 1, err
 			}
@@ -161,16 +156,16 @@ port=8080
 				log.Fatalf("git failed %v", errs.String())
 				return 1, err
 			}
-			if err := file.CreateFileWithContent(filepath.Join(dir, ".gitignore"), fmt.Sprintf(`
+			if err := ioutil.WriteFile(filepath.Join(dir, ".gitignore"), []byte(fmt.Sprintf(`
 %v
 %v.tar
-`, name, name)); err != nil {
+`, name, name)), 0755); err != nil {
 				log.Fatalf("gitignore failed %v", errs.String())
 				return 1, err
 			}
 
 			log.Printf("init docker")
-			if err := file.CreateFileWithContent(filepath.Join(dir, "Dockerfile"), fmt.Sprintf(`
+			if err := ioutil.WriteFile(filepath.Join(dir, "Dockerfile"), []byte(fmt.Sprintf(`
 FROM golang as back
 
 ENV GOPROXY=https://goproxy.io
@@ -197,7 +192,7 @@ COPY --from=back /main/main .
 
 CMD ["/main/main"]
 
-`)); err != nil {
+`)), 0755); err != nil {
 				log.Fatalf("docker failed %v", errs.String())
 				return 1, err
 			}
