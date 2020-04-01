@@ -7,7 +7,7 @@ import (
 
 func MountPromHandlerToGin(r gin.IRouter) {
 	Handlers{Handler{
-		path: "/",
+		path:    "/",
 		handler: promhttp.Handler(),
 	}}.MountToEndpoint(r)
 }

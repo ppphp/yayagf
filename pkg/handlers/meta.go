@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"gitlab.papegames.com/fengche/yayagf/pkg/meta"
-	"net/http"
 )
 
 // 简单的meta信息暴露

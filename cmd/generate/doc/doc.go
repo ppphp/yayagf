@@ -4,9 +4,10 @@ import (
 	"log"
 	"os"
 
-	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
-	"gitlab.papegames.com/fengche/yayagf/internal/command"
+	"gitlab.papegames.com/fengche/yayagf/internal/swagger"
+
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
+	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 )
 
 func CommandFactory() (*cli.Command, error) {
@@ -20,8 +21,8 @@ func CommandFactory() (*cli.Command, error) {
 				log.Fatal(err)
 			}
 
-			if err, _, e := command.DoCommand2("swag", "init", "--output", "app/doc"); err != nil {
-				log.Fatal(err, e)
+			if err := swagger.GenerateSwagger(); err != nil {
+				log.Fatal(err)
 			}
 
 			return 0, nil

@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"gitlab.papegames.com/fengche/yayagf/internal/swagger"
+
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
 	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 )
@@ -27,7 +29,7 @@ func CommandFactory() (*cli.Command, error) {
 				return 1, err
 			}
 			log.Printf("create %v", dir)
-			if err := os.MkdirAll(dir, 0755); err != nil {
+			if err := os.MkdirAll(dir, 0644); err != nil {
 				fmt.Println(err.Error())
 				return 1, err
 			}
@@ -79,7 +81,7 @@ func main() {
 
 	r.Run()
 }
-`, mod, mod)), 0755)
+`, mod, mod)), 0644)
 			log.Printf("create %v", filepath.Join(dir, "app", "router", "router.go"))
 			if err := ioutil.WriteFile(filepath.Join(dir, "app", "router", "router.go"), []byte(fmt.Sprintf(`
 package router
@@ -90,7 +92,7 @@ import (
 
 func AddRoute(r *gin.Engine) {
 }
-`)), 0755); err != nil {
+`)), 0644); err != nil {
 				log.Println(err.Error())
 				return 1, err
 			}
@@ -132,21 +134,21 @@ func GetConfig() Config {
 	return *conf
 }
 
-`), 0755); err != nil {
+`), 0644); err != nil {
 				log.Println(err.Error())
 				return 1, err
 			}
 			if err := ioutil.WriteFile(filepath.Join(dir, "conf.toml"), []byte(`
 db=""
 port=8080
-`), 0755); err != nil {
+`), 0644); err != nil {
 				log.Println(err.Error())
 				return 1, err
 			}
 
 			out, errs := &bytes.Buffer{}, &bytes.Buffer{}
 			log.Printf("init swagger")
-			if err := command.DoCommand("swag", []string{"init", "--output", "app/doc"}, out, errs); err != nil {
+			if err := swagger.GenerateSwagger(); err != nil {
 				log.Fatalf("swag failed %v", errs.String())
 				return 1, err
 			}
@@ -159,7 +161,7 @@ port=8080
 			if err := ioutil.WriteFile(filepath.Join(dir, ".gitignore"), []byte(fmt.Sprintf(`
 %v
 %v.tar
-`, name, name)), 0755); err != nil {
+`, name, name)), 0644); err != nil {
 				log.Fatalf("gitignore failed %v", errs.String())
 				return 1, err
 			}
@@ -192,7 +194,7 @@ COPY --from=back /main/main .
 
 CMD ["/main/main"]
 
-`)), 0755); err != nil {
+`)), 0644); err != nil {
 				log.Fatalf("docker failed %v", errs.String())
 				return 1, err
 			}

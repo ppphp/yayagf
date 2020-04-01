@@ -1,9 +1,10 @@
 package curd
 
 import (
-	"gitlab.papegames.com/fengche/yayagf/internal/ent"
 	"log"
 	"path/filepath"
+
+	"gitlab.papegames.com/fengche/yayagf/internal/ent"
 
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
 	"gitlab.papegames.com/fengche/yayagf/pkg/cli"

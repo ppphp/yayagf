@@ -8,9 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
+	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 )
 
 func CommandFactory() (*cli.Command, error) {

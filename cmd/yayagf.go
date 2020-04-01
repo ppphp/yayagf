@@ -1,10 +1,11 @@
 package cmd
 
 import (
-	"gitlab.papegames.com/fengche/yayagf/cmd/generate"
-	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 	"log"
 	"os"
+
+	"gitlab.papegames.com/fengche/yayagf/cmd/generate"
+	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 
 	"gitlab.papegames.com/fengche/yayagf/cmd/new"
 	_package "gitlab.papegames.com/fengche/yayagf/cmd/package"

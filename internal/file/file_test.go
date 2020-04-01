@@ -9,7 +9,7 @@ import (
 
 func TestGetMod(t *testing.T) {
 	path := os.TempDir()
-	ioutil.WriteFile(filepath.Join(path, "go.mod"),[]byte(`
+	ioutil.WriteFile(filepath.Join(path, "go.mod"), []byte(`
 module gitlab.papegames.com/fengche/yayagf
 
 go 1.13
@@ -27,11 +27,11 @@ require (
 	golang.org/x/tools v0.0.0-20191012152004-8de300cfc20a
 )
 
-`) , 0644)
+`), 0644)
 	mod, err := GetMod(path)
-	if err!= nil {
+	if err != nil {
 		t.Errorf("%v", err)
 	} else if mod != "gitlab.papegames.com/fengche/yayagf" {
-		t.Errorf("%v (evaluated) != %v (expected)", mod , "gitlab.papegames.com/fengche/yayagf")
+		t.Errorf("%v (evaluated) != %v (expected)", mod, "gitlab.papegames.com/fengche/yayagf")
 	}
 }

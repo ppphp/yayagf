@@ -1,10 +1,11 @@
 package schema
 
 import (
-	"gitlab.papegames.com/fengche/yayagf/internal/ent"
 	"log"
 	"path/filepath"
 	"strings"
+
+	"gitlab.papegames.com/fengche/yayagf/internal/ent"
 
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
 	"gitlab.papegames.com/fengche/yayagf/pkg/cli"

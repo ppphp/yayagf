@@ -3,16 +3,17 @@ package ent
 import (
 	"bytes"
 	"fmt"
-	"github.com/facebookincubator/ent/entc"
-	"github.com/facebookincubator/ent/entc/gen"
-	"github.com/facebookincubator/ent/schema/field"
-	"golang.org/x/tools/go/packages"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 	"text/template"
+
+	"github.com/facebookincubator/ent/entc"
+	"github.com/facebookincubator/ent/entc/gen"
+	"github.com/facebookincubator/ent/schema/field"
+	"golang.org/x/tools/go/packages"
 )
 
 // generate path and model names

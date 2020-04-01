@@ -21,7 +21,7 @@ func (c *Command) exec() (int, error) {
 	}
 	if len(c.Args) == 0 {
 		if s, ok := c.Commands[""]; !ok {
-			if c.Run!= nil {
+			if c.Run != nil {
 				return c.Run(c.Args)
 			} else {
 				return 1, nil

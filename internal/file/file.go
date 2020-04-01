@@ -35,17 +35,18 @@ func FindAppRoot(path string) (string, error) {
 }
 
 var goModRegexp = regexp.MustCompile("^module (.+)$")
+
 // 不看源码了，internal没法直接import，意思意思得了
-func GetMod(path string) (string,error){
+func GetMod(path string) (string, error) {
 	root, err := FindAppRoot(path)
-	if err!= nil {
+	if err != nil {
 		return "", err
 	}
 	file, err := ioutil.ReadFile(filepath.Join(root, "go.mod"))
 	if err != nil {
 		return "", err
 	}
-	for _, line:= range strings.Split(string(file), "\n"){
+	for _, line := range strings.Split(string(file), "\n") {
 		if goModRegexp.MatchString(line) {
 			return goModRegexp.FindAllStringSubmatch(line, -1)[0][1], nil
 		}

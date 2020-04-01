@@ -3,8 +3,8 @@ package cli
 
 var ApplicationCommands = &Command{
 	Commands: map[string]CommandFactory{
-		"": ServerFactory,
-		"server": ServerFactory,
+		"":        ServerFactory,
+		"server":  ServerFactory,
 		"migrate": MigrateFactory,
 	},
 }

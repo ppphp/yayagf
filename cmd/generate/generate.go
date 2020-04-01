@@ -12,7 +12,7 @@ func CommandFactory() (*cli.Command, error) {
 		Commands: map[string]cli.CommandFactory{
 			"schema": schema.CommandFactory, "s": schema.CommandFactory,
 			"model": schema.CommandFactory,
-			"crud": curd.CommandFactory, "curd": curd.CommandFactory,
+			"crud":  curd.CommandFactory, "curd": curd.CommandFactory,
 			"doc": doc.CommandFactory, "docs": doc.CommandFactory,
 		},
 	}
