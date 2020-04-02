@@ -48,6 +48,7 @@ package main
 
 import (
 	"github.com/gin-contrib/cors"
+	// "gitlab.papegames.com/fengche/yayagf/pkg/model"
 	"github.com/gin-gonic/gin"
 	"log"
 	"%v/app/router"
@@ -79,9 +80,21 @@ func main() {
 		log.Fatal(err)
 	}
 
-	r.Run()
+	// Uncomment the following code to simplify db
+	//drv, err := model.Open("mysql", config.GetConfig().DB)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//crud.C = crud.NewClient(crud.Driver(drv))
+	//if err := crud.C.Schema.Create(context.Background()); err != nil {
+	//	log.Fatal(err)
+	//}
+
+	if err := r.Run(fmt.Sprintf(":%v", config.GetConfig().Port)); err != nil {
+		log.Fatal(err)
+	}
 }
-`, mod, mod)), 0644)
+`, mod, mod, "%v")), 0644)
 			log.Printf("create %v", filepath.Join(dir, "app", "router", "router.go"))
 			if err := ioutil.WriteFile(filepath.Join(dir, "app", "router", "router.go"), []byte(fmt.Sprintf(`
 package router

@@ -91,6 +91,12 @@ func GenerateCRUDFiles(mod, path, target string) error {
 	if err != nil {
 		return err
 	}
+
+	// generate a client
+	err = ioutil.WriteFile(filepath.Join(target, "c.go"), []byte("package crud\nvar C *Client\n"), 0644)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
