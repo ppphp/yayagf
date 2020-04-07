@@ -213,6 +213,11 @@ CMD ["/main/main"]
 				return 1, err
 			}
 
+			if err := ioutil.WriteFile(filepath.Join(dir, "README.md"), []byte("\n"), 0644); err != nil {
+				log.Fatalf("readme failed %v", errs.String())
+				return 1, err
+			}
+
 			return 0, nil
 		},
 	}
