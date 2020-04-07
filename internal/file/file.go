@@ -53,3 +53,22 @@ func GetMod(path string) (string, error) {
 	}
 	return "", errors.New("no error")
 }
+
+type ProjectInfo struct {
+	// 项目根文件夹，全称
+	Root string
+	// 项目模块名
+	Mod string
+	// 项目bin的名称
+	BinName string
+}
+
+func GetProjectInfo() ProjectInfo {
+	root, _ := GetAppRoot()
+	mod, _ := GetMod(root)
+	return ProjectInfo{
+		Root:    root,
+		Mod:     mod,
+		BinName: filepath.Base(root),
+	}
+}

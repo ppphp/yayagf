@@ -48,6 +48,7 @@ package main
 
 import (
 	"github.com/gin-contrib/cors"
+	// "%v/app/crud"
 	// "gitlab.papegames.com/fengche/yayagf/pkg/model"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -94,7 +95,7 @@ func main() {
 		log.Fatal(err)
 	}
 }
-`, mod, mod, "%v")), 0644)
+`, mod, mod, mod, "%v")), 0644)
 			log.Printf("create %v", filepath.Join(dir, "app", "router", "router.go"))
 			if err := ioutil.WriteFile(filepath.Join(dir, "app", "router", "router.go"), []byte(fmt.Sprintf(`
 package router
