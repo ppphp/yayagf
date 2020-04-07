@@ -23,6 +23,7 @@ func MountALotOfThingToEndpoint(r gin.IRouter) {
 	MountPProfHandlerToGin(r.Group("/pprof"))
 	MountMetaHandlerToGin(r.Group("/meta"))
 	MountPromHandlerToGin(r.Group("/metrics"))
+	MountHealthHandlerToGin(r.Group("/health"))
 }
 
 type Handler struct {
