@@ -16,7 +16,7 @@ import (
 
 func CommandFactory() (*cli.Command, error) {
 	c := &cli.Command{
-		Run: func(args []string) (int, error) { // TODO: to be cx
+		Run: func(args []string, flags map[string]string) (int, error) { // TODO: to be cx
 			type Command struct {
 				watcher *quartz.Quartz
 				pwd     string

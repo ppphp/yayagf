@@ -16,7 +16,7 @@ import (
 
 func CommandFactory() (*cli.Command, error) {
 	c := &cli.Command{
-		Run: func(args []string) (int, error) {
+		Run: func(args []string, flags map[string]string) (int, error) {
 			if len(args) == 0 {
 				fmt.Println("no project name")
 				return 1, nil

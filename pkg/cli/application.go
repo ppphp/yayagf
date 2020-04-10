@@ -11,7 +11,7 @@ var ApplicationCommands = &Command{
 
 func ServerFactory() (*Command, error) {
 	c := &Command{
-		Run: func(args []string) (int, error) {
+		Run: func(args []string, flags map[string]string) (int, error) {
 			return 0, nil
 		},
 	}
@@ -20,7 +20,7 @@ func ServerFactory() (*Command, error) {
 
 func MigrateFactory() (*Command, error) {
 	c := &Command{
-		Run: func(args []string) (int, error) {
+		Run: func(args []string, flags map[string]string) (int, error) {
 			return 0, nil
 		},
 	}

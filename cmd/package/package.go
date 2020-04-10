@@ -15,7 +15,7 @@ import (
 
 func CommandFactory() (*cli.Command, error) {
 	c := &cli.Command{
-		Run: func(args []string) (int, error) {
+		Run: func(args []string, flags map[string]string) (int, error) {
 			root, err := file.GetAppRoot()
 			name := filepath.Base(root)
 			if err != nil {

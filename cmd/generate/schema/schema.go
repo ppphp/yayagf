@@ -13,7 +13,7 @@ import (
 
 func CommandFactory() (*cli.Command, error) {
 	c := &cli.Command{
-		Run: func(args []string) (int, error) {
+		Run: func(args []string, flags map[string]string) (int, error) {
 			root, err := file.GetAppRoot()
 			if err != nil {
 				log.Printf("get project name failed: %v", err.Error())

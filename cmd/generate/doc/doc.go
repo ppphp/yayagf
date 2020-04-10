@@ -12,7 +12,7 @@ import (
 
 func CommandFactory() (*cli.Command, error) {
 	return &cli.Command{
-		Run: func(args []string) (int, error) {
+		Run: func(args []string, flags map[string]string) (int, error) {
 			root, err := file.GetAppRoot()
 			if err != nil {
 				log.Fatal(err)
