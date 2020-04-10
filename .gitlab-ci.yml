@@ -34,16 +34,15 @@ sonar_analyze:
   script:
     - wget http://192.168.0.97:8000/sonar-scanner.tar.gz
     - tar -xvf sonar-scanner.tar.gz
-    - |
-    ./sonar-scanner/bin/sonar-scanner \\
-      -Dsonar.host.url=http://192.168.0.97:9000 \\
-      -Dsonar.sources=. \\
-      -Dsonar.projectKey=$CI_PROJECT_NAME \\
-      -Dsonar.login=dced6e70e45d30783fda260701e8e0169b61013f \\
-      -Dsonar.tests=. \\
-      -Dsonar.exclusions=**/*_test.go,**/vendor/**\\
-      -Dsonar.test.inclusions=**/*_test.go\\
-      -Dsonar.test.exclusions=**/vendor/**
+    - "./sonar-scanner/bin/sonar-scanner \
+      -Dsonar.host.url=http://192.168.0.97:9000 \
+      -Dsonar.sources=. \
+      -Dsonar.projectKey=$CI_PROJECT_NAME \
+      -Dsonar.login=dced6e70e45d30783fda260701e8e0169b61013f \
+      -Dsonar.tests=. \
+      -Dsonar.exclusions=**/*_test.go,**/vendor/** \
+      -Dsonar.test.inclusions=**/*_test.go \
+      -Dsonar.test.exclusions=**/vendor/**"
 
 compile:
   stage: build
