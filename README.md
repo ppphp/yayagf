@@ -3,7 +3,20 @@
 yet another yet another go web framework
 [![pipeline status](https://gitlab.papegames.com/fengche/yayagf/badges/master/pipeline.svg)](https://gitlab.papegames.com/fengche/yayagf/commits/master)
 [![coverage report](https://gitlab.papegames.com/fengche/yayagf/badges/master/coverage.svg)](https://gitlab.papegames.com/fengche/yayagf/commits/master)
-[![coverage report](https://gitlab.papegames.com/fengche/yayagf/badges/master/coverage.svg)](https://gitlab.papegames.com/fengche/yayagf/commits/master)
+[![SQALE评级](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=sqale_rating)](http://192.168.0.97:9000/dashboard?id=yayagf)
+
+###### sonar
+[![Bugs](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=bugs)](http://192.168.0.97:9000/dashboard?id=yayagf)
+[![异味](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=code_smells)](http://192.168.0.97:9000/dashboard?id=yayagf)
+[![覆盖率](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=coverage)](http://192.168.0.97:9000/dashboard?id=yayagf)
+[![重复行(%)](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=duplicated_lines_density)](http://192.168.0.97:9000/dashboard?id=yayagf)
+[![代码行数](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=ncloc)](http://192.168.0.97:9000/dashboard?id=yayagf)
+[![警报](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=alert_status)](http://192.168.0.97:9000/dashboard?id=yayagf)
+[![可靠性比率](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=reliability_rating)](http://192.168.0.97:9000/dashboard?id=yayagf)
+[![安全比率](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=security_rating)](http://192.168.0.97:9000/dashboard?id=yayagf)
+[![技术债务](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=sqale_index)](http://192.168.0.97:9000/dashboard?id=yayagf)
+[![漏洞](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=vulnerabilities)](http://192.168.0.97:9000/dashboard?id=yayagf)
+
 
 ## install
 

@@ -23,7 +23,7 @@ func (s *Spec) When(initF func() (string, error)) *Spec {
 	if err != nil {
 		s.T.Fatalf("%v failed when %v because %v", s.Title, state, err)
 	}
-	s.Condition = append(s.Condition)
+	s.Condition = append(s.Condition, state)
 	return s
 }
 
