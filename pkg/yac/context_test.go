@@ -37,5 +37,10 @@ func TestIsPublicIP(t *testing.T) {
 			if !isPublicIP(net.ParseIP("1.1.1.1")) {
 				t.Errorf("ip is not private %v", "127.0.0.1")
 			}
+		}).
+		Run(func() {
+			if isPublicIP(net.ParseIP("1.1.1.1.?")) {
+				t.Errorf("ip is not private %v", "127.0.0.1")
+			}
 		})
 }
