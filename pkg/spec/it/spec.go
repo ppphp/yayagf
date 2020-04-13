@@ -23,14 +23,11 @@ func (s *Spec) When(initF func() (string, error)) *Spec {
 	if err != nil {
 		s.T.Fatalf("%v failed when %v because %v", s.Title, state, err)
 	}
-	s.Condition = append(s.Condition, )
+	s.Condition = append(s.Condition)
 	return s
 }
 
-func (s *Spec) Then(fs func() error ) *Spec {
-	err := fs()
-	if err != nil {
-		s.T.Errorf("%v failed when testing because %v", s.Title, err)
-	}
+func (s *Spec) Run(fs func()) *Spec {
+	fs()
 	return s
 }

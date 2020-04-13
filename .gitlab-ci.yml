@@ -1,4 +1,4 @@
-image: golang:latest
+image: golang:1.13
 
 variables:
   REPO_NAME: gitlab.papegames.com/fengche/yayagf
@@ -12,20 +12,6 @@ stages:
   - test
   - build
 
-format:
-  stage: test
-  script:
-    - go vet $(go list ./... | grep -v /vendor/)
-    - go test -race -cover -coverprofile=./coverage.data $(go list ./... | grep -v /vendor/)
-    - go tool cover -html=./coverage.data -o ./coverage.html
-  artifacts:
-    untracked: true
-
-#lint_code:
-#  stage: test
-#  script:
-#    - golangci-lint run ./...
-
 sonar_analyze:
   stage: test
   only:
@@ -34,6 +20,9 @@ sonar_analyze:
   script:
     - wget http://192.168.0.97:8000/sonar-scanner.tar.gz
     - tar -xvf sonar-scanner.tar.gz
+    - go test -race -cover -v ./... -json -coverprofile=covprofile > test.json
+    - go vet -n ./... 2> report.out
+    - golangci-lint run ./... --out-format=checkstyle > golangci-lint-report.xml || true
     - "./sonar-scanner/bin/sonar-scanner \
       -Dsonar.host.url=http://192.168.0.97:9000 \
       -Dsonar.sources=. \
@@ -41,13 +30,9 @@ sonar_analyze:
       -Dsonar.login=dced6e70e45d30783fda260701e8e0169b61013f \
       -Dsonar.tests=. \
       -Dsonar.exclusions=**/*_test.go,**/vendor/** \
+      -Dsonar.go.tests.reportPaths=test.json \
+      -Dsonar.go.coverage.reportPaths=covprofile \
+      -Dsonar.go.govet.reportPaths=report.out \
+      -Dsonar.go.golangci-lint.reportPaths=golangci-lint-report.xml \
       -Dsonar.test.inclusions=**/*_test.go \
       -Dsonar.test.exclusions=**/vendor/**"
-
-compile:
-  stage: build
-  script:
-    - go build -race -ldflags "-extldflags '-static'" -o $CI_PROJECT_DIR/nnmutex
-  artifacts:
-    paths:
-      - nnmutex
