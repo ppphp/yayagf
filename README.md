@@ -3,6 +3,7 @@
 yet another yet another go web framework
 [![pipeline status](https://gitlab.papegames.com/fengche/yayagf/badges/master/pipeline.svg)](https://gitlab.papegames.com/fengche/yayagf/commits/master)
 [![coverage report](https://gitlab.papegames.com/fengche/yayagf/badges/master/coverage.svg)](https://gitlab.papegames.com/fengche/yayagf/commits/master)
+[![coverage report](https://gitlab.papegames.com/fengche/yayagf/badges/master/coverage.svg)](https://gitlab.papegames.com/fengche/yayagf/commits/master)
 
 ## install
 

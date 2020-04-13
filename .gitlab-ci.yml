@@ -25,7 +25,6 @@ golangci-lint:
   stage: lint
   script:
     - golangci-lint run ./... --out-format=checkstyle > golangci-lint-report.xml || true
-    - ls
   artifacts:
     paths:
       - golangci-lint-report.xml
@@ -45,7 +44,6 @@ sonar_analyze:
     refs:
       - master
   script:
-    - ls
     - wget -q http://192.168.0.97:8000/sonar-scanner.tar.gz
     - tar -xf sonar-scanner.tar.gz
     - "./sonar-scanner/bin/sonar-scanner \
