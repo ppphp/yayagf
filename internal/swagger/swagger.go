@@ -89,14 +89,3 @@ const Swagger = %s
 	log.Printf("create docs.go at  %+v", docFileName)
 	return nil
 }
-
-func (g *Gen) writeFile(b []byte, file string) error {
-	f, err := os.Create(file)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	_, err = f.Write(b)
-	return err
-}

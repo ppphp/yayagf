@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"gitlab.papegames.com/fengche/yayagf/cmd/version"
 	"log"
 	"os"
 
@@ -25,10 +26,13 @@ func Main() {
 		"new":     new.CommandFactory,
 		"package": _package.CommandFactory,
 		"server":  server.CommandFactory,
+		"version":  version.CommandFactory,
 	}
 	exitStatus, err := c.Run()
 	if err != nil {
 		log.Println(err)
 	}
-	os.Exit(exitStatus)
+	if exitStatus != 0 {
+		os.Exit(exitStatus)
+	}
 }
