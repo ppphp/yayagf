@@ -33,7 +33,7 @@ golangci-lint:
 go-test:
   stage: test
   script:
-    - go test -race -cover -v ./... -json -coverprofile=covprofile > test.json
+    - go test -race -cover -v ./cmd/... ./internal/{blueprint,command,ent,file,log}/... ./internal/swagger/ ./pkg/... -json -coverprofile=covprofile > test.json
     - go tool cover -html=covprofile -o covprofile.html
   artifacts:
     paths:

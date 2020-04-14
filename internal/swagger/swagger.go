@@ -24,13 +24,7 @@ func GenerateSwagger() error {
 	if err := New().Build(&Config{
 		SearchDir:          root,
 		MainAPIFile:        "main.go",
-		PropNamingStrategy: "camelcase",
 		OutputDir:          filepath.Join(root, "app", "doc"),
-		ParseVendor:        false,
-		ParseDependency:    false,
-		MarkdownFilesDir:   "",
-		GeneratedTime:      true,
-		Format:             "go",
 	}); err != nil {
 		return err
 	}
@@ -62,23 +56,6 @@ type Config struct {
 
 	// MainAPIFile the Go file path in which 'swagger general API Info' is written
 	MainAPIFile string
-
-	// PropNamingStrategy represents property naming strategy like snakecase,camelcase,pascalcase
-	PropNamingStrategy string
-
-	// ParseVendor whether swag should be parse vendor folder
-	ParseVendor bool
-
-	// ParseDependencies whether swag should be parse outside dependency folder
-	ParseDependency bool
-
-	// MarkdownFilesDir used to find markdownfiles, which can be used for tag descriptions
-	MarkdownFilesDir string
-
-	// GeneratedTime whether swag should generate the timestamp at the top of docs.go
-	GeneratedTime bool
-
-	Format string
 }
 
 // Build builds swagger json file  for given searchDir and mainAPIFile. Returns json
@@ -87,11 +64,7 @@ func (g *Gen) Build(config *Config) error {
 		return fmt.Errorf("dir: %s is not exist", config.SearchDir)
 	}
 
-	log.Println("Generate swagger docs....")
-	p := swag.New(swag.SetMarkdownFileDirectory(config.MarkdownFilesDir))
-	p.PropNamingStrategy = config.PropNamingStrategy
-	p.ParseVendor = config.ParseVendor
-	p.ParseDependency = config.ParseDependency
+	p := swag.New()
 
 	if err := p.ParseAPI(config.SearchDir, config.MainAPIFile); err != nil {
 		return err
@@ -107,36 +80,13 @@ func (g *Gen) Build(config *Config) error {
 		return err
 	}
 
-	switch config.Format {
-	case "json":
-		jsonFileName := path.Join(config.OutputDir, "swagger.json")
-		err = g.writeFile(b, jsonFileName)
-		if err != nil {
-			return err
-		}
-		log.Printf("create swagger.json at  %+v", jsonFileName)
-	case "yaml":
-		yamlFileName := path.Join(config.OutputDir, "swagger.yaml")
-		y, err := g.jsonToYAML(b)
-		if err != nil {
-			return fmt.Errorf("cannot covert json to yaml error: %s", err)
-		}
-		err = g.writeFile(y, yamlFileName)
-		if err != nil {
-			return err
-		}
-		log.Printf("create swagger.yaml at  %+v", yamlFileName)
-	case "go":
-
-		docFileName := path.Join(config.OutputDir, "docs.go")
-		err := ioutil.WriteFile(docFileName, []byte(fmt.Sprintf(`package doc
+	docFileName := path.Join(config.OutputDir, "docs.go")
+	if err := ioutil.WriteFile(docFileName, []byte(fmt.Sprintf(`package doc
 const Swagger = %s
-`, strconv.Quote(string(b)))), 0644)
-		if err != nil {
-			return err
-		}
-		log.Printf("create docs.go at  %+v", docFileName)
+`, strconv.Quote(string(b)))), 0644); err != nil {
+		return err
 	}
+	log.Printf("create docs.go at  %+v", docFileName)
 	return nil
 }
 
