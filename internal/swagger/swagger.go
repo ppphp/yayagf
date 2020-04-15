@@ -12,7 +12,7 @@ import (
 	"strconv"
 
 	"github.com/ghodss/yaml"
-	"github.com/swaggo/swag"
+	"gitlab.papegames.com/fengche/yayagf/internal/swagger/swag"
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
 )
 
