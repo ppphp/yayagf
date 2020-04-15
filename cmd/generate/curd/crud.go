@@ -19,6 +19,9 @@ func CommandFactory() (*cli.Command, error) {
 				return 1, err
 			}
 			mod, err := file.GetMod(root)
+			if err != nil {
+				return 1, err
+			}
 			if err := ent.GenerateCRUDFiles(mod, filepath.Join(root, "app", "schema"), filepath.Join(root, "app", "crud")); err != nil {
 				return 1, err
 			}
