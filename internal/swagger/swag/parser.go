@@ -7,6 +7,7 @@ import (
 	"go/build"
 	goparser "go/parser"
 	"go/token"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -67,6 +68,8 @@ type Parser struct {
 
 	// markdownFileDir holds the path to the folder, where markdown files are stored
 	markdownFileDir string
+
+	logger io.Writer
 }
 
 // New creates a new Parser with default properties.
@@ -91,6 +94,7 @@ func New(options ...func(*Parser)) *Parser {
 		ImportAliases:        make(map[string]map[string]*ast.ImportSpec),
 		CustomPrimitiveTypes: make(map[string]string),
 		registerTypes:        make(map[string]*ast.TypeSpec),
+		logger:               ioutil.Discard,
 	}
 
 	for _, option := range options {
@@ -104,6 +108,12 @@ func New(options ...func(*Parser)) *Parser {
 func SetMarkdownFileDirectory(directoryPath string) func(*Parser) {
 	return func(p *Parser) {
 		p.markdownFileDir = directoryPath
+	}
+}
+
+func SetLogger(writer io.Writer) func(*Parser) {
+	return func(p *Parser) {
+		p.logger = writer
 	}
 }
 
@@ -580,22 +590,22 @@ func (parser *Parser) ParseDefinition(pkgName, typeName string, typeSpec *ast.Ty
 	refTypeName := fullTypeName(pkgName, typeName)
 
 	if typeSpec == nil {
-		Println("Skipping '" + refTypeName + "', pkg '" + pkgName + "' not found, try add flag --parseDependency or --parseVendor.")
+		_, _ = parser.logger.Write([]byte("Skipping '" + refTypeName + "', pkg '" + pkgName + "' not found, try add flag --parseDependency or --parseVendor.\n"))
 		return nil
 	}
 
 	if _, isParsed := parser.swagger.Definitions[refTypeName]; isParsed {
-		Println("Skipping '" + refTypeName + "', already parsed.")
+		_, _ = parser.logger.Write([]byte("Skipping '" + refTypeName + "', already parsed.\n"))
 		return nil
 	}
 
 	if parser.isInStructStack(refTypeName) {
-		Println("Skipping '" + refTypeName + "', recursion detected.")
+		_, _ = parser.logger.Write([]byte("Skipping '" + refTypeName + "', recursion detected.\n"))
 		return nil
 	}
 	parser.structStack = append(parser.structStack, refTypeName)
 
-	Println("Generating " + refTypeName)
+	_, _ = parser.logger.Write([]byte("Generating " + refTypeName+"\n"))
 
 	schema, err := parser.parseTypeExpr(pkgName, typeName, typeSpec.Type)
 	if err != nil {
@@ -727,7 +737,7 @@ func (parser *Parser) parseTypeExpr(pkgName, typeName string, typeExpr ast.Expr)
 		}, nil
 	// ...
 	default:
-		Printf("Type definition of type '%T' is not supported yet. Using 'object' instead.\n", typeExpr)
+		_, _ = parser.logger.Write([]byte(fmt.Sprintf("Type definition of type '%T' is not supported yet. Using 'object' instead.\n", typeExpr)))
 	}
 
 	return &spec.Schema{
@@ -851,7 +861,7 @@ func (parser *Parser) parseStructField(pkgName string, field *ast.Field) (map[st
 			case "array":
 				properties[typeName] = *schema
 			default:
-				Printf("Can't extract properties from a schema of type '%s'", schemaType)
+				_, _ = parser.logger.Write([]byte(fmt.Sprintf("Can't extract properties from a schema of type '%s'", schemaType)))
 			}
 			return properties, schema.SchemaProps.Required, nil
 		}

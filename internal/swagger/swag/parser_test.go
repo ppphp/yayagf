@@ -14,8 +14,7 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	swagMode = test
-	New()
+	New(SetLogger(os.Stdout))
 }
 
 func TestParser_ParseGeneralApiInfo(t *testing.T) {

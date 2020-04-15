@@ -217,7 +217,7 @@ func (operation *Operation) ParseParamComment(commentLine string, astFile *ast.F
 				} else if IsSimplePrimitiveType(prop.Type[0]) {
 					param = createParameter(paramType, prop.Description, name, prop.Type[0], find(schema.Required, name))
 				} else {
-					Println(fmt.Sprintf("skip field [%s] in %s is not supported type for %s", name, refType, paramType))
+					_, _ = operation.parser.logger.Write([]byte(fmt.Sprintf("skip field [%s] in %s is not supported type for %s", name, refType, paramType)))
 					continue
 				}
 				param.CommonValidations.Maximum = prop.Maximum
