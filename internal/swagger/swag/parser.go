@@ -19,7 +19,6 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/KyleBanks/depth"
 	"github.com/go-openapi/jsonreference"
 	"github.com/go-openapi/spec"
 )
@@ -152,6 +151,7 @@ func getPkgName(searchDir string) (string, error) {
 	return outStr, nil
 }
 
+// use parser
 // ParseGeneralAPIInfo parses general api info for given mainAPIFile path
 func (parser *Parser) ParseGeneralAPIInfo(mainAPIFile string) error {
 	fileSet := token.NewFileSet()
@@ -1367,37 +1367,6 @@ func (parser *Parser) getAllGoFileInfo(searchDir string) error {
 	return filepath.Walk(searchDir, parser.visit)
 }
 
-func (parser *Parser) getAllGoFileInfoFromDeps(pkg *depth.Pkg) error {
-	if pkg.Internal || !pkg.Resolved { // ignored internal and not resolved dependencies
-		return nil
-	}
-
-	srcDir := pkg.Raw.Dir
-	files, err := ioutil.ReadDir(srcDir) // only parsing files in the dir(don't contains sub dir files)
-	if err != nil {
-		return err
-	}
-
-	for _, f := range files {
-		if f.IsDir() {
-			continue
-		}
-
-		path := filepath.Join(srcDir, f.Name())
-		if err := parser.parseFile(path); err != nil {
-			return err
-		}
-	}
-
-	for i := 0; i < len(pkg.Deps); i++ {
-		if err := parser.getAllGoFileInfoFromDeps(&pkg.Deps[i]); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (parser *Parser) visit(path string, f os.FileInfo, err error) error {
 	if err := parser.Skip(path, f); err != nil {
 		return err
@@ -1431,7 +1400,7 @@ func (parser *Parser) Skip(path string, f os.FileInfo) error {
 	}
 
 	// exclude all hidden folder
-	if f.IsDir() && len(f.Name()) > 1 && f.Name()[0] == '.' {
+	if f.IsDir() && strings.HasSuffix(f.Name(),".") {
 		return filepath.SkipDir
 	}
 	return nil
