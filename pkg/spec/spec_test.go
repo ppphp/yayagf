@@ -56,7 +56,10 @@ func TestGolden_Compare(t *testing.T) {
 func TestGolden_Update(t *testing.T) {
 	it.Should("ok").Run(func() {
 		g := LoadGolden("testdata/golden.golden")
-		if g.Compare([]byte("a")) {
+		if g == nil {
+			t.Errorf("g is nil")
+		}
+		if !g.Compare([]byte("a")) {
 			t.Errorf("g is not empty")
 		}
 		if err := g.Update(); err != nil {

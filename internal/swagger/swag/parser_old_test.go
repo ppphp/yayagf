@@ -1,3 +1,5 @@
+// +build sql
+
 package swag
 
 import (
@@ -13,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNew(t *testing.T) {
+func TestNew2(t *testing.T) {
 	New(SetLogger(os.Stdout))
 }
 
