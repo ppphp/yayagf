@@ -33,7 +33,7 @@ golangci-lint:
 go-test:
   stage: test
   script:
-    - go test -race -cover -v . ./cmd/... ./internal/{blueprint,command,ent,file,log}/... ./internal/swagger/ ./pkg/... -json -coverprofile=covprofile > test.json
+    - go test -race -cover -v . ./cmd/... ./internal/{blueprint,command,ent,file,log}/...  ./internal/swagger/{,swag/{opration.go,parser.go,property.go,schema.go,swagger.go,parser_test.go}} ./pkg/... -json -coverprofile=covprofile > test.json
   artifacts:
     paths:
       - covprofile
@@ -52,7 +52,7 @@ sonar_analyze:
       -Dsonar.projectKey=$CI_PROJECT_NAME \
       -Dsonar.login=dced6e70e45d30783fda260701e8e0169b61013f \
       -Dsonar.tests=. \
-      -Dsonar.exclusions=**/*_test.go,**/vendor/**,**/testdata/** \
+      -Dsonar.exclusions=**/*_test.go,**/vendor/**,golangci-lint-report.xml,**/testdata/** \
       -Dsonar.go.tests.reportPaths=test.json \
       -Dsonar.go.coverage.reportPaths=covprofile \
       -Dsonar.go.govet.reportPaths=vet \
