@@ -4,14 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"go/ast"
-	"go/build"
 	goparser "go/parser"
 	"go/token"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"reflect"
 	"sort"
@@ -127,28 +125,6 @@ func (parser *Parser) ParseAPI(searchDir string, mainAPIFile string) error {
 	}
 
 	return parser.parseDefinitions()
-}
-
-func getPkgName(searchDir string) (string, error) {
-	cmd := exec.Command("go", "list", "-f={{.ImportPath}}")
-	cmd.Dir = searchDir
-	var stdout, stderr strings.Builder
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("execute go list command, %s, stdout:%s, stderr:%s", err, stdout.String(), stderr.String())
-	}
-
-	outStr, _ := stdout.String(), stderr.String()
-
-	if outStr[0] == '_' { // will shown like _/{GOPATH}/src/{YOUR_PACKAGE} when NOT enable GO MODULE.
-		outStr = strings.TrimPrefix(outStr, "_"+build.Default.GOPATH+"/src/")
-	}
-	f := strings.Split(outStr, "\n")
-	outStr = f[0]
-
-	return outStr, nil
 }
 
 // use parser
@@ -365,34 +341,6 @@ func securitySchemeOAuth2AccessToken(authorizationurl, tokenurl string, scopes m
 		securityScheme.AddScope(scope, description)
 	}
 	return securityScheme
-}
-
-func getMarkdownForTag(tagName string, dirPath string) ([]byte, error) {
-	filesInfos, err := ioutil.ReadDir(dirPath)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, fileInfo := range filesInfos {
-		if fileInfo.IsDir() {
-			continue
-		}
-		fileName := fileInfo.Name()
-
-		if !strings.Contains(fileName, ".md") {
-			continue
-		}
-
-		if strings.Contains(fileName, tagName) {
-			fullPath := filepath.Join(dirPath, fileName)
-			commentInfo, err := ioutil.ReadFile(fullPath)
-			if err != nil {
-				return nil, fmt.Errorf("Failed to read markdown file %s error: %s ", fullPath, err)
-			}
-			return commentInfo, nil
-		}
-	}
-	return nil, fmt.Errorf("Unable to find markdown file for tag %s in the given directory", tagName)
 }
 
 func getScopeScheme(scope string) (string, error) {
@@ -1259,8 +1207,7 @@ func (parser *Parser) parseField(field *ast.Field) (*structField, error) {
 }
 
 func replaceLastTag(slice []spec.Tag, element spec.Tag) {
-	slice = slice[:len(slice)-1]
-	slice = append(slice, element)
+	slice[len(slice)-1] = element
 }
 
 func getFloatTag(structTag reflect.StructTag, tagName string) (*float64, error) {

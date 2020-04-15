@@ -57,7 +57,7 @@ func NewOperation() *Operation {
 
 // ParseComment parses comment for given comment string and returns error if error occurs.
 func (operation *Operation) ParseComment(comment string, astFile *ast.File) error {
-	commentLine := strings.TrimSpace(strings.TrimLeft(comment, "//"))
+	commentLine := strings.TrimSpace(strings.TrimPrefix(comment, "//"))
 	if len(commentLine) == 0 {
 		return nil
 	}
@@ -141,7 +141,7 @@ func (operation *Operation) ParseParamComment(commentLine string, astFile *ast.F
 
 	// Detect refType
 	objectType := "object"
-	if strings.HasPrefix(refType, "[]") == true {
+	if strings.HasPrefix(refType, "[]") {
 		objectType = "array"
 		refType = strings.TrimPrefix(refType, "[]")
 		refType = TransToValidSchemeType(refType)
