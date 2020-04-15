@@ -2236,7 +2236,6 @@ func TestParseNested(t *testing.T) {
 	searchDir := "testdata/nested"
 	mainAPIFile := "main.go"
 	p := New()
-	p.ParseDependency = true
 	err := p.ParseAPI(searchDir, mainAPIFile)
 	assert.NoError(t, err)
 
@@ -2362,7 +2361,6 @@ type ResponseWrapper struct {
    }
 }`
 	parser := New()
-	parser.ParseDependency = true
 
 	f, err := goparser.ParseFile(token.NewFileSet(), "", src, goparser.ParseComments)
 	assert.NoError(t, err)
@@ -2815,7 +2813,6 @@ func TestSkipMustParseVendor(t *testing.T) {
 	f1, _ := os.Stat(folder1)
 
 	parser := New()
-	parser.ParseVendor = true
 
 	assert.True(t, parser.Skip(folder1, f1) == nil)
 	assert.NoError(t, os.Remove(folder1))
@@ -2871,7 +2868,7 @@ func TestSkipMustParseVendor(t *testing.T) {
 func TestApiParseTag(t *testing.T) {
 	searchDir := "testdata/tags"
 	mainAPIFile := "main.go"
-	p := New(SetMarkdownFileDirectory(searchDir))
+	p := New()
 	p.PropNamingStrategy = PascalCase
 	err := p.ParseAPI(searchDir, mainAPIFile)
 	assert.NoError(t, err)
@@ -2900,7 +2897,7 @@ func TestApiParseTag(t *testing.T) {
 func TestParseTagMarkdownDescription(t *testing.T) {
 	searchDir := "testdata/tags"
 	mainAPIFile := "main.go"
-	p := New(SetMarkdownFileDirectory(searchDir))
+	p := New()
 	p.PropNamingStrategy = PascalCase
 	err := p.ParseAPI(searchDir, mainAPIFile)
 	if err != nil {
@@ -2920,7 +2917,7 @@ func TestParseTagMarkdownDescription(t *testing.T) {
 func TestParseApiMarkdownDescription(t *testing.T) {
 	searchDir := "testdata/tags"
 	mainAPIFile := "main.go"
-	p := New(SetMarkdownFileDirectory(searchDir))
+	p := New()
 	p.PropNamingStrategy = PascalCase
 	err := p.ParseAPI(searchDir, mainAPIFile)
 	if err != nil {
@@ -2956,7 +2953,6 @@ func TestParseOutsideDependencies(t *testing.T) {
 	mainAPIFile := "cmd/main.go"
 
 	p := New()
-	p.ParseDependency = true
 	if err := p.ParseAPI(searchDir, mainAPIFile); err != nil {
 		t.Error("Failed to parse api: " + err.Error())
 	}

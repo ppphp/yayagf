@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"reflect"
 	"sort"
@@ -58,16 +57,8 @@ type Parser struct {
 
 	PropNamingStrategy string
 
-	ParseVendor bool
-
-	// ParseDependencies whether swag should be parse outside dependency folder
-	ParseDependency bool
-
 	// structStack stores full names of the structures that were already parsed or are being parsed now
 	structStack []string
-
-	// markdownFileDir holds the path to the folder, where markdown files are stored
-	markdownFileDir string
 
 	logger io.Writer
 }
@@ -104,13 +95,6 @@ func New(options ...func(*Parser)) *Parser {
 	return parser
 }
 
-// SetMarkdownFileDirectory sets the directory to search for markdownfiles
-func SetMarkdownFileDirectory(directoryPath string) func(*Parser) {
-	return func(p *Parser) {
-		p.markdownFileDir = directoryPath
-	}
-}
-
 func SetLogger(writer io.Writer) func(*Parser) {
 	return func(p *Parser) {
 		p.logger = writer
@@ -124,26 +108,9 @@ func (parser *Parser) ParseAPI(searchDir string, mainAPIFile string) error {
 		return err
 	}
 
-	var t depth.Tree
-
 	absMainAPIFilePath, err := filepath.Abs(filepath.Join(searchDir, mainAPIFile))
 	if err != nil {
 		return err
-	}
-
-	if parser.ParseDependency {
-		pkgName, err := getPkgName(path.Dir(absMainAPIFilePath))
-		if err != nil {
-			return err
-		}
-		if err := t.Resolve(pkgName); err != nil {
-			return fmt.Errorf("pkg %s cannot find all dependencies, %s", pkgName, err)
-		}
-		for i := 0; i < len(t.Root.Deps); i++ {
-			if err := parser.getAllGoFileInfoFromDeps(&t.Root.Deps[i]); err != nil {
-				return err
-			}
-		}
 	}
 
 	if err := parser.ParseGeneralAPIInfo(absMainAPIFilePath); err != nil {
@@ -221,12 +188,6 @@ func (parser *Parser) ParseGeneralAPIInfo(mainAPIFile string) error {
 					continue
 				}
 				parser.swagger.Info.Description = value
-			case "@description.markdown":
-				commentInfo, err := getMarkdownForTag("api", parser.markdownFileDir)
-				if err != nil {
-					return err
-				}
-				parser.swagger.Info.Description = string(commentInfo)
 			case "@termsofservice":
 				parser.swagger.Info.TermsOfService = value
 			case "@contact.name":
@@ -254,14 +215,6 @@ func (parser *Parser) ParseGeneralAPIInfo(mainAPIFile string) error {
 			case "@tag.description":
 				tag := parser.swagger.Tags[len(parser.swagger.Tags)-1]
 				tag.TagProps.Description = value
-				replaceLastTag(parser.swagger.Tags, tag)
-			case "@tag.description.markdown":
-				tag := parser.swagger.Tags[len(parser.swagger.Tags)-1]
-				commentInfo, err := getMarkdownForTag(tag.TagProps.Name, parser.markdownFileDir)
-				if err != nil {
-					return err
-				}
-				tag.TagProps.Description = string(commentInfo)
 				replaceLastTag(parser.swagger.Tags, tag)
 			case "@tag.docs.url":
 				tag := parser.swagger.Tags[len(parser.swagger.Tags)-1]
@@ -605,7 +558,7 @@ func (parser *Parser) ParseDefinition(pkgName, typeName string, typeSpec *ast.Ty
 	}
 	parser.structStack = append(parser.structStack, refTypeName)
 
-	_, _ = parser.logger.Write([]byte("Generating " + refTypeName+"\n"))
+	_, _ = parser.logger.Write([]byte("Generating " + refTypeName + "\n"))
 
 	schema, err := parser.parseTypeExpr(pkgName, typeName, typeSpec.Type)
 	if err != nil {
@@ -1468,10 +1421,8 @@ func (parser *Parser) parseFile(path string) error {
 // Skip returns filepath.SkipDir error if match vendor and hidden folder
 func (parser *Parser) Skip(path string, f os.FileInfo) error {
 
-	if !parser.ParseVendor { // ignore vendor
-		if f.IsDir() && f.Name() == "vendor" {
-			return filepath.SkipDir
-		}
+	if f == nil || (f.IsDir() && f.Name() == "vendor") {
+		return filepath.SkipDir
 	}
 
 	// issue
