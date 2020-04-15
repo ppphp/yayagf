@@ -127,7 +127,7 @@ func (parser *Parser) ParseAPI(searchDir string, mainAPIFile string) error {
 	return parser.parseDefinitions()
 }
 
-// use parser
+// use swag parser
 // ParseGeneralAPIInfo parses general api info for given mainAPIFile path
 func (parser *Parser) ParseGeneralAPIInfo(mainAPIFile string) error {
 	fileSet := token.NewFileSet()
@@ -147,8 +147,12 @@ func (parser *Parser) ParseGeneralAPIInfo(mainAPIFile string) error {
 		previousAttribute := ""
 		// parsing classic meta data model
 		for i, commentLine := range comments {
-			attribute := strings.ToLower(strings.Split(commentLine, " ")[0])
-			value := strings.TrimSpace(commentLine[len(attribute):])
+			kv := strings.SplitN(commentLine, " ", 2)
+			attribute := kv[0]
+			value := ""
+			if len(kv) >= 2 {
+				value = strings.TrimSpace(kv[1])
+			}
 			multilineBlock := false
 			if previousAttribute == attribute {
 				multilineBlock = true
@@ -1337,7 +1341,7 @@ func (parser *Parser) parseFile(path string) error {
 // Skip returns filepath.SkipDir error if match vendor and hidden folder
 func (parser *Parser) Skip(path string, f os.FileInfo) error {
 
-	if f == nil || (f.IsDir() && f.Name() == "vendor") {
+	if f != nil && f.IsDir() && f.Name() == "vendor" {
 		return filepath.SkipDir
 	}
 
@@ -1347,7 +1351,7 @@ func (parser *Parser) Skip(path string, f os.FileInfo) error {
 	}
 
 	// exclude all hidden folder
-	if f.IsDir() && strings.HasSuffix(f.Name(),".") {
+	if f.IsDir() && strings.HasSuffix(f.Name(), ".") {
 		return filepath.SkipDir
 	}
 	return nil

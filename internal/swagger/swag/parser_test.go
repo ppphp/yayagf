@@ -2805,66 +2805,6 @@ func TestSkip(t *testing.T) {
 	assert.True(t, parser.Skip(currentPath, currentPathInfo) == nil)
 }
 
-func TestSkipMustParseVendor(t *testing.T) {
-	folder1 := "/tmp/vendor"
-	err := os.Mkdir(folder1, os.ModePerm)
-	assert.NoError(t, err)
-
-	f1, _ := os.Stat(folder1)
-
-	parser := New()
-
-	assert.True(t, parser.Skip(folder1, f1) == nil)
-	assert.NoError(t, os.Remove(folder1))
-
-	folder2 := "/tmp/.git"
-	err = os.Mkdir(folder2, os.ModePerm)
-	assert.NoError(t, err)
-
-	f2, _ := os.Stat(folder2)
-
-	assert.True(t, parser.Skip(folder2, f2) == filepath.SkipDir)
-	assert.NoError(t, os.Remove(folder2))
-
-	currentPath := "./"
-	currentPathInfo, _ := os.Stat(currentPath)
-	assert.True(t, parser.Skip(currentPath, currentPathInfo) == nil)
-
-	folder3 := "/tmp/test/vendor/github.com/swaggo/swag"
-	assert.NoError(t, os.MkdirAll(folder3, os.ModePerm))
-	f3, _ := os.Stat(folder3)
-
-	assert.Nil(t, parser.Skip(folder3, f3))
-	assert.NoError(t, os.RemoveAll("/tmp/test"))
-}
-
-// func TestParseDeterministic(t *testing.T) {
-// 	mainAPIFile := "main.go"
-// 	for _, searchDir := range []string{
-// 		"testdata/simple",
-// 		"testdata/model_not_under_root/cmd",
-// 	} {
-// 		t.Run(searchDir, func(t *testing.T) {
-// 			var expected string
-
-// 			// run the same code 100 times and check that the output is the same every time
-// 			for i := 0; i < 100; i++ {
-// 				p := New()
-// 				p.PropNamingStrategy = PascalCase
-// 				err := p.ParseAPI(searchDir, mainAPIFile)
-// 				b, _ := json.MarshalIndent(p.swagger, "", "    ")
-// 				assert.NotEqual(t, "", string(b))
-
-// 				if expected == "" {
-// 					expected = string(b)
-// 				}
-
-// 				assert.Equal(t, expected, string(b))
-// 			}
-// 		})
-// 	}
-// }
-
 func TestApiParseTag(t *testing.T) {
 	searchDir := "testdata/tags"
 	mainAPIFile := "main.go"
