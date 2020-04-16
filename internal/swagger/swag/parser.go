@@ -167,7 +167,7 @@ func (parser *Parser) ParseGeneralAPIInfo(mainAPIFile string) error {
 					continue
 				}
 				parser.swagger.Info.Description = value
-			case "@info.termsofservice":
+			case "@info.termsOfService":
 				parser.swagger.Info.TermsOfService = value
 			case "@info.contact.name":
 				parser.swagger.Info.Contact.Name = value

@@ -33,5 +33,34 @@ func TestParser_ParseGeneralApiInfo(t *testing.T) {
 
 		b, _ := json.MarshalIndent(p.swagger, "", "    ")
 		assert.True(t, g.Compare(b))
+	}).Run(func() {
+		g:=spec.LoadGolden("./testdata/ParseGeneralApiInfoInfo.golden")
+		p := New()
+		err := p.ParseGeneralAPIInfo("./testdata/ParseGeneralApiInfoInfo.go")
+		assert.NoError(t, err)
+
+		b, _ := json.MarshalIndent(p.swagger, "", "    ")
+		assert.True(t, g.Compare(b))
+	})/* TODO: finish it
+	.Run(func() {
+		g:=spec.LoadGolden("./testdata/ParseGeneralApiInfoAll.golden")
+		p := New()
+		err := p.ParseGeneralAPIInfo("./testdata/ParseGeneralApiInfoAll.go")
+		assert.NoError(t, err)
+
+		b, _ := json.MarshalIndent(p.swagger, "", "    ")
+		assert.True(t, g.Compare(b))
+	})*/
+
+	it.Should("cover no main").Run(func() {
+		p := New()
+		assert.Error(t, p.ParseGeneralAPIInfo("./testdata/nothing.go"))
 	})
+
+	it.Should("cover fail x-").Run(func() {
+		p := New()
+		err := p.ParseGeneralAPIInfo("./testdata/ParseGeneralApiInfoXFail.go")
+		assert.Error(t, err)
+	})
+
 }
