@@ -6,6 +6,7 @@ import (
 	"go/ast"
 	goparser "go/parser"
 	"go/token"
+	"golang.org/x/xerrors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -127,11 +128,11 @@ func (parser *Parser) ParseAPI(searchDir string, mainAPIFile string) error {
 	return parser.parseDefinitions()
 }
 
-// use swag parser
+// use swag original parser, source is https://swagger.io/specification/v2/#fixed-fields
+// all fields except paths, definitions, parameters, responses, TODO: support securityDefinitions, security, tags
 // ParseGeneralAPIInfo parses general api info for given mainAPIFile path
 func (parser *Parser) ParseGeneralAPIInfo(mainAPIFile string) error {
-	fileSet := token.NewFileSet()
-	fileTree, err := goparser.ParseFile(fileSet, mainAPIFile, nil, goparser.ParseComments)
+	fileTree, err := parseFile(mainAPIFile)
 	if err != nil {
 		return fmt.Errorf("cannot parse source files %s: %s", mainAPIFile, err)
 	}
@@ -158,34 +159,38 @@ func (parser *Parser) ParseGeneralAPIInfo(mainAPIFile string) error {
 				multilineBlock = true
 			}
 			switch attribute {
-			case "@version":
-				parser.swagger.Info.Version = value
-			case "@title":
+			case "@info.title":
 				parser.swagger.Info.Title = value
-			case "@description":
+			case "@info.description":
 				if multilineBlock {
 					parser.swagger.Info.Description += "\n" + value
 					continue
 				}
 				parser.swagger.Info.Description = value
-			case "@termsofservice":
+			case "@info.termsofservice":
 				parser.swagger.Info.TermsOfService = value
-			case "@contact.name":
+			case "@info.contact.name":
 				parser.swagger.Info.Contact.Name = value
-			case "@contact.email":
-				parser.swagger.Info.Contact.Email = value
-			case "@contact.url":
+			case "@info.contact.url":
 				parser.swagger.Info.Contact.URL = value
-			case "@license.name":
+			case "@info.contact.email":
+				parser.swagger.Info.Contact.Email = value
+			case "@info.license.name":
 				parser.swagger.Info.License.Name = value
-			case "@license.url":
+			case "@info.license.url":
 				parser.swagger.Info.License.URL = value
+			case "@info.version":
+				parser.swagger.Info.Version = value
 			case "@host":
 				parser.swagger.Host = value
 			case "@basepath":
 				parser.swagger.BasePath = value
 			case "@schemes":
-				parser.swagger.Schemes = getSchemes(commentLine)
+				parser.swagger.Schemes = strings.Split(value, " ")
+			case "@consumes":
+				parser.swagger.Consumes = strings.Split(value, " ")
+			case "@produces":
+				parser.swagger.Produces = strings.Split(value, " ")
 			case "@tag.name":
 				parser.swagger.Tags = append(parser.swagger.Tags, spec.Tag{
 					TagProps: spec.TagProps{
@@ -209,6 +214,10 @@ func (parser *Parser) ParseGeneralAPIInfo(mainAPIFile string) error {
 				}
 				tag.TagProps.ExternalDocs.Description = value
 				replaceLastTag(parser.swagger.Tags, tag)
+			case "@externalDocs.description":
+				parser.swagger.ExternalDocs.Description = value
+			case "@externalDocs.url":
+				parser.swagger.ExternalDocs.URL = value
 			case "@securitydefinitions.basic":
 				securityMap[value] = spec.BasicAuth()
 			case "@securitydefinitions.apikey":
@@ -245,17 +254,14 @@ func (parser *Parser) ParseGeneralAPIInfo(mainAPIFile string) error {
 			default:
 				prefixExtension := "@x-"
 				if len(attribute) > 5 { // Prefix extension + 1 char + 1 space  + 1 char
-					if attribute[:len(prefixExtension)] == prefixExtension {
-						var valueJSON interface{}
-						split := strings.SplitAfter(commentLine, attribute+" ")
-						if len(split) < 2 {
-							return fmt.Errorf("annotation %s need a value", attribute)
+					if strings.HasPrefix(attribute, prefixExtension) {
+						var valueJSON interface{} = nil
+						if strings.TrimSpace(value) != "" {
+							if err := json.Unmarshal([]byte(value), &valueJSON); err != nil {
+								return fmt.Errorf("annotation %s need a valid json value", attribute)
+							}
 						}
-						extensionName := "x-" + strings.SplitAfter(attribute, prefixExtension)[1]
-						if err := json.Unmarshal([]byte(split[1]), &valueJSON); err != nil {
-							return fmt.Errorf("annotation %s need a valid json value", attribute)
-						}
-						parser.swagger.AddExtension(extensionName, valueJSON)
+						parser.swagger.AddExtension(attribute[1:], valueJSON)
 					}
 				}
 			}
@@ -365,12 +371,6 @@ func isExistsScope(scope string) (bool, error) {
 		}
 	}
 	return strings.Contains(scope, "@scope."), nil
-}
-
-// getSchemes parses swagger schemes for given commentLine
-func getSchemes(commentLine string) []string {
-	attribute := strings.ToLower(strings.Split(commentLine, " ")[0])
-	return strings.Split(strings.TrimSpace(commentLine[len(attribute):]), " ")
 }
 
 // ParseRouterAPIInfo parses router api info for given astFile
@@ -1319,40 +1319,15 @@ func (parser *Parser) getAllGoFileInfo(searchDir string) error {
 }
 
 func (parser *Parser) visit(path string, f os.FileInfo, err error) error {
-	if err := parser.Skip(path, f); err != nil {
-		return err
+	if (f == nil) || (f.IsDir() && f.Name() == "vendor") || (f.IsDir() && f.Name() == "docs") || (f.IsDir() && strings.HasPrefix(f.Name(), ".")) {
+		return filepath.SkipDir
 	}
-	return parser.parseFile(path)
-}
-
-func (parser *Parser) parseFile(path string) error {
 	if ext := filepath.Ext(path); ext == ".go" {
-		fset := token.NewFileSet() // positions are relative to fset
-		astFile, err := goparser.ParseFile(fset, path, nil, goparser.ParseComments)
+		astFile, err := parseFile(path)
 		if err != nil {
-			return fmt.Errorf("ParseFile error:%+v", err)
+			return xerrors.Errorf("ParseFile error:%+v", err)
 		}
-
 		parser.files[path] = astFile
-	}
-	return nil
-}
-
-// Skip returns filepath.SkipDir error if match vendor and hidden folder
-func (parser *Parser) Skip(path string, f os.FileInfo) error {
-
-	if f != nil && f.IsDir() && f.Name() == "vendor" {
-		return filepath.SkipDir
-	}
-
-	// issue
-	if f.IsDir() && f.Name() == "docs" {
-		return filepath.SkipDir
-	}
-
-	// exclude all hidden folder
-	if f.IsDir() && strings.HasSuffix(f.Name(), ".") {
-		return filepath.SkipDir
 	}
 	return nil
 }
@@ -1360,4 +1335,8 @@ func (parser *Parser) Skip(path string, f os.FileInfo) error {
 // GetSwagger returns *spec.Swagger which is the root document object for the API specification.
 func (parser *Parser) GetSwagger() *spec.Swagger {
 	return parser.swagger
+}
+
+func parseFile(path string) (*ast.File, error) {
+	return goparser.ParseFile(token.NewFileSet(), path, nil, goparser.ParseComments)
 }

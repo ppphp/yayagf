@@ -1,6 +1,8 @@
 package spec
 
 import (
+	"fmt"
+	"github.com/sergi/go-diff/diffmatchpatch"
 	"golang.org/x/xerrors"
 	"io/ioutil"
 )
@@ -24,10 +26,21 @@ type Golden struct {
 
 func (g *Golden) Compare(data []byte) bool {
 	g.result = data
-	return string(data) == string(g.expect)
+	if string(data) == string(g.expect) {
+		return true
+	}
+	dmp := diffmatchpatch.New()
+
+	diffs := dmp.DiffMain(string(data), string(g.expect), false)
+
+	fmt.Println(string(data))
+	fmt.Println(string(g.expect))
+	fmt.Println(dmp.DiffToDelta(diffs))
+
+	return false
 }
 
-func (g *Golden) Update() error{
+func (g *Golden) Update() error {
 	return ioutil.WriteFile(g.filename, g.result, 0644)
 }
 

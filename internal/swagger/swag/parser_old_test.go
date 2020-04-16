@@ -275,12 +275,6 @@ func TestParser_ParseType(t *testing.T) {
 	assert.NotNil(t, p.TypeDefinitions["web"]["Pet2"])
 }
 
-func TestGetSchemes(t *testing.T) {
-	schemes := getSchemes("@schemes http https")
-	expectedSchemes := []string{"http", "https"}
-	assert.Equal(t, expectedSchemes, schemes)
-}
-
 func TestParseSimpleApi1(t *testing.T) {
 	expected := `{
     "swagger": "2.0",
