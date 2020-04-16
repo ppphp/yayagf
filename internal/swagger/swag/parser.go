@@ -102,16 +102,16 @@ func SetLogger(writer io.Writer) func(*Parser) {
 // ParseAPI parses general api info for given searchDir and mainAPIFile
 func (parser *Parser) ParseAPI(searchDir string, mainAPIFile string) error {
 
-	if err := parser.getAllGoFileInfo(searchDir); err != nil {
-		return err
-	}
-
 	absMainAPIFilePath, err := filepath.Abs(filepath.Join(searchDir, mainAPIFile))
 	if err != nil {
 		return err
 	}
 
 	if err := parser.ParseGeneralAPIInfo(absMainAPIFilePath); err != nil {
+		return err
+	}
+
+	if err := parser.getAllGoFileInfo(searchDir); err != nil {
 		return err
 	}
 
