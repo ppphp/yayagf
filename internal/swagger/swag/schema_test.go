@@ -1,5 +1,3 @@
-// +build sql
-
 package swag
 
 import (

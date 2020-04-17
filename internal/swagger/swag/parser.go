@@ -440,6 +440,7 @@ func (parser *Parser) ParseType(astFile *ast.File) {
 		}
 	}
 
+	// looks like to get types from import files
 	for _, importSpec := range astFile.Imports {
 		if importSpec.Name == nil {
 			continue
