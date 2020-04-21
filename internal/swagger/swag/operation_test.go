@@ -192,6 +192,49 @@ func TestOperation_ParseEmptyResponseOnly(t *testing.T) {
 
 }
 
+func TestOperation_ParseSecurityComment(t *testing.T) {
+
+}
+
+func TestOperation_ParseMetadata(t *testing.T) {
+	t.Run("need a value", func(t *testing.T) {
+		operation := NewOperation()
+		operation.parser = New()
+		err := operation.ParseMetadata("@x-amazon-apigateway-integration", "@x-amazon-apigateway-integration", "")
+		assert.EqualError(t, err, "annotation @x-amazon-apigateway-integration need a value")
+	})
+
+	// Fail if args of attributes are broken.
+	t.Run("attributes are broken", func(t *testing.T) {
+		comment := `@x-amazon-apigateway-integration ["broken"}]`
+		operation := NewOperation()
+		operation.parser = New()
+
+		err := operation.ParseComment(comment, nil)
+		assert.EqualError(t, err, "annotation @x-amazon-apigateway-integration need a valid json value")
+	})
+
+	t.Run("pass", func(t *testing.T) {
+		comment := `@x-amazon-apigateway-integration {"uri": "${some_arn}", "passthroughBehavior": "when_no_match", "httpMethod": "POST", "type": "aws_proxy"}`
+		operation := NewOperation()
+		operation.parser = New()
+
+		err := operation.ParseComment(comment, nil)
+		assert.NoError(t, err)
+
+		expected := `{
+    "x-amazon-apigateway-integration": {
+        "httpMethod": "POST",
+        "passthroughBehavior": "when_no_match",
+        "type": "aws_proxy",
+        "uri": "${some_arn}"
+    }
+}`
+		b, _ := json.MarshalIndent(operation, "", "    ")
+		assert.Equal(t, expected, string(b))
+	})
+}
+
 func TestOperation_ParseComment(t *testing.T) {
 	t.Run("test empty",
 		func(t *testing.T) {

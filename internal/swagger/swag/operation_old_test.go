@@ -13,63 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParseRouterComment(t *testing.T) {
-	comment := `/@Router /customer/get-wishlist/{wishlist_id} [get]`
-	operation := NewOperation()
-	err := operation.ParseComment(comment, nil)
-	assert.NoError(t, err)
-	assert.Equal(t, "/customer/get-wishlist/{wishlist_id}", operation.Path)
-	assert.Equal(t, "GET", operation.HTTPMethod)
-}
-
-func TestParseRouterOnlySlash(t *testing.T) {
-	comment := `// @Router / [get]`
-	operation := NewOperation()
-	err := operation.ParseComment(comment, nil)
-	assert.NoError(t, err)
-	assert.Equal(t, "/", operation.Path)
-	assert.Equal(t, "GET", operation.HTTPMethod)
-}
-
-func TestParseRouterCommentWithPlusSign(t *testing.T) {
-	comment := `/@Router /customer/get-wishlist/{proxy+} [post]`
-	operation := NewOperation()
-	err := operation.ParseComment(comment, nil)
-	assert.NoError(t, err)
-	assert.Equal(t, "/customer/get-wishlist/{proxy+}", operation.Path)
-	assert.Equal(t, "POST", operation.HTTPMethod)
-}
-
-func TestParseRouterCommentWithColonSign(t *testing.T) {
-	comment := `/@Router /customer/get-wishlist/{wishlist_id}:move [post]`
-	operation := NewOperation()
-	err := operation.ParseComment(comment, nil)
-	assert.NoError(t, err)
-	assert.Equal(t, "/customer/get-wishlist/{wishlist_id}:move", operation.Path)
-	assert.Equal(t, "POST", operation.HTTPMethod)
-}
-
-func TestParseRouterCommentNoColonSignAtPathStartErr(t *testing.T) {
-	comment := `/@Router :customer/get-wishlist/{wishlist_id}:move [post]`
-	operation := NewOperation()
-	err := operation.ParseComment(comment, nil)
-	assert.Error(t, err)
-}
-
-func TestParseRouterCommentMethodSeparationErr(t *testing.T) {
-	comment := `/@Router /api/{id}|,*[get`
-	operation := NewOperation()
-	err := operation.ParseComment(comment, nil)
-	assert.Error(t, err)
-}
-
-func TestParseRouterCommentMethodMissingErr(t *testing.T) {
-	comment := `/@Router /customer/get-wishlist/{wishlist_id}`
-	operation := NewOperation()
-	err := operation.ParseComment(comment, nil)
-	assert.Error(t, err)
-}
-
 func TestParseResponseCommentWithObjectType(t *testing.T) {
 	comment := `@Success 200 {object} model.OrderRow "Error message, if code != 200`
 	operation := NewOperation()
@@ -814,28 +757,6 @@ func TestParseSecurityComment(t *testing.T) {
 	assert.Equal(t, expected, string(b))
 }
 
-func TestParseMultiDescription(t *testing.T) {
-	comment := `@Description line one`
-	operation := NewOperation()
-	operation.parser = New()
-
-	err := operation.ParseComment(comment, nil)
-	assert.NoError(t, err)
-
-	comment = `@Tags multi`
-	err = operation.ParseComment(comment, nil)
-	assert.NoError(t, err)
-
-	comment = `@Description line two x`
-	err = operation.ParseComment(comment, nil)
-	assert.NoError(t, err)
-
-	b, _ := json.MarshalIndent(operation, "", "    ")
-
-	expected := `"description": "line one\nline two x"`
-	assert.Contains(t, string(b), expected)
-}
-
 func TestParseSummary(t *testing.T) {
 	comment := `@summary line one`
 	operation := NewOperation()
@@ -847,19 +768,6 @@ func TestParseSummary(t *testing.T) {
 	comment = `@Summary line one`
 	err = operation.ParseComment(comment, nil)
 	assert.NoError(t, err)
-}
-
-func TestParseDeprecationDescription(t *testing.T) {
-	comment := `@Deprecated`
-	operation := NewOperation()
-	operation.parser = New()
-
-	err := operation.ParseComment(comment, nil)
-	assert.NoError(t, err)
-
-	if !operation.Deprecated {
-		t.Error("Failed to parse @deprecated comment")
-	}
 }
 
 func TestRegisterSchemaType(t *testing.T) {
@@ -875,47 +783,4 @@ func TestRegisterSchemaType(t *testing.T) {
 	operation.parser = New()
 	_, _, err = operation.registerSchemaType("timer.Location", astFile)
 	assert.Error(t, err)
-}
-
-func TestParseExtentions(t *testing.T) {
-	// Fail if there are no args for attributes.
-	{
-		comment := `@x-amazon-apigateway-integration`
-		operation := NewOperation()
-		operation.parser = New()
-
-		err := operation.ParseComment(comment, nil)
-		assert.EqualError(t, err, "annotation @x-amazon-apigateway-integration need a value")
-	}
-
-	// Fail if args of attributes are broken.
-	{
-		comment := `@x-amazon-apigateway-integration ["broken"}]`
-		operation := NewOperation()
-		operation.parser = New()
-
-		err := operation.ParseComment(comment, nil)
-		assert.EqualError(t, err, "annotation @x-amazon-apigateway-integration need a valid json value")
-	}
-
-	// OK
-	{
-		comment := `@x-amazon-apigateway-integration {"uri": "${some_arn}", "passthroughBehavior": "when_no_match", "httpMethod": "POST", "type": "aws_proxy"}`
-		operation := NewOperation()
-		operation.parser = New()
-
-		err := operation.ParseComment(comment, nil)
-		assert.NoError(t, err)
-
-		expected := `{
-    "x-amazon-apigateway-integration": {
-        "httpMethod": "POST",
-        "passthroughBehavior": "when_no_match",
-        "type": "aws_proxy",
-        "uri": "${some_arn}"
-    }
-}`
-		b, _ := json.MarshalIndent(operation, "", "    ")
-		assert.Equal(t, expected, string(b))
-	}
 }

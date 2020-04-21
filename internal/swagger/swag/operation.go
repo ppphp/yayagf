@@ -20,11 +20,11 @@ import (
 // Operation describes a single API operation on a path.
 // For more information: https://github.com/swaggo/swag#api-operation
 type Operation struct {
-	HTTPMethod string
-	Path       string
 	spec.Operation
 
-	parser *Parser
+	HTTPMethod string
+	Path       string
+	parser     *Parser
 }
 
 var mimeTypeAliases = map[string]string{
@@ -42,8 +42,6 @@ var mimeTypeAliases = map[string]string{
 	"jpg":                   "image/jpeg",
 	"gif":                   "image/gif",
 }
-
-var mimeTypePattern = regexp.MustCompile("^[^/]+/[^/]+$")
 
 // NewOperation creates a new Operation with default properties.
 // map[int]Response
@@ -516,7 +514,7 @@ func (operation *Operation) ParseRouterComment(commentLine string) error {
 	}
 
 	operation.Path = rm[0]
-	operation.HTTPMethod = strings.ToUpper(rm[1][1:len(rm[1])-1])
+	operation.HTTPMethod = strings.ToUpper(rm[1][1 : len(rm[1])-1])
 
 	return nil
 }
