@@ -26,7 +26,7 @@ func TestTransToValidSchemeType(t *testing.T) {
 	assert.Equal(t, TransToValidSchemeType("string"), "string")
 
 	// should accept any type, due to user defined types
-	TransToValidSchemeType("oops")
+	assert.Equal(t, TransToValidSchemeType("oops"), "oops")
 }
 
 func TestIsGolangPrimitiveType(t *testing.T) {
