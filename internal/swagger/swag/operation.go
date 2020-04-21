@@ -39,6 +39,7 @@ var mimeTypeAliases = map[string]string{
 	"octet-stream":          "application/octet-stream",
 	"png":                   "image/png",
 	"jpeg":                  "image/jpeg",
+	"jpg":                   "image/jpeg",
 	"gif":                   "image/gif",
 }
 
@@ -57,7 +58,7 @@ func NewOperation() *Operation {
 
 // ParseComment parses comment for given comment string and returns error if error occurs.
 func (operation *Operation) ParseComment(comment string, astFile *ast.File) error {
-	commentLine := strings.TrimSpace(strings.TrimPrefix(comment, "//"))
+	commentLine := strings.TrimSpace(strings.TrimLeft(comment, "/"))
 	if len(commentLine) == 0 {
 		return nil
 	}
@@ -100,11 +101,10 @@ func (operation *Operation) ParseComment(comment string, astFile *ast.File) erro
 
 // ParseDescriptionComment godoc
 func (operation *Operation) ParseDescriptionComment(lineRemainder string) {
-	if operation.Description == "" {
-		operation.Description = lineRemainder
-		return
+	if operation.Description != "" {
+		operation.Description += "\n"
 	}
-	operation.Description += "\n" + lineRemainder
+	operation.Description += lineRemainder
 }
 
 // ParseMetadata godoc

@@ -13,13 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParseEmptyComment(t *testing.T) {
-	operation := NewOperation()
-	err := operation.ParseComment("//", nil)
-
-	assert.NoError(t, err)
-}
-
 func TestParseTagsComment(t *testing.T) {
 	expected := `{
     "tags": [
