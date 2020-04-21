@@ -478,29 +478,30 @@ func (operation *Operation) ParseTagsComment(commentLine string) {
 
 // ParseAcceptComment parses comment for given `accept` comment string.
 func (operation *Operation) ParseAcceptComment(commentLine string) error {
-	return parseMimeTypeList(commentLine, &operation.Consumes, "%v accept type can't be accepted")
+	mimeTypes := strings.Split(commentLine, ",")
+	for _, typeName := range mimeTypes {
+		if aliasMimeType, ok := mimeTypeAliases[typeName]; ok {
+			typeName = aliasMimeType
+		}
+		if len(strings.Split(typeName, "/")) != 2 {
+			return fmt.Errorf("%v accept type can't be accepted", typeName)
+		}
+		operation.Consumes = append(operation.Consumes, typeName)
+	}
+	return nil
 }
 
 // ParseProduceComment parses comment for given `produce` comment string.
 func (operation *Operation) ParseProduceComment(commentLine string) error {
-	return parseMimeTypeList(commentLine, &operation.Produces, "%v produce type can't be accepted")
-}
-
-// parseMimeTypeList parses a list of MIME Types for a comment like
-// `produce` (`Content-Type:` response header) or
-// `accept` (`Accept:` request header)
-func parseMimeTypeList(mimeTypeList string, typeList *[]string, format string) error {
-	mimeTypes := strings.Split(mimeTypeList, ",")
+	mimeTypes := strings.Split(commentLine, ",")
 	for _, typeName := range mimeTypes {
-		if mimeTypePattern.MatchString(typeName) {
-			*typeList = append(*typeList, typeName)
-			continue
-		}
 		if aliasMimeType, ok := mimeTypeAliases[typeName]; ok {
-			*typeList = append(*typeList, aliasMimeType)
-			continue
+			typeName = aliasMimeType
 		}
-		return fmt.Errorf(format, typeName)
+		if len(strings.Split(typeName, "/")) != 2 {
+			return fmt.Errorf("%v produce type can't be accepted", typeName)
+		}
+		operation.Produces = append(operation.Produces, typeName)
 	}
 	return nil
 }
