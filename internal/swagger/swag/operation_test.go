@@ -185,11 +185,22 @@ func TestOperation_ParseResponseHeaderComment(t *testing.T) {
 }
 
 func TestOperation_ParseEmptyResponseComment(t *testing.T) {
-
 }
 
 func TestOperation_ParseEmptyResponseOnly(t *testing.T) {
+	comment := `200`
+	operation := NewOperation()
+	err := operation.ParseEmptyResponseOnly(comment)
+	assert.NoError(t, err, "ParseComment should not fail")
 
+	b, _ := json.MarshalIndent(operation, "", "    ")
+
+	expected := `{
+    "responses": {
+        "200": {}
+    }
+}`
+	assert.Equal(t, expected, string(b))
 }
 
 func TestOperation_ParseSecurityComment(t *testing.T) {
@@ -206,20 +217,18 @@ func TestOperation_ParseMetadata(t *testing.T) {
 
 	// Fail if args of attributes are broken.
 	t.Run("attributes are broken", func(t *testing.T) {
-		comment := `@x-amazon-apigateway-integration ["broken"}]`
 		operation := NewOperation()
 		operation.parser = New()
 
-		err := operation.ParseComment(comment, nil)
+		err := operation.ParseMetadata("@x-amazon-apigateway-integration", "@x-amazon-apigateway-integration", "[\"broken\"}]")
 		assert.EqualError(t, err, "annotation @x-amazon-apigateway-integration need a valid json value")
 	})
 
 	t.Run("pass", func(t *testing.T) {
-		comment := `@x-amazon-apigateway-integration {"uri": "${some_arn}", "passthroughBehavior": "when_no_match", "httpMethod": "POST", "type": "aws_proxy"}`
 		operation := NewOperation()
 		operation.parser = New()
 
-		err := operation.ParseComment(comment, nil)
+		err := operation.ParseMetadata("@x-amazon-apigateway-integration","@x-amazon-apigateway-integration", "{\"uri\": \"${some_arn}\", \"passthroughBehavior\": \"when_no_match\", \"httpMethod\": \"POST\", \"type\": \"aws_proxy\"}")
 		assert.NoError(t, err)
 
 		expected := `{
