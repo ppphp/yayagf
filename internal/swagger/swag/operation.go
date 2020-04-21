@@ -506,20 +506,17 @@ func (operation *Operation) ParseProduceComment(commentLine string) error {
 	return nil
 }
 
-var routerPattern = regexp.MustCompile(`^(/[\w\.\/\-{}\+:]*)[[:blank:]]+\[(\w+)]`)
+var routerPattern = regexp.MustCompile(`^/[\w\.\/\-{}\+:]*$`)
 
 // ParseRouterComment parses comment for gived `router` comment string.
 func (operation *Operation) ParseRouterComment(commentLine string) error {
-	var matches []string
-
-	if matches = routerPattern.FindStringSubmatch(commentLine); len(matches) != 3 {
+	rm := strings.Fields(commentLine)
+	if len(rm) != 2 || !routerPattern.MatchString(rm[0]) || len(rm[1]) <= 2 || rm[1][0] != '[' || rm[1][len(rm[1])-1] != ']' {
 		return fmt.Errorf("can not parse router comment \"%s\"", commentLine)
 	}
-	path := matches[1]
-	httpMethod := matches[2]
 
-	operation.Path = path
-	operation.HTTPMethod = strings.ToUpper(httpMethod)
+	operation.Path = rm[0]
+	operation.HTTPMethod = strings.ToUpper(rm[1][1:len(rm[1])-1])
 
 	return nil
 }

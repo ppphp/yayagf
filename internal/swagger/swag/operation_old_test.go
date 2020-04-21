@@ -13,22 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParseTagsComment(t *testing.T) {
-	expected := `{
-    "tags": [
-        "pet",
-        "store",
-        "user"
-    ]
-}`
-	comment := `/@Tags pet, store,user`
-	operation := NewOperation()
-	err := operation.ParseComment(comment, nil)
-	assert.NoError(t, err)
-	b, _ := json.MarshalIndent(operation, "", "    ")
-	assert.Equal(t, expected, string(b))
-}
-
 func TestParseRouterComment(t *testing.T) {
 	comment := `/@Router /customer/get-wishlist/{wishlist_id} [get]`
 	operation := NewOperation()
