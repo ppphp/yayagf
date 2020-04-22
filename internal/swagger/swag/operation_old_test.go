@@ -735,18 +735,3 @@ func TestParseSummary(t *testing.T) {
 	err = operation.ParseComment(comment, nil)
 	assert.NoError(t, err)
 }
-
-func TestRegisterSchemaType(t *testing.T) {
-	operation := NewOperation()
-
-	fset := token.NewFileSet()
-	astFile, err := goparser.ParseFile(fset, "main.go", `package main
-	import "timer"
-`, goparser.ParseComments)
-
-	assert.NoError(t, err)
-
-	operation.parser = New()
-	_, _, err = operation.registerSchemaType("timer.Location", astFile)
-	assert.Error(t, err)
-}

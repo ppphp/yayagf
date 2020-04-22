@@ -3,6 +3,8 @@ package swag
 import (
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
+	goparser "go/parser"
+	"go/token"
 	"testing"
 )
 
@@ -251,4 +253,20 @@ func TestOperation_ParseComment(t *testing.T) {
 			err := operation.ParseComment("//", nil)
 			assert.NoError(t, err)
 		})
+}
+
+func TestOperation_registerSchemaType(t*testing.T){
+
+	operation := NewOperation()
+
+	fset := token.NewFileSet()
+	astFile, err := goparser.ParseFile(fset, "main.go", `package main
+	import "timer"
+`, goparser.ParseComments)
+
+	assert.NoError(t, err)
+
+	operation.parser = New()
+	_, _, err = operation.registerSchemaType("timer.Location", astFile)
+	assert.Error(t, err)
 }
