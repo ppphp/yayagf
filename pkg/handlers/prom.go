@@ -17,6 +17,12 @@ func MountPromHandlerToGin(r gin.IRouter) {
 	reg.MustRegister(prom.Disk)
 	reg.MustRegister(prom.Load)
 
+	reg.MustRegister(prom.OpenConnections)
+	reg.MustRegister(prom.Idle)
+	reg.MustRegister(prom.InUse)
+	reg.MustRegister(prom.WaitCount)
+	reg.MustRegister(prom.WaitDuration)
+
 	Handlers{Handler{
 		path:    "/",
 		handler: promhttp.InstrumentMetricHandler(
