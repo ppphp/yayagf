@@ -20,7 +20,7 @@ func MountPromHandlerToGin(r gin.IRouter) {
 	Handlers{Handler{
 		path:    "/",
 		handler: promhttp.InstrumentMetricHandler(
-			reg, promhttp.HandlerFor(prometheus.DefaultGatherer, promhttp.HandlerOpts{}),
+			reg, promhttp.HandlerFor(reg, promhttp.HandlerOpts{}),
 		),
 	}}.MountToEndpoint(r)
 }
