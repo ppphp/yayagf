@@ -6,7 +6,6 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/facebookincubator/ent v0.1.4
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/ghodss/yaml v1.0.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-openapi/inflect v0.19.0 // indirect
@@ -19,6 +18,7 @@ require (
 	github.com/mattn/go-isatty v0.0.8 // indirect
 	github.com/prometheus/client_golang v1.5.1
 	github.com/sergi/go-diff v1.1.0
+	github.com/shirou/gopsutil v2.20.4+incompatible
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.4.0
 	github.com/ugorji/go v1.1.5-pre // indirect

@@ -1,3 +1,4 @@
+// package for binary metadata like compilers and version
 package meta
 
 import (
@@ -6,6 +7,7 @@ import (
 )
 
 var BuildInfo, _ = debug.ReadBuildInfo()
+var binhash, _ = CalculateSelfMD5()
 
 // 一个构建期注入的meta信息结构体
 var Meta = struct {
@@ -15,9 +17,10 @@ var Meta = struct {
 	GoArch      string
 	GoCompiler  string
 	GoBuildInfo *debug.BuildInfo
-	CPUProcs    int
 
+	MD5 string
 	// 注入
+	BuildAt string
 	Commit  string
 	Version string
 }{
@@ -26,7 +29,7 @@ var Meta = struct {
 	GoArch:      runtime.GOARCH,
 	GoCompiler:  runtime.Compiler,
 	GoBuildInfo: BuildInfo,
-	CPUProcs:    runtime.NumCPU(),
 	Commit:      "HEAD",
 	Version:     "HEAD",
+	MD5:         binhash,
 }

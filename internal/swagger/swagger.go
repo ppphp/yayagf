@@ -50,5 +50,4 @@ const Swagger = %s
 	}
 	log.Printf("create docs.go at  %+v", docFileName)
 	return nil
-
 }
