@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/prometheus/client_golang/prometheus"
 	"net/http"
 	"path/filepath"
 
@@ -19,10 +20,10 @@ func (h Handlers) MountToEndpoint(r gin.IRouter) {
 }
 
 // pprof prom meta
-func MountALotOfThingToEndpoint(r gin.IRouter) {
+func MountALotOfThingToEndpoint(r gin.IRouter, options ...prometheus.Collector) {
 	MountPProfHandlerToGin(r.Group("/pprof"))
 	MountMetaHandlerToGin(r.Group("/meta"))
-	MountPromHandlerToGin(r.Group("/metrics"))
+	MountPromHandlerToGin(r.Group("/metrics"), options...)
 	MountHealthHandlerToGin(r.Group("/health"))
 }
 
