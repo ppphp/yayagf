@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func CalculateSelfMD5() (string,error) {
+func CalculateSelfMD5() (string, error) {
 	bs, err := ioutil.ReadFile(os.Args[0])
 	if err != nil {
 		return "", err
@@ -18,4 +18,3 @@ func CalculateSelfMD5() (string,error) {
 	}
 	return string(h.Sum(nil)), nil
 }
-

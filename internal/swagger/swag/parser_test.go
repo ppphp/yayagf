@@ -2,12 +2,13 @@ package swag
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
-	"gitlab.papegames.com/fengche/yayagf/pkg/spec"
-	"gitlab.papegames.com/fengche/yayagf/pkg/spec/it"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"gitlab.papegames.com/fengche/yayagf/pkg/spec"
+	"gitlab.papegames.com/fengche/yayagf/pkg/spec/it"
 )
 
 func TestNew(t *testing.T) {

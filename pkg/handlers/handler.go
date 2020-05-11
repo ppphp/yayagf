@@ -1,9 +1,10 @@
 package handlers
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
 	"net/http"
 	"path/filepath"
+
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/gin-gonic/gin"
 )

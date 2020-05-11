@@ -6,7 +6,6 @@ import (
 	"go/ast"
 	goparser "go/parser"
 	"go/token"
-	"golang.org/x/xerrors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -17,6 +16,8 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+
+	"golang.org/x/xerrors"
 
 	"github.com/go-openapi/jsonreference"
 	"github.com/go-openapi/spec"

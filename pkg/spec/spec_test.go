@@ -1,8 +1,9 @@
 package spec
 
 import (
-	"gitlab.papegames.com/fengche/yayagf/pkg/spec/it"
 	"testing"
+
+	"gitlab.papegames.com/fengche/yayagf/pkg/spec/it"
 )
 
 func TestRecoverOrError(t *testing.T) {

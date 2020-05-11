@@ -2,12 +2,13 @@ package ci
 
 import (
 	"bytes"
-	"gitlab.papegames.com/fengche/yayagf/internal/file"
-	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"path/filepath"
+
+	"gitlab.papegames.com/fengche/yayagf/internal/file"
+	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 )
 
 func CommandFactory() (*cli.Command, error) {
@@ -18,13 +19,13 @@ func CommandFactory() (*cli.Command, error) {
 				log.Printf("get project name failed: %v", err.Error())
 				return 1, err
 			}
-			tmpl, err  := template.New("jenkins").Parse(jenkinsTemplate)
+			tmpl, err := template.New("jenkins").Parse(jenkinsTemplate)
 			if err != nil {
 				log.Printf("jenkinsTemplate parse failed: %v", err.Error())
 				return 1, err
 			}
 			b := bytes.Buffer{}
-			if err :=tmpl.Execute(&b, file.GetProjectInfo()); err != nil {
+			if err := tmpl.Execute(&b, file.GetProjectInfo()); err != nil {
 				log.Printf("jenkinsTemplate parse failed: %v", err.Error())
 				return 1, err
 			}

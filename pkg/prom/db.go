@@ -2,6 +2,7 @@ package prom
 
 import (
 	"database/sql"
+
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -66,5 +67,3 @@ var WaitDuration = prometheus.NewGaugeFunc(prometheus.GaugeOpts{
 	}
 	return float64(Db.Stats().WaitDuration.Seconds())
 })
-
-

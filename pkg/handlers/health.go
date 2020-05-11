@@ -1,8 +1,9 @@
 package handlers
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 var healthHandler = Handlers([]Handler{{
@@ -11,6 +12,6 @@ var healthHandler = Handlers([]Handler{{
 		w.Write([]byte("health"))
 	})}})
 
-func MountHealthHandlerToGin(r gin.IRouter)  {
+func MountHealthHandlerToGin(r gin.IRouter) {
 	healthHandler.MountToEndpoint(r)
 }

@@ -2,10 +2,11 @@ package swag
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	goparser "go/parser"
 	"go/token"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewOperation(t *testing.T) {
@@ -230,7 +231,7 @@ func TestOperation_ParseMetadata(t *testing.T) {
 		operation := NewOperation()
 		operation.parser = New()
 
-		err := operation.ParseMetadata("@x-amazon-apigateway-integration","@x-amazon-apigateway-integration", "{\"uri\": \"${some_arn}\", \"passthroughBehavior\": \"when_no_match\", \"httpMethod\": \"POST\", \"type\": \"aws_proxy\"}")
+		err := operation.ParseMetadata("@x-amazon-apigateway-integration", "@x-amazon-apigateway-integration", "{\"uri\": \"${some_arn}\", \"passthroughBehavior\": \"when_no_match\", \"httpMethod\": \"POST\", \"type\": \"aws_proxy\"}")
 		assert.NoError(t, err)
 
 		expected := `{
@@ -255,7 +256,7 @@ func TestOperation_ParseComment(t *testing.T) {
 		})
 }
 
-func TestOperation_registerSchemaType(t*testing.T){
+func TestOperation_registerSchemaType(t *testing.T) {
 
 	operation := NewOperation()
 

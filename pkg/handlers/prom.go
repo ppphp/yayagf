@@ -7,7 +7,7 @@ import (
 	"gitlab.papegames.com/fengche/yayagf/pkg/prom"
 )
 
-func MountPromHandlerToGin(r gin.IRouter, options... prometheus.Collector) {
+func MountPromHandlerToGin(r gin.IRouter, options ...prometheus.Collector) {
 	reg := prometheus.NewRegistry()
 
 	reg.MustRegister(prom.Routine)
@@ -23,12 +23,12 @@ func MountPromHandlerToGin(r gin.IRouter, options... prometheus.Collector) {
 	reg.MustRegister(prom.WaitCount)
 	reg.MustRegister(prom.WaitDuration)
 
-	for _, o := range options{
+	for _, o := range options {
 		reg.MustRegister(o)
 	}
 
 	Handlers{Handler{
-		path:    "/",
+		path: "/",
 		handler: promhttp.InstrumentMetricHandler(
 			reg, promhttp.HandlerFor(reg, promhttp.HandlerOpts{}),
 		),

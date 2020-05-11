@@ -1,9 +1,10 @@
 package cmd
 
 import (
-	"gitlab.papegames.com/fengche/yayagf/cmd/version"
 	"log"
 	"os"
+
+	"gitlab.papegames.com/fengche/yayagf/cmd/version"
 
 	"gitlab.papegames.com/fengche/yayagf/cmd/generate"
 	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
@@ -26,7 +27,7 @@ func Main() {
 		"new":     new.CommandFactory,
 		"package": _package.CommandFactory,
 		"server":  server.CommandFactory,
-		"version":  version.CommandFactory,
+		"version": version.CommandFactory,
 	}
 	exitStatus, err := c.Run()
 	if err != nil {

@@ -34,4 +34,3 @@ func (s *Spec) Run(fs func()) *Spec {
 	fs()
 	return s
 }
-

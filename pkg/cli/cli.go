@@ -63,15 +63,14 @@ func (c *Command) parseArgs(args []string) {
 			return
 		} else {
 			f := strings.SplitN(strings.TrimPrefix(args[i], "-"), "=", 2)
-			if len(f) ==1 {
-				c.Flags[f[0]]=""
+			if len(f) == 1 {
+				c.Flags[f[0]] = ""
 			} else {
-				c.Flags[f[0]]=f[1]
+				c.Flags[f[0]] = f[1]
 			}
 		}
 	}
 }
-
 
 // 根command，当然也可以用来做普通command，就是个例子
 type App struct {

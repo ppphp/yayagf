@@ -2,9 +2,10 @@ package spec
 
 import (
 	"fmt"
+	"io/ioutil"
+
 	"github.com/sergi/go-diff/diffmatchpatch"
 	"golang.org/x/xerrors"
-	"io/ioutil"
 )
 
 func RecoverOrError(fs func()) (err error) {
