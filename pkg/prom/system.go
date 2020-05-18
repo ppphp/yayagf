@@ -57,8 +57,8 @@ var Mem = NewGaugeVecFunc(prometheus.GaugeOpts{
 	}
 	lvs = append(lvs, LV{Lbs: []string{"virtual_free"}, V: float64(m.Free)})
 	lvs = append(lvs, LV{Lbs: []string{"virtual_used"}, V: float64(m.Used)})
-	lvs = append(lvs, LV{Lbs: []string{"virtual_used"}, V: float64(m.Total)})
-	lvs = append(lvs, LV{Lbs: []string{"virtual_used"}, V: float64(m.Active)})
+	lvs = append(lvs, LV{Lbs: []string{"virtual_total"}, V: float64(m.Total)})
+	lvs = append(lvs, LV{Lbs: []string{"virtual_active"}, V: float64(m.Active)})
 	m2, err := mem.SwapMemory()
 	if err != nil {
 		return
