@@ -94,7 +94,7 @@ var Load = NewGaugeVecFunc(prometheus.GaugeOpts{
 	Subsystem:   "system",
 	Name:        "load",
 	ConstLabels: map[string]string{},
-}, []string{}, func() (lvs []LV) {
+}, []string{"cat"}, func() (lvs []LV) {
 	lvs = []LV{}
 	a, err := load.Avg()
 	if err != nil {
