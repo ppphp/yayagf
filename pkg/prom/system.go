@@ -65,7 +65,7 @@ var Mem = NewGaugeVecFunc(prometheus.GaugeOpts{
 	}
 	lvs = append(lvs, LV{Lbs: []string{"swap_free"}, V: float64(m2.Free)})
 	lvs = append(lvs, LV{Lbs: []string{"swap_used"}, V: float64(m2.Used)})
-	lvs = append(lvs, LV{Lbs: []string{"swap_used"}, V: float64(m2.Total)})
+	lvs = append(lvs, LV{Lbs: []string{"swap_total"}, V: float64(m2.Total)})
 	return
 })
 
