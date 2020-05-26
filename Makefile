@@ -18,6 +18,7 @@ test:
 
 update:
 	go get -u
+	go mod tidy
 
 install:
 	go install .
