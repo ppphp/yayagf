@@ -84,7 +84,7 @@ func Metrics(path string, collectors ...prometheus.Collector) func(*MaoTai) {
 	}
 }
 
-func NikkiSerializer(m *MaoTai, controller func(*gin.Context) (int, map[string]interface{})) func(*gin.Context) {
+func NikkiSerializer(m *MaoTai, controller func(*gin.Context) (int, gin.H)) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var ret int
 		mp, mret := map[string]interface{}{}, map[string]interface{}{}
@@ -102,7 +102,7 @@ func NikkiSerializer(m *MaoTai, controller func(*gin.Context) (int, map[string]i
 	}
 }
 
-func TDSSerializer(m *MaoTai, controller func(*gin.Context) (int, map[string]interface{})) func(*gin.Context) {
+func TDSSerializer(m *MaoTai, controller func(*gin.Context) (int, gin.H)) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var ret int
 		mp, mret := map[string]interface{}{}, map[string]interface{}{}
