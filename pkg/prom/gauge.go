@@ -25,7 +25,7 @@ func NewGaugeVecFunc(opts prometheus.GaugeOpts, labelNames []string, funcs func(
 			opts.ConstLabels,
 		),
 		labelsDeduplicatedMap: make(map[string]bool),
-		funcs:                 funcs,
+		funcs: funcs,
 	}
 }
 

@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 
-	"gitlab.papegames.com/fengche/yayagf/internal/swagger"
-
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
+	"gitlab.papegames.com/fengche/yayagf/internal/log"
+	"gitlab.papegames.com/fengche/yayagf/internal/swagger"
 	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 )
 
@@ -29,7 +28,7 @@ func CommandFactory() (*cli.Command, error) {
 				return 1, err
 			}
 			log.Printf("create %v", dir)
-			if err := os.MkdirAll(dir, 0644); err != nil {
+			if err := os.MkdirAll(dir, os.ModePerm); err != nil {
 				fmt.Println(err.Error())
 				return 1, err
 			}

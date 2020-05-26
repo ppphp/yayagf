@@ -2,9 +2,10 @@ package prom
 
 import (
 	"database/sql"
+	"net/http"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"net/http"
 )
 
 type Prom struct {

@@ -9,6 +9,10 @@ type MaoTai struct {
 	*gin.Engine
 }
 
+func (m *MaoTai) Use(middleware ...gin.HandlerFunc) gin.IRoutes {
+	return m.Engine.Use(middleware...)
+}
+
 func (m *MaoTai) Handle(httpMethod, relativePath string, handlers ...gin.HandlerFunc) gin.IRoutes {
 	return m.Engine.Handle(httpMethod, relativePath, handlers...)
 }
