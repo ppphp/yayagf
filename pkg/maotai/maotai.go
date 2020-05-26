@@ -2,11 +2,20 @@
 package maotai
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"gitlab.papegames.com/fengche/yayagf/pkg/prom"
+	"net/http"
+	"time"
 )
 
 type MaoTai struct {
 	*gin.Engine
+	reg        *prometheus.Registry
+	urlCounter *prometheus.CounterVec
+	TTLHist    *prometheus.HistogramVec
 }
 
 func (m *MaoTai) Use(middleware ...gin.HandlerFunc) gin.IRoutes {
@@ -42,7 +51,7 @@ func (m *MaoTai) OPTIONS(relativePath string, handlers ...gin.HandlerFunc) gin.I
 }
 
 func (m *MaoTai) HEAD(relativePath string, handlers ...gin.HandlerFunc) gin.IRoutes {
-	return m.Engine.OPTIONS(relativePath, handlers...)
+	return m.Engine.HEAD(relativePath, handlers...)
 }
 
 func New() *MaoTai {
@@ -56,4 +65,57 @@ func Default() *MaoTai {
 	m := &MaoTai{}
 	m.Engine = gin.Default()
 	return m
+}
+
+func Metrics(path string, collectors ...prometheus.Collector) func(*MaoTai) {
+	return func(m *MaoTai) {
+		m.urlCounter = prom.NewUrlCounter()
+		m.TTLHist = prom.NewUrlTTLHist()
+		m.reg = prometheus.NewRegistry()
+
+		m.reg.MustRegister(m.TTLHist, m.urlCounter)
+		m.reg.MustRegister(collectors...)
+
+		m.GET(path, func(c *gin.Context) {
+			promhttp.InstrumentMetricHandler(
+				m.reg, promhttp.HandlerFor(m.reg, promhttp.HandlerOpts{}),
+			).ServeHTTP(c.Writer, c.Request)
+		})
+	}
+}
+
+func NikkiSerializer(m *MaoTai, controller func(*gin.Context) (int, map[string]interface{})) func(*gin.Context) {
+	return func(c *gin.Context) {
+		var ret int
+		mp, mret := map[string]interface{}{}, map[string]interface{}{}
+		defer func(t time.Time) {
+			m.TTLHist.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Observe(time.Now().Sub(t).Seconds())
+			m.urlCounter.WithLabelValues(c.Request.URL.Path, c.Request.Method, "-1001").Add(1)
+		}(time.Now())
+		ret, mp = controller(c)
+		for k, v := range mp {
+			mret[k] = v
+		}
+		mret["ret"] = ret
+		mret["timestamp"] = time.Now().Unix()
+		c.JSON(http.StatusOK, mret)
+	}
+}
+
+func TDSSerializer(m *MaoTai, controller func(*gin.Context) (int, map[string]interface{})) func(*gin.Context) {
+	return func(c *gin.Context) {
+		var ret int
+		mp, mret := map[string]interface{}{}, map[string]interface{}{}
+		defer func(t time.Time) {
+			m.TTLHist.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Observe(time.Now().Sub(t).Seconds())
+			m.urlCounter.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Add(1)
+		}(time.Now())
+		ret, mp = controller(c)
+		for k, v := range mp {
+			mret[k] = v
+		}
+		mret["iRet"] = ret
+		mret["timestamp"] = time.Now().Unix()
+		c.JSON(http.StatusOK, mret)
+	}
 }

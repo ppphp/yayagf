@@ -33,23 +33,6 @@ go is fast, so performance is not a really big thing.
 
 util now, it uses gin as framework.
 
-```mermaid
-graph TB
-
-  SubGraph1 --> SubGraph1Flow
-  subgraph "SubGraph 1 Flow"
-  SubGraph1Flow(SubNode 1)
-  SubGraph1Flow -- Choice1 --> DoChoice1
-  SubGraph1Flow -- Choice2 --> DoChoice2
-  end
-
-  subgraph "Main Graph"
-  Node1[Node 1] --> Node2[Node 2]
-  Node2 --> SubGraph1[Jump to SubGraph1]
-  SubGraph1 --> FinalThing[Final Thing]
-end
-```
-
 ## how to use
 
 ### yayagf new
@@ -64,15 +47,13 @@ project_root
 --crud
 --schema
 --serializer // TODO
---docs // TODO
+--doc
 -config_file1 // TODO
 -config_file2 // TODO
 -project_root.yml // TODO
--Dockerfile // TODO
+-Dockerfile
 
 ### yayagf server // FIXME
-
-two steps
 
 1. go into any go project 
 
@@ -110,7 +91,7 @@ yayagf g crud
 
 #### doc (swagger)
 
-will generate crud files in `app/crud` according to `app/schema`
+will generate doc files in `app/doc` according to `app/controllers`
 
 ```bash
 yayagf g doc
