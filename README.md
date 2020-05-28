@@ -4,7 +4,7 @@
 [![SQALE评级](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=sqale_rating)](http://192.168.0.97:9000/dashboard?id=yayagf)
 # yayagf
 
-yet another yet another go web framework
+yet another yet another go web framework, my practice
 
 ###### sonar
 [![Bugs](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=bugs)](http://192.168.0.97:9000/dashboard?id=yayagf)
@@ -23,19 +23,7 @@ yet another yet another go web framework
 
 `go install ./cmd/yayagf`
 
-## what to use
-
-### performance
-
-web framework should not treat the performance very important.
-
-go is fast, so performance is not a really big thing.
-
-util now, it uses gin as framework.
-
-## how to use
-
-### yayagf new
+## start a project
 
 type `yayagf new gitlab.papegames.com/fengche/abc` will generate a folder named abc
 
@@ -53,19 +41,11 @@ project_root
 -project_root.yml // TODO
 -Dockerfile
 
-### yayagf server // FIXME
+## run a project // FIXME
 
-1. go into any go project 
+`yayagf server` will monitor the code, recompile the code when compilable and run.
 
-2. `yayagf server` will monitor the code, recompile the code when compilable and run.
-
-### yayagf package
-
-package to docker // TODO some others
-
-### yayagf generate
-
-generate a component scaffold.
+## generate a component scaffold
 
 ```bash
 yayagf g commands
@@ -74,7 +54,7 @@ yayagf generate commands
 
 #### schema (ent)
 
-will generate schema in `app/schema`
+will generate schema(table) in `app/schema`
 
 ```bash
 yayagf g schema a
@@ -102,10 +82,10 @@ yayagf g doc
 
 #### serializer // TODO
 
-## packages
+## write codes
 
-### ent driver
-
+### ent (db)
+- driver
 ```go
 package main
 import (
@@ -125,6 +105,10 @@ func main() {
 	}
 }
 ```
+- sharding name
+- sharding databases
+- monitoring
+
 
 ### config loader
 
@@ -145,9 +129,7 @@ func main() {
 }
 ```
 
-
 ### util handlers
-
 ```go
 package main
 import (
@@ -174,3 +156,39 @@ func main() {
 	}
 }
 ```
+
+### monitoring
+
+#### system
+- cpu
+- memory
+- load average
+- disk
+
+#### runtime
+- process cpu
+- process mem
+- process fd
+- goroutine
+- gc
+
+#### handler
+- outer services (rest)
+- inner services (rpc)
+
+#### storage
+- db
+- redis
+- thirdparty services (rpc)
+
+## testing
+
+WIP
+
+## performance
+
+i don't care.
+
+## packages
+
+package to docker // TODO some others
