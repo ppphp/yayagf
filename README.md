@@ -159,6 +159,8 @@ func main() {
 
 ### monitoring
 
+only monitor dynamic metrics
+
 #### system
 - cpu
 - memory
@@ -169,6 +171,7 @@ func main() {
 - process cpu
 - process mem
 - process fd
+- thread
 - goroutine
 - gc
 

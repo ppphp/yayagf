@@ -13,9 +13,9 @@ import (
 
 type MaoTai struct {
 	*gin.Engine
-	reg        *prometheus.Registry
-	urlCounter *prometheus.CounterVec
-	TTLHist    *prometheus.HistogramVec
+	reg     *prometheus.Registry
+	urlConn *prometheus.GaugeVec
+	TTLHist *prometheus.HistogramVec
 }
 
 func (m *MaoTai) Use(middleware ...gin.HandlerFunc) gin.IRoutes {
@@ -69,11 +69,10 @@ func Default() *MaoTai {
 
 func Metrics(path string, collectors ...prometheus.Collector) func(*MaoTai) {
 	return func(m *MaoTai) {
-		m.urlCounter = prom.NewUrlCounter()
-		m.TTLHist = prom.NewUrlTTLHist()
+		m.TTLHist = prom.UrlTTL()
 		m.reg = prometheus.NewRegistry()
 
-		m.reg.MustRegister(m.TTLHist, m.urlCounter)
+		m.reg.MustRegister(m.TTLHist,)
 		m.reg.MustRegister(collectors...)
 
 		m.GET(path, func(c *gin.Context) {
@@ -88,9 +87,10 @@ func NikkiSerializer(m *MaoTai, controller func(*gin.Context) (int, gin.H)) func
 	return func(c *gin.Context) {
 		var ret int
 		mp, mret := map[string]interface{}{}, map[string]interface{}{}
+		m.urlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(1)
 		defer func(t time.Time) {
 			m.TTLHist.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Observe(time.Now().Sub(t).Seconds())
-			m.urlCounter.WithLabelValues(c.Request.URL.Path, c.Request.Method, "-1001").Add(1)
+			m.urlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(-1)
 		}(time.Now())
 		ret, mp = controller(c)
 		for k, v := range mp {
@@ -106,9 +106,10 @@ func TDSSerializer(m *MaoTai, controller func(*gin.Context) (int, gin.H)) func(*
 	return func(c *gin.Context) {
 		var ret int
 		mp, mret := map[string]interface{}{}, map[string]interface{}{}
+		m.urlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(1)
 		defer func(t time.Time) {
 			m.TTLHist.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Observe(time.Now().Sub(t).Seconds())
-			m.urlCounter.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Add(1)
+			m.urlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(-1)
 		}(time.Now())
 		ret, mp = controller(c)
 		for k, v := range mp {
