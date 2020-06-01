@@ -17,4 +17,7 @@ func TestCommandFactory(t *testing.T) {
 	i, err := c.Run(nil, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, i, 0)
+	st, err := os.Stat("Jenkinsfile")
+	assert.NoError(t, err)
+	assert.NotNil(t, st)
 }

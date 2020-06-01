@@ -3,6 +3,7 @@ package new
 import (
 	"bytes"
 	"fmt"
+	"gitlab.papegames.com/fengche/yayagf/internal/blueprint"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -39,122 +40,34 @@ func CommandFactory() (*cli.Command, error) {
 			}
 
 			log.Printf("init mod")
-			command.DoCommand("go", []string{"mod", "init", mod}, nil, nil)
+			if err := command.DoCommand("go", []string{"mod", "init", mod}, nil, nil); err != nil {
+				log.Println("go mod failed")
+				return 1, err
+			}
 
 			log.Printf("create %v", filepath.Join(dir, "main.go"))
-			ioutil.WriteFile(filepath.Join(dir, "main.go"), []byte(fmt.Sprintf(`
-package main
-
-import (
-	"github.com/gin-contrib/cors"
-	// "%v/app/crud"
-	// "gitlab.papegames.com/fengche/yayagf/pkg/model"
-	"github.com/gin-gonic/gin"
-	"log"
-	"%v/app/router"
-	"%v/app/config"
-)
-
-// @title Swagger Example API
-// @version 1.0
-// @description This is a sample server Petstore server.
-// @termsOfService http://swagger.io/terms/
-
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
-
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host petstore.swagger.io
-// @BasePath /v2
-func main() {
-	r := gin.Default()
-
-	r.Use(cors.Default())
-
-	router.AddRoute(r)
-
-	if err := config.LoadConfig(); err != nil {
-		log.Fatal(err)
-	}
-
-	// Uncomment the following code to simplify db
-	//drv, err := model.Open("mysql", config.GetConfig().DB)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//crud.C = crud.NewClient(crud.Driver(drv))
-	//if err := crud.C.Schema.Create(context.Background()); err != nil {
-	//	log.Fatal(err)
-	//}
-
-	if err := r.Run(fmt.Sprintf(":%v", config.GetConfig().Port)); err != nil {
-		log.Fatal(err)
-	}
-}
-`, mod, mod, mod, "%v")), 0644)
+			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "main.go"), MainGo, struct{Mod string}{mod}); err != nil {
+				log.Println(err.Error())
+				return 1, err
+			}
 			log.Printf("create %v", filepath.Join(dir, "app", "router", "router.go"))
-			if err := ioutil.WriteFile(filepath.Join(dir, "app", "router", "router.go"), []byte(fmt.Sprintf(`
-package router
-
-import (
-	"github.com/gin-gonic/gin"
-)
-
-func AddRoute(r *gin.Engine) {
-}
-`)), 0644); err != nil {
+			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "app", "router", "router.go"), RouterGo, nil); err != nil {
 				log.Println(err.Error())
 				return 1, err
 			}
-			if err := ioutil.WriteFile(filepath.Join(dir, "app", "config", "config.go"), []byte(`
-package config
-
-import (
-	"gitlab.papegames.com/fengche/yayagf/pkg/config"
-	"log"
-	"sync"
-)
-
-var lock sync.RWMutex
-
-type Config struct {
-	DB   string
-	Port int
-}
-
-var conf = new(Config)
-
-// only support ini like config
-func LoadConfig() error {
-	lock.Lock()
-	defer lock.Unlock()
-	if err := config.LoadTomlFile("conf.toml", conf); err != nil {
-		log.Fatal(err)
-	}
-
-	config.LoadEnv(conf)
-
-	log.Println(conf)
-	return nil
-}
-
-func GetConfig() Config {
-	lock.RLock()
-	defer lock.RUnlock()
-	return *conf
-}
-
-`), 0644); err != nil {
+			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "app", "router", "router.go"), RouterGo, nil); err != nil {
 				log.Println(err.Error())
 				return 1, err
 			}
-			if err := ioutil.WriteFile(filepath.Join(dir, "conf.toml"), []byte(`
+
+			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "app", "config", "config.go"), ConfigGo, nil); err != nil {
+				log.Println(err.Error())
+				return 1, err
+			}
+			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "conf.toml"), `
 db=""
 port=8080
-`), 0644); err != nil {
+`, nil); err != nil {
 				log.Println(err.Error())
 				return 1, err
 			}
@@ -171,10 +84,10 @@ port=8080
 				log.Fatalf("git failed %v", errs.String())
 				return 1, err
 			}
-			if err := ioutil.WriteFile(filepath.Join(dir, ".gitignore"), []byte(fmt.Sprintf(`
-%v
-%v.tar
-`, name, name)), 0644); err != nil {
+			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, ".gitignore"), `
+{{.Name}}
+{{.Name}}.tar
+`, struct {Name string}{name}); err != nil {
 				log.Fatalf("gitignore failed %v", errs.String())
 				return 1, err
 			}
@@ -222,3 +135,109 @@ CMD ["/main/main"]
 	}
 	return c, nil
 }
+
+const (
+	MainGo = `
+package main
+
+import (
+	"github.com/gin-contrib/cors"
+	// {{.Mod}}/app/crud"
+	// "gitlab.papegames.com/fengche/yayagf/pkg/model"
+	"github.com/gin-gonic/gin"
+	"log"
+	"{{.Mod}}/app/router"
+	"{{.Mod}}/app/config"
+)
+
+// @title Swagger Example API
+// @version 1.0
+// @description This is a sample server Petstore server.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host petstore.swagger.io
+// @BasePath /v2
+func main() {
+	r := gin.Default()
+
+	r.Use(cors.Default())
+
+	router.AddRoute(r)
+
+	if err := config.LoadConfig(); err != nil {
+		log.Fatal(err)
+	}
+
+	// Uncomment the following code to simplify db
+	//drv, err := model.Open("mysql", config.GetConfig().DB)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//crud.C = crud.NewClient(crud.Driver(drv))
+	//if err := crud.C.Schema.Create(context.Background()); err != nil {
+	//	log.Fatal(err)
+	//}
+
+	if err := r.Run(fmt.Sprintf(":%v", config.GetConfig().Port)); err != nil {
+		log.Fatal(err)
+	}
+}
+`
+
+	RouterGo=`
+package router
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+func AddRoute(r *gin.Engine) {
+}
+`
+
+	ConfigGo=`
+package config
+
+import (
+	"gitlab.papegames.com/fengche/yayagf/pkg/config"
+	"log"
+	"sync"
+)
+
+var lock sync.RWMutex
+
+type Config struct {
+	DB   string
+	Port int
+}
+
+var conf = new(Config)
+
+// only support ini like config
+func LoadConfig() error {
+	lock.Lock()
+	defer lock.Unlock()
+	if err := config.LoadTomlFile("conf.toml", conf); err != nil {
+		log.Fatal(err)
+	}
+
+	config.LoadEnv(conf)
+
+	log.Println(conf)
+	return nil
+}
+
+func GetConfig() Config {
+	lock.RLock()
+	defer lock.RUnlock()
+	return *conf
+}
+`
+)
