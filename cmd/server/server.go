@@ -16,7 +16,7 @@ import (
 
 func CommandFactory() (*cli.Command, error) {
 	c := &cli.Command{
-		Run: func(args []string, flags map[string]string) (int, error) { // TODO: to be cx
+		Run: func(args []string, flags map[string]string) (int, error) {
 			type Command struct {
 				watcher *quartz.Quartz
 				pwd     string
@@ -38,15 +38,18 @@ func CommandFactory() (*cli.Command, error) {
 				return 1, err
 			}
 			// specify build params
-			os.Setenv("GOPROXY", "https://goproxy.io")
-			os.Setenv("GOSUMDB", "off")
-			os.Setenv("GOPRIVATE", "gitlab.papegames.com/*")
+			_ = os.Setenv("GOPROXY", "https://goproxy.io")
+			_ = os.Setenv("GOSUMDB", "off")
+			_ = os.Setenv("GOPRIVATE", "gitlab.papegames.com/*")
 
 			// begin watch
-			os.Chdir(root)
-			c.watcher.Begin()
+			_ = os.Chdir(root)
+			if err := c.watcher.Begin(); err != nil {
+				return 1, err
+			}
 			defer c.watcher.Stop()
 			lastName := ""
+			go func() { c.watcher.Event <- "" }()
 			for {
 				select {
 				case event, ok := <-c.watcher.Event:
@@ -55,24 +58,11 @@ func CommandFactory() (*cli.Command, error) {
 					}
 					log.Printf("event: %v\n", event)
 
-					/*
-						cmd := exec.Command("go", "test", "./...")
-						if err := cmd.Run(); err != nil {
-							log.Printf("test err: %v \n", err)
-							continue
-						}
-					*/
 					f, err := ioutil.TempFile("/tmp", "*")
 					if err != nil {
 					}
 					f.Close()
 					var o, e bytes.Buffer
-					/*
-						if err := command.DoCommand("swag", []string{"init", "-o", "app/docs"}, &o, &e); err != nil {
-							log.Printf("swag to %v err: %v, err: %v, out: %v\n", "app/docs", e.String(), o.String())
-							continue
-						}
-					*/
 					if err := command.DoCommand("go", []string{"build", "-o", f.Name(), "./"}, &o, &e); err != nil {
 						log.Printf("build to %v err: %v, err: %v, out: %v\n", f.Name(), err, e.String(), o.String())
 						continue
@@ -102,7 +92,6 @@ func CommandFactory() (*cli.Command, error) {
 				}
 			}
 
-			//return 0, nil
 		},
 	}
 	return c, nil
