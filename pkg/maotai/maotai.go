@@ -83,40 +83,59 @@ func Metrics(path string, collectors ...prometheus.Collector) func(*MaoTai) {
 	}
 }
 
-func NikkiSerializer(m *MaoTai, controller func(*gin.Context) (int, gin.H)) func(*gin.Context) {
+func NikkiSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.H)) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var ret int
+		var msg string
 		mp, mret := map[string]interface{}{}, map[string]interface{}{}
 		m.urlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(1)
 		defer func(t time.Time) {
 			m.TTLHist.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Observe(time.Now().Sub(t).Seconds())
 			m.urlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(-1)
 		}(time.Now())
-		ret, mp = controller(c)
+		ret, msg, mp = controller(c)
 		for k, v := range mp {
 			mret[k] = v
 		}
 		mret["ret"] = ret
+		mret["msg"] = msg
 		mret["timestamp"] = time.Now().Unix()
 		c.JSON(http.StatusOK, mret)
 	}
 }
 
-func TDSSerializer(m *MaoTai, controller func(*gin.Context) (int, gin.H)) func(*gin.Context) {
+func TDSSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.H)) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var ret int
+		var msg string
 		mp, mret := map[string]interface{}{}, map[string]interface{}{}
 		m.urlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(1)
 		defer func(t time.Time) {
 			m.TTLHist.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Observe(time.Now().Sub(t).Seconds())
 			m.urlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(-1)
 		}(time.Now())
-		ret, mp = controller(c)
+		ret, msg, mp = controller(c)
 		for k, v := range mp {
 			mret[k] = v
 		}
 		mret["iRet"] = ret
+		mret["sMsg"] = msg
 		mret["timestamp"] = time.Now().Unix()
 		c.JSON(http.StatusOK, mret)
+	}
+}
+
+
+func PlainSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.H)) func(*gin.Context) {
+	return func(c *gin.Context) {
+		var ret int
+		mp := map[string]interface{}{}
+		m.urlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(1)
+		defer func(t time.Time) {
+			m.TTLHist.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Observe(time.Now().Sub(t).Seconds())
+			m.urlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(-1)
+		}(time.Now())
+		ret, _, mp = controller(c)
+		c.JSON(http.StatusOK, mp)
 	}
 }
