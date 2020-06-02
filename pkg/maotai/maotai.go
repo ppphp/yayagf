@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"gitlab.papegames.com/fengche/yayagf/pkg/prom"
 	"net/http"
 	"time"
 )
@@ -69,7 +68,6 @@ func Default() *MaoTai {
 
 func Metrics(path string, collectors ...prometheus.Collector) func(*MaoTai) {
 	return func(m *MaoTai) {
-		m.TTLHist = prom.UrlTTL()
 		m.reg = prometheus.NewRegistry()
 
 		m.reg.MustRegister(m.TTLHist,)
