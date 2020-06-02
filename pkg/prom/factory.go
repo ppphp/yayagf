@@ -216,3 +216,21 @@ func DBWaitDuration(Db *sql.DB) prometheus.GaugeFunc {
 		return Db.Stats().WaitDuration.Seconds()
 	})
 }
+
+func CallHTTPConnection(name string) *prometheus.GaugeVec {
+	return prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace:   "caller",
+		Subsystem:   name,
+		Name:        "http_connections",
+		ConstLabels: map[string]string{},
+	}, []string{"url", "method"})
+}
+
+func CallHTTPTTL(name string) *prometheus.GaugeVec {
+	return prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace:   "caller",
+		Subsystem:   name,
+		Name:        "http_connections",
+		ConstLabels: map[string]string{},
+	}, []string{"url", "method", "code", "ret"})
+}
