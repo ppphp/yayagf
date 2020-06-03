@@ -20,11 +20,23 @@ func (h Handlers) MountToEndpoint(r gin.IRouter) {
 	}
 }
 
+type MountOption struct {
+	metric []prometheus.Collector
+}
+
+func WithMetric(collectors ...prometheus.Collector) *MountOption {
+	return &MountOption{metric: collectors}
+}
+
 // pprof prom meta
-func MountALotOfThingToEndpoint(r gin.IRouter, options ...prometheus.Collector) {
+func MountALotOfThingToEndpoint(r gin.IRouter, options ...*MountOption) {
 	MountPProfHandlerToGin(r.Group("/pprof"))
 	MountMetaHandlerToGin(r.Group("/meta"))
-	MountPromHandlerToGin(r.Group("/metrics"), options...)
+	cs := []prometheus.Collector{}
+	for _, o := range options {
+		cs = append(cs, o.metric...)
+	}
+	MountPromHandlerToGin(r.Group("/metrics"), cs...)
 	MountHealthHandlerToGin(r.Group("/health"))
 }
 
