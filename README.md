@@ -41,7 +41,7 @@ project_root
 -project_root.yml // TODO
 -Dockerfile
 
-## run a project // FIXME
+## run a project
 
 `yayagf server` will monitor the code, recompile the code when compilable and run.
 
