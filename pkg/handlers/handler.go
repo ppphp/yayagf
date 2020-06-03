@@ -21,6 +21,7 @@ func (h Handlers) MountToEndpoint(r gin.IRouter) {
 }
 
 type MountOption struct {
+	swagger string
 	metric []prometheus.Collector
 }
 
@@ -28,15 +29,26 @@ func WithMetric(collectors ...prometheus.Collector) *MountOption {
 	return &MountOption{metric: collectors}
 }
 
+func WithSwagger(swagger string) *MountOption {
+	return &MountOption{swagger: swagger}
+}
+
 // pprof prom meta
 func MountALotOfThingToEndpoint(r gin.IRouter, options ...*MountOption) {
+	collectors := []prometheus.Collector{}
+	swagger := ""
+	for _, o := range options {
+		collectors = append(collectors, o.metric...)
+		if o.swagger!= "" {
+			swagger = o.swagger
+		}
+	}
 	MountPProfHandlerToGin(r.Group("/pprof"))
 	MountMetaHandlerToGin(r.Group("/meta"))
-	cs := []prometheus.Collector{}
-	for _, o := range options {
-		cs = append(cs, o.metric...)
+	MountPromHandlerToGin(r.Group("/metrics"), collectors...)
+	if swagger!= "" {
+		MountSwaggerStringToGin(swagger, r.Group("/swagger.json"))
 	}
-	MountPromHandlerToGin(r.Group("/metrics"), cs...)
 	MountHealthHandlerToGin(r.Group("/health"))
 }
 
