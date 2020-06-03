@@ -55,10 +55,6 @@ func CommandFactory() (*cli.Command, error) {
 				log.Println(err.Error())
 				return 1, err
 			}
-			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "app", "router", "router.go"), RouterGo, nil); err != nil {
-				log.Println(err.Error())
-				return 1, err
-			}
 
 			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "app", "config", "config.go"), ConfigGo, nil); err != nil {
 				log.Println(err.Error())
