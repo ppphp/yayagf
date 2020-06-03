@@ -5,15 +5,14 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"gitlab.papegames.com/fengche/yayagf/pkg/prom"
 	"net/http"
 	"time"
 )
 
 type MaoTai struct {
 	*gin.Engine
-	reg     *prometheus.Registry
-	urlConn *prometheus.GaugeVec
+	UrlConn *prometheus.GaugeVec
 	TTLHist *prometheus.HistogramVec
 }
 
@@ -53,32 +52,24 @@ func (m *MaoTai) HEAD(relativePath string, handlers ...gin.HandlerFunc) gin.IRou
 	return m.Engine.HEAD(relativePath, handlers...)
 }
 
-func New() *MaoTai {
+func New(project string) *MaoTai {
 	m := &MaoTai{}
+
+	m.UrlConn = prom.UrlConnection(project)
+	m.TTLHist = prom.UrlTTL(project)
 
 	m.Engine = gin.New()
 	return m
 }
 
-func Default() *MaoTai {
+func Default(project string) *MaoTai {
 	m := &MaoTai{}
+
+	m.UrlConn = prom.UrlConnection(project)
+	m.TTLHist = prom.UrlTTL(project)
+
 	m.Engine = gin.Default()
 	return m
-}
-
-func Metrics(path string, collectors ...prometheus.Collector) func(*MaoTai) {
-	return func(m *MaoTai) {
-		m.reg = prometheus.NewRegistry()
-
-		m.reg.MustRegister(m.TTLHist,)
-		m.reg.MustRegister(collectors...)
-
-		m.GET(path, func(c *gin.Context) {
-			promhttp.InstrumentMetricHandler(
-				m.reg, promhttp.HandlerFor(m.reg, promhttp.HandlerOpts{}),
-			).ServeHTTP(c.Writer, c.Request)
-		})
-	}
 }
 
 func NikkiSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.H)) func(*gin.Context) {
@@ -86,10 +77,10 @@ func NikkiSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.
 		var ret int
 		var msg string
 		mp, mret := map[string]interface{}{}, map[string]interface{}{}
-		m.urlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(1)
+		m.UrlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(1)
 		defer func(t time.Time) {
 			m.TTLHist.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Observe(time.Since(t).Seconds())
-			m.urlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(-1)
+			m.UrlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(-1)
 		}(time.Now())
 		ret, msg, mp = controller(c)
 		for k, v := range mp {
@@ -107,10 +98,10 @@ func TDSSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.H)
 		var ret int
 		var msg string
 		mp, mret := map[string]interface{}{}, map[string]interface{}{}
-		m.urlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(1)
+		m.UrlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(1)
 		defer func(t time.Time) {
 			m.TTLHist.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Observe(time.Since(t).Seconds())
-			m.urlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(-1)
+			m.UrlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(-1)
 		}(time.Now())
 		ret, msg, mp = controller(c)
 		for k, v := range mp {
@@ -123,15 +114,14 @@ func TDSSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.H)
 	}
 }
 
-
 func PlainSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.H)) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var ret int
 		mp := map[string]interface{}{}
-		m.urlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(1)
+		m.UrlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(1)
 		defer func(t time.Time) {
 			m.TTLHist.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Observe(time.Since(t).Seconds())
-			m.urlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(-1)
+			m.UrlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(-1)
 		}(time.Now())
 		ret, _, mp = controller(c)
 		c.JSON(http.StatusOK, mp)
