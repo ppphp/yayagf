@@ -4,6 +4,14 @@ import "github.com/sirupsen/logrus"
 
 var Logger = logrus.New()
 
+func init() {
+	Logger.SetLevel(logrus.InfoLevel)
+}
+
+func Debugf(format string, args ...interface{}) {
+	Logger.Debugf(format, args...)
+}
+
 func Printf(format string, args ...interface{}) {
 	Logger.Printf(format, args...)
 }
