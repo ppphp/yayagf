@@ -51,13 +51,19 @@ type {{ . }} struct {
 
 // Fields of the {{ . }}.
 func ({{ . }}) Fields() []ent.Field {
-	return nil
+	return []ent.Field{}
 }
 
 // Edges of the {{ . }}.
 func ({{ . }}) Edges() []ent.Edge {
 	return nil
 }
+
+// Indexes of the {{ . }}.
+func ({{ . }}) Indexes() []ent.Index {
+    return []ent.Index{}
+}
+
 `))
 
 var DefaultConfig = &packages.Config{Mode: packages.NeedName}
