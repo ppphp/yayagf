@@ -21,6 +21,7 @@ require (
 	github.com/sergi/go-diff v1.1.0
 	github.com/shirou/gopsutil v2.20.4+incompatible
 	github.com/sirupsen/logrus v1.6.0
+	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.4.0
 	gitlab.papegames.com/fringe/quartz v0.0.0-20200103072440-229d00f9ada6
 	golang.org/x/mod v0.3.0 // indirect

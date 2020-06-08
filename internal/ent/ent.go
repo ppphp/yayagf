@@ -51,23 +51,28 @@ type {{ . }} struct {
 
 // Fields of the {{ . }}.
 func ({{ . }}) Fields() []ent.Field {
-	return nil
+	return []ent.Field{}
 }
 
 // Edges of the {{ . }}.
 func ({{ . }}) Edges() []ent.Edge {
 	return nil
 }
+
+// Indexes of the {{ . }}.
+func ({{ . }}) Indexes() []ent.Index {
+    return []ent.Index{}
+}
+
 `))
 
 var DefaultConfig = &packages.Config{Mode: packages.NeedName}
 
-func GenerateCRUDFiles(mod, path, target string) error {
+func GenerateCRUDFiles(mod, path, target string, template []string) error {
 	type idType field.Type
 	var (
 		storage  string
 		cfg      gen.Config
-		template []string
 		idtype   = idType(field.TypeInt)
 	)
 	storage = "sql"
@@ -78,17 +83,14 @@ func GenerateCRUDFiles(mod, path, target string) error {
 	// If the target directory is not inferred from
 	// the schema path, resolve its package path.
 	cfg.Target = target
-	if cfg.Target != "" {
-		pkgPath, err := PkgPath(DefaultConfig, cfg.Target)
-		if err != nil {
-			return err
-		}
-		cfg.Package = pkgPath
+	pkgPath, err := PkgPath(DefaultConfig, cfg.Target)
+	if err != nil {
+		return err
 	}
+	cfg.Package = pkgPath
 	cfg.IDType = &field.TypeInfo{Type: field.Type(idtype)}
 	cfg.Package = filepath.Join(mod, "app", "crud") // TODO: well test
-	err := entc.Generate(path, &cfg, opts...)
-	if err != nil {
+	if err := entc.Generate(path, &cfg, opts...); err != nil {
 		return err
 	}
 
