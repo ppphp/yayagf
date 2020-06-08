@@ -25,6 +25,7 @@ func CommandFactory() (*cli.Command, error) {
 			}
 			log.Debugf("%v", templates)
 			if debug {
+				log.Logger.SetReportCaller(true)
 				log.Logger.SetLevel(logrus.DebugLevel)
 			}
 
