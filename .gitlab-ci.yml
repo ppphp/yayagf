@@ -42,9 +42,6 @@ go-test:
 
 sonar_analyze:
   stage: sonar
-  only:
-    refs:
-      - master
   script:
     - wget -q http://192.168.0.97:8000/sonar-scanner.tar.gz
     - tar -xf sonar-scanner.tar.gz
@@ -60,8 +57,57 @@ sonar_analyze:
       -Dsonar.go.govet.reportPaths=vet \
       -Dsonar.go.golangci-lint.reportPaths=golangci-lint-report.xml \
       -Dsonar.test.inclusions=**/*_test.go \
+      -Dsonar.test.exclusions=**/vendor/** \
+      -Dsonar.branch.name=${CI_COMMIT_REF_NAME}"
+  dependencies:
+    - vet
+    - golangci-lint
+    - go-test
+  except:
+    refs:
+      - merge_requests
+
+sonar_analyze_decoration:
+  stage: sonar
+  script:
+    - git config --global user.email "bigcar@papegames.com"
+    - git config --global user.name "bigcar"
+    - git branch -D ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+    - git checkout ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+    - git merge origin/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+    - go vet -n ./... 2> vet
+    - go test -race -cover -v ./... -json -coverprofile=covprofile > test.json
+    - go tool cover -func=./covprofile -o ./total.txt
+    - cat total.txt|grep total
+    - golangci-lint run ./... --out-format=checkstyle > golangci-lint-report.xml || true
+    - wget -q http://192.168.0.97:8000/sonar-scanner.tar.gz
+    - tar -xf sonar-scanner.tar.gz
+    - "./sonar-scanner/bin/sonar-scanner \
+      -Dsonar.host.url=http://192.168.0.97:9000 \
+      -Dsonar.sources=. \
+      -Dsonar.projectKey=$CI_PROJECT_NAME \
+      -Dsonar.login=dced6e70e45d30783fda260701e8e0169b61013f \
+      -Dsonar.exclusions=**/*_test.go,**/vendor/**,golangci-lint-report.xml,**/testdata/** \
+      -Dsonar.test.inclusions=**/*_test.go \
+      -Dsonar.test.exclusions=**/vendor/** \
+      -Dsonar.go.tests.reportPaths=test.json \
+      -Dsonar.go.coverage.reportPaths=covprofile \
+      -Dsonar.go.govet.reportPaths=vet \
+      -Dsonar.go.golangci-lint.reportPaths=golangci-lint-report.xml \
+      -Dsonar.pullrequest.gitlab.repositorySlug=$CI_PROJECT_ID \
+      -Dsonar.pullrequest.key=${CI_MERGE_REQUEST_IID} \
+      -Dsonar.gitlab.ref_name=${CI_COMMIT_REF_NAME} \
+      -Dsonar.projectDescription=${CI_PROJECT_TITLE} \
+      -Dsonar.links.homepage=${CI_PROJECT_URL} \
+      -Dsonar.gitlab.commit_sha=${CI_COMMIT_SHA}  \
+      -Dsonar.gitlab.project_id=${CI_PROJECT_ID} \
+      -Dsonar.pullrequest.branch=${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} \
+      -Dsonar.pullrequest.base=${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} \
       -Dsonar.test.exclusions=**/vendor/**"
   dependencies:
     - vet
     - golangci-lint
     - go-test
+  only:
+    refs:
+      - merge_requests
