@@ -114,10 +114,10 @@ func TDSSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.H)
 	}
 }
 
-func PlainSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.H)) func(*gin.Context) {
+func PlainSerializer(m *MaoTai, controller func(*gin.Context) (int, string, interface{})) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var ret int
-		mp := map[string]interface{}{}
+		var mp interface{}
 		m.UrlConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(1)
 		defer func(t time.Time) {
 			m.TTLHist.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Observe(time.Since(t).Seconds())
