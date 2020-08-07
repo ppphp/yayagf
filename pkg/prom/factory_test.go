@@ -26,6 +26,22 @@ func TestGoMem(t *testing.T) {
 	GoMem("test")
 }
 
+func TestGoGCTime(t *testing.T) {
+	GoGCTime("test")
+}
+
+func TestRedisConnection(t *testing.T) {
+	RedisConnection("test", "test", nil)
+}
+
+func TestRedisWaitDuration(t *testing.T) {
+	RedisWaitDuration("test", "test", nil)
+}
+
+func TestRedisWaitCount(t *testing.T) {
+	RedisWaitCount("test", "test", nil)
+}
+
 func TestUrlTTL(t *testing.T) {
 	UrlTTL("test")
 }

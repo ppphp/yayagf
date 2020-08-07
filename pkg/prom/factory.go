@@ -4,11 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/gomodule/redigo/redis"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/mem"
 	"runtime"
+	"runtime/debug"
 )
 
 func SysCPU(project string) *gaugeVecFuncCollector {
@@ -60,7 +62,7 @@ func SysDisk(project string) *gaugeVecFuncCollector {
 		Namespace:   project,
 		Name:        "system_disk",
 		ConstLabels: map[string]string{},
-	}, []string{"path"}, func() []LV {
+	}, []string{"path", "status"}, func() []LV {
 		ps, err := disk.Partitions(false)
 		if err != nil {
 			return nil
@@ -69,7 +71,12 @@ func SysDisk(project string) *gaugeVecFuncCollector {
 		for _, v := range ps {
 			d, err := disk.Usage(v.Mountpoint)
 			if err == nil {
-				lvs = append(lvs, LV{Lbs: []string{v.Mountpoint}, V: float64(d.Free)})
+				lvs = append(lvs, LV{Lbs: []string{v.Mountpoint, "total"}, V: float64(d.Total)})
+				lvs = append(lvs, LV{Lbs: []string{v.Mountpoint, "free"}, V: float64(d.Free)})
+				lvs = append(lvs, LV{Lbs: []string{v.Mountpoint, "used"}, V: float64(d.Used)})
+				lvs = append(lvs, LV{Lbs: []string{v.Mountpoint, "inode_used"}, V: float64(d.InodesUsed)})
+				lvs = append(lvs, LV{Lbs: []string{v.Mountpoint, "inode_total"}, V: float64(d.InodesTotal)})
+				lvs = append(lvs, LV{Lbs: []string{v.Mountpoint, "inode_free"}, V: float64(d.InodesFree)})
 			}
 		}
 		return lvs
@@ -121,7 +128,7 @@ func GoMem(project string) *gaugeVecFuncCollector {
 		runtime.ReadMemStats(memstat)
 		lvs = append(lvs, LV{Lbs: []string{"sys"}, V: float64(memstat.Sys)})                    //服务现在系统使用的内存
 		lvs = append(lvs, LV{Lbs: []string{"alloc"}, V: float64(memstat.Alloc)})                //golang语言框架堆空间分配的字节数
-		lvs = append(lvs, LV{Lbs: []string{"total_alloc"}, V: float64(memstat.TotalAlloc)})     //从服务开始运行至今分配器为分配的堆空间总 和，只有增加，释放的时候不减少
+		lvs = append(lvs, LV{Lbs: []string{"total_alloc"}, V: float64(memstat.TotalAlloc)})     //从服务开始运行至今分配器为分配的堆空间总和，只有增加，释放的时候不减少
 		lvs = append(lvs, LV{Lbs: []string{"frees"}, V: float64(memstat.Frees)})                //服务回收的heap objects的字节数
 		lvs = append(lvs, LV{Lbs: []string{"heap_alloc"}, V: float64(memstat.HeapAlloc)})       //服务分配的堆内存字节数
 		lvs = append(lvs, LV{Lbs: []string{"heap_sys"}, V: float64(memstat.HeapSys)})           //系统分配的作为运行栈的内存
@@ -141,6 +148,21 @@ func GoMem(project string) *gaugeVecFuncCollector {
 	})
 }
 
+func GoGCTime(project string) *gaugeVecFuncCollector {
+	return NewGaugeVecFunc(prometheus.GaugeOpts{
+		Namespace:   project,
+		Name:      "gc_time",
+	}, []string{"quantile"},func() []LV {
+		gst := debug.GCStats{}
+		debug.ReadGCStats(&gst)
+		lvs := []LV{}
+		for k, v:= range gst.PauseQuantiles {
+			lvs = append(lvs, LV{Lbs: []string{fmt.Sprint(k)}, V: v.Seconds()})
+		}
+		return lvs
+	})
+}
+
 func UrlTTL(project string) *prometheus.HistogramVec {
 	return prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace:   project,
@@ -155,6 +177,54 @@ func UrlConnection(project string) *prometheus.GaugeVec {
 		Name:        "http_connections",
 		ConstLabels: map[string]string{},
 	}, []string{"url", "method"})
+}
+
+func RedisConnection(project string, dbname string, client *redis.Pool) *gaugeVecFuncCollector {
+	return NewGaugeVecFunc(prometheus.GaugeOpts{
+		Namespace:   project,
+		Subsystem:   dbname,
+		Name:        "redis_connection",
+		ConstLabels: map[string]string{},
+	}, []string{"type"}, func() []LV {
+		if client == nil {
+			return nil
+		}
+		lvs := []LV{
+			// The number of active connections.
+			{[]string{"active"}, float64(client.Stats().ActiveCount)},
+			// The number of open connections that are currently idle.
+			{[]string{"idle"}, float64(client.Stats().IdleCount)},
+		}
+		return lvs
+	})
+}
+
+func RedisWaitCount(project string, dbname string, client *redis.Pool) prometheus.GaugeFunc{
+	return prometheus.NewGaugeFunc(prometheus.GaugeOpts{
+		Namespace:   project,
+		Subsystem:   dbname,
+		Name:        "redis_wait_count",
+		ConstLabels: map[string]string{},
+	}, func() float64 {
+		if client == nil {
+			return 0
+		}
+		return float64(client.Stats().WaitCount)
+	})
+}
+
+func RedisWaitDuration(project string, dbname string, client *redis.Pool) prometheus.GaugeFunc{
+	return prometheus.NewGaugeFunc(prometheus.GaugeOpts{
+		Namespace:   project,
+		Subsystem:   dbname,
+		Name:        "redis_wait_duration",
+		ConstLabels: map[string]string{},
+	}, func() float64 {
+		if client == nil {
+			return 0
+		}
+		return client.Stats().WaitDuration.Seconds()
+	})
 }
 
 // https://orangematter.solarwinds.com/2018/05/22/new-stats-exposed-in-gos-database-sql-package/

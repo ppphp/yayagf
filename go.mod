@@ -15,6 +15,7 @@ require (
 	github.com/go-playground/validator/v10 v10.3.0 // indirect
 	github.com/go-sql-driver/mysql v1.5.1-0.20200311113236-681ffa848bae
 	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/gomodule/redigo/redis v0.0.0-20200429221454-e14091dffc1b
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/lib/pq v1.7.0
 	github.com/mailru/easyjson v0.7.1 // indirect

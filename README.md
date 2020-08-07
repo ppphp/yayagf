@@ -6,6 +6,12 @@
 
 yet another yet another go web framework, my practice
 
+it is a 缝合怪 of some tool
+- http: gin-gonic/gin
+- monitor: prometheus/prometheus
+- database: facebookincubator/ent
+- cli: urfave/cli (WIP)
+
 ###### sonar
 [![Bugs](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=bugs)](http://192.168.0.97:9000/dashboard?id=yayagf)
 [![异味](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=code_smells)](http://192.168.0.97:9000/dashboard?id=yayagf)
