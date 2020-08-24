@@ -10,9 +10,9 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/facebookincubator/ent/entc"
-	"github.com/facebookincubator/ent/entc/gen"
-	"github.com/facebookincubator/ent/schema/field"
+	"github.com/facebook/ent/entc"
+	"github.com/facebook/ent/entc/gen"
+	"github.com/facebook/ent/schema/field"
 	"golang.org/x/tools/go/packages"
 )
 
