@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/facebook/ent/dialect/sql"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 )

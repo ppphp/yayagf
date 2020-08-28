@@ -6,7 +6,6 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/facebook/ent v0.4.0
-	github.com/facebookincubator/ent v0.2.3
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-ole/go-ole v1.2.4 // indirect
@@ -27,8 +26,8 @@ require (
 	github.com/stretchr/testify v1.6.1
 	gitlab.papegames.com/fringe/quartz v0.0.0-20200103072440-229d00f9ada6
 	golang.org/x/net v0.0.0-20200822124328-c89045814202 // indirect
-	golang.org/x/sys v0.0.0-20200821140526-fda516888d29 // indirect
-	golang.org/x/tools v0.0.0-20200823205832-c024452afbcd
+	golang.org/x/sys v0.0.0-20200826173525-f9321e4c35a6 // indirect
+	golang.org/x/tools v0.0.0-20200828013309-97019fc2e64b
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect

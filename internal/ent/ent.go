@@ -42,7 +42,7 @@ func GenerateSchema(path string, names []string) error {
 var tmpl = template.Must(template.New("schema").
 	Parse(`package schema
 
-import "github.com/facebookincubator/ent"
+import "github.com/facebook/ent"
 
 // {{ . }} holds the schema definition for the {{ . }} entity.
 type {{ . }} struct {

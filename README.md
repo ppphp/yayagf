@@ -9,7 +9,7 @@ yet another yet another go web framework, my practice
 it is a 缝合怪 of some tool
 - http: gin-gonic/gin
 - monitor: prometheus/prometheus
-- database: facebookincubator/ent
+- database: facebook/ent
 - cli: urfave/cli (WIP)
 
 ###### sonar
