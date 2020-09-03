@@ -30,6 +30,7 @@ func GenerateSwagger() error {
 	if err := p.ParseAPI(root, "main.go"); err != nil {
 		return err
 	}
+
 	swagger := p.GetSwagger()
 
 	b, err := json.MarshalIndent(swagger, "", "    ")
@@ -48,6 +49,8 @@ const Swagger = %s
 `, strconv.Quote(string(b)))), 0644); err != nil {
 		return err
 	}
+
 	log.Printf("create docs.go at  %+v", docFileName)
+
 	return nil
 }
