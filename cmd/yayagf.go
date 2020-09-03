@@ -14,7 +14,7 @@ import (
 	"gitlab.papegames.com/fengche/yayagf/cmd/server"
 )
 
-func Main() {
+func Main() int {
 	c := cli.NewApp("yayagf", "HEAD")
 
 	if len(os.Args) > 0 {
@@ -35,7 +35,5 @@ func Main() {
 		log.Println(err)
 	}
 
-	if exitStatus != 0 {
-		os.Exit(exitStatus)
-	}
+	return exitStatus
 }

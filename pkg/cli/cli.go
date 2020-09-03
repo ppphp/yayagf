@@ -27,47 +27,57 @@ func (c *Command) exec(cargs []string) (int, error) {
 	if c.Commands == nil {
 		return c.Run(c.Args, c.Flags)
 	}
+
 	if len(c.Args) == 0 {
-		if s, ok := c.Commands[""]; !ok {
+		s, ok := c.Commands[""]
+		if !ok {
 			if c.Run != nil {
 				return c.Run(c.Args, c.Flags)
-			} else {
-				return 1, nil
 			}
-		} else {
-			if f, err := s(); err != nil {
-				return 1, err
-			} else {
-				return f.exec(c.Args[1:])
-			}
-		}
-	} else {
-		if s, ok := c.Commands[c.Args[0]]; !ok {
-			// preserve for help function
+
 			return 1, nil
-		} else {
-			if f, err := s(); err != nil {
-				return 1, err
-			} else {
-				return f.exec(c.Args[1:])
-			}
 		}
+
+		f, err := s()
+
+		if err != nil {
+			return 1, err
+		}
+
+		return f.exec(c.Args[1:])
 	}
+
+	s, ok := c.Commands[c.Args[0]]
+
+	if !ok {
+		// preserve for help function
+		return 1, nil
+	}
+
+	f, err := s()
+
+	if err != nil {
+		return 1, err
+	}
+
+	return f.exec(c.Args[1:])
 }
 
 func (c *Command) parseArgs(args []string) {
 	c.Flags = map[string]string{}
+
 	for i := range args {
 		if !strings.HasPrefix(args[i], "-") {
 			c.Args = append([]string{}, args[i:]...)
 			return
+		}
+
+		f := strings.SplitN(strings.TrimPrefix(args[i], "-"), "=", 2)
+
+		if len(f) == 1 {
+			c.Flags[f[0]] = ""
 		} else {
-			f := strings.SplitN(strings.TrimPrefix(args[i], "-"), "=", 2)
-			if len(f) == 1 {
-				c.Flags[f[0]] = ""
-			} else {
-				c.Flags[f[0]] = f[1]
-			}
+			c.Flags[f[0]] = f[1]
 		}
 	}
 }

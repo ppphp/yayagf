@@ -19,6 +19,7 @@ func NewYayagfApp(name, version string, engine *gin.Engine, port int) *App {
 				return 0, nil
 			},
 		}
+
 		return c, nil
 	}
 
@@ -28,6 +29,7 @@ func NewYayagfApp(name, version string, engine *gin.Engine, port int) *App {
 				return 0, nil
 			},
 		}
+
 		return c, nil
 	}
 
