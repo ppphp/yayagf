@@ -30,9 +30,11 @@ func Main() {
 		"version": version.CommandFactory,
 	}
 	exitStatus, err := c.Run()
+
 	if err != nil {
 		log.Println(err)
 	}
+
 	if exitStatus != 0 {
 		os.Exit(exitStatus)
 	}

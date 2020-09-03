@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/swaggo/swag"
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
-	"gitlab.papegames.com/fengche/yayagf/internal/swagger/swag"
 )
 
 func GenerateSwagger() error {
