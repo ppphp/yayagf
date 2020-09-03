@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestMain(t *testing.M) {
+func TestMain(m *testing.M) {
 	os.Args = []string{"yayagf", "version"}
-	t.Main()
+	m.Run()
 }
