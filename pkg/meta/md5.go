@@ -2,6 +2,7 @@ package meta
 
 import (
 	"crypto/md5"
+	"encoding/hex"
 	"io/ioutil"
 	"os"
 )
@@ -16,5 +17,5 @@ func CalculateSelfMD5() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return string(h.Sum(nil)), nil
+	return hex.EncodeToString(h.Sum(nil)), nil
 }
