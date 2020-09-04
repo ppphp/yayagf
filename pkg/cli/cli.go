@@ -3,6 +3,8 @@
 package cli
 
 import (
+	"fmt"
+	"gitlab.papegames.com/fengche/yayagf/pkg/meta"
 	"os"
 	"strings"
 )
@@ -84,20 +86,27 @@ func (c *Command) parseArgs(args []string) {
 
 // 根command，当然也可以用来做普通command，就是个例子
 type App struct {
-	Name    string
-	Version string
+	Name string
+	Meta meta.Meta
 	*Command
 }
 
 func NewApp(name, version string) *App {
-	a := &App{Name: name, Version: version, Command: &Command{}}
+	a := &App{Name: name, Meta: meta.Get(), Command: &Command{}}
 	return a
 }
 
 func (a *App) Run() (int, error) {
+	if os.Getenv("Meta") != "mute" {
+		fmt.Println(a.PrintMeta())
+	}
 	return a.RunArgs(os.Args[1:])
 }
 
 func (a *App) RunArgs(args []string) (int, error) {
 	return a.exec(args)
+}
+
+func (a *App) PrintMeta() string {
+	return fmt.Sprintf("%v %v, digested %v built by %v %v on %v %v at %v with intranet %v", a.Name, a.Meta.Version, a.Meta.MD5, a.Meta.GoCompiler, a.Meta.GoVersion, a.Meta.GoOS, a.Meta.GoArch, a.Meta.BuildAt, a.Meta.Local)
 }

@@ -47,7 +47,7 @@ var local = func() string {
 }()
 
 // 一个构建期注入的meta信息结构体
-var Meta = struct {
+type Meta struct {
 	// binary自带信息
 	GoOS        string
 	GoVersion   string
@@ -63,16 +63,20 @@ var Meta = struct {
 	BuildAt string
 	Commit  string
 	Version string
-}{
-	GoOS:        runtime.GOOS,
-	GoVersion:   runtime.Version(),
-	GoArch:      runtime.GOARCH,
-	GoCompiler:  runtime.Compiler,
-	GoBuildInfo: BuildInfo,
-	Commit:      "HEAD",
-	Version:     "HEAD",
-	MD5:         binhash,
-	Uptime:      uptime,
-	Mtime:       mtime,
-	Local:       local,
+}
+
+func Get() Meta {
+	return Meta{
+		GoOS:        runtime.GOOS,
+		GoVersion:   runtime.Version(),
+		GoArch:      runtime.GOARCH,
+		GoCompiler:  runtime.Compiler,
+		GoBuildInfo: BuildInfo,
+		Commit:      "HEAD",
+		Version:     "HEAD",
+		MD5:         binhash,
+		Uptime:      uptime,
+		Mtime:       mtime,
+		Local:       local,
+	}
 }
