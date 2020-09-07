@@ -9,15 +9,15 @@ type LV struct {
 	V   float64
 }
 
-type gaugeVecFuncCollector struct {
+type GaugeVecFuncCollector struct {
 	desc                  *prometheus.Desc
 	labelsDeduplicatedMap map[string]bool
 	funcs                 func() []LV
 }
 
 // NewGaugeVecFunc
-func NewGaugeVecFunc(opts prometheus.GaugeOpts, labelNames []string, funcs func() []LV) *gaugeVecFuncCollector {
-	return &gaugeVecFuncCollector{
+func NewGaugeVecFunc(opts prometheus.GaugeOpts, labelNames []string, funcs func() []LV) *GaugeVecFuncCollector {
+	return &GaugeVecFuncCollector{
 		desc: prometheus.NewDesc(
 			prometheus.BuildFQName(opts.Namespace, opts.Subsystem, opts.Name),
 			opts.Help,
@@ -25,17 +25,17 @@ func NewGaugeVecFunc(opts prometheus.GaugeOpts, labelNames []string, funcs func(
 			opts.ConstLabels,
 		),
 		labelsDeduplicatedMap: make(map[string]bool),
-		funcs: funcs,
+		funcs:                 funcs,
 	}
 }
 
 // Describe
-func (dc *gaugeVecFuncCollector) Describe(ch chan<- *prometheus.Desc) {
+func (dc *GaugeVecFuncCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- dc.desc
 }
 
 // Collect
-func (dc *gaugeVecFuncCollector) Collect(ch chan<- prometheus.Metric) {
+func (dc *GaugeVecFuncCollector) Collect(ch chan<- prometheus.Metric) {
 	for _, v := range dc.funcs() {
 		ch <- prometheus.MustNewConstMetric(dc.desc, prometheus.GaugeValue, v.V, v.Lbs...)
 	}

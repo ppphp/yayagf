@@ -3,8 +3,8 @@ package prom
 import (
 	"database/sql"
 	"fmt"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/gomodule/redigo/redis"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/load"
@@ -13,7 +13,7 @@ import (
 	"runtime/debug"
 )
 
-func SysCPU(project string) *gaugeVecFuncCollector {
+func SysCPU(project string) *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   project,
 		Name:        "system_cpu",
@@ -31,7 +31,7 @@ func SysCPU(project string) *gaugeVecFuncCollector {
 	})
 }
 
-func SysMem(project string) *gaugeVecFuncCollector {
+func SysMem(project string) *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   project,
 		Name:        "system_mem",
@@ -57,7 +57,7 @@ func SysMem(project string) *gaugeVecFuncCollector {
 	})
 }
 
-func SysDisk(project string) *gaugeVecFuncCollector {
+func SysDisk(project string) *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   project,
 		Name:        "system_disk",
@@ -83,7 +83,7 @@ func SysDisk(project string) *gaugeVecFuncCollector {
 	})
 }
 
-func SysLoad(project string) *gaugeVecFuncCollector {
+func SysLoad(project string) *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   project,
 		Name:        "system_load",
@@ -94,9 +94,9 @@ func SysLoad(project string) *gaugeVecFuncCollector {
 		if err != nil {
 			return
 		}
-		lvs = append(lvs, LV{Lbs: []string{"avg_1"}, V: float64(a.Load1)})
-		lvs = append(lvs, LV{Lbs: []string{"avg_5"}, V: float64(a.Load5)})
-		lvs = append(lvs, LV{Lbs: []string{"avg_15"}, V: float64(a.Load15)})
+		lvs = append(lvs, LV{Lbs: []string{"avg_1"}, V: a.Load1})
+		lvs = append(lvs, LV{Lbs: []string{"avg_5"}, V: a.Load5})
+		lvs = append(lvs, LV{Lbs: []string{"avg_15"}, V: a.Load15})
 		m, err := load.Misc()
 		if err != nil {
 			return
@@ -110,7 +110,7 @@ func SysLoad(project string) *gaugeVecFuncCollector {
 
 func GoRoutine(project string) prometheus.GaugeFunc {
 	return prometheus.NewGaugeFunc(prometheus.GaugeOpts{
-		Namespace:   project,
+		Namespace: project,
 		Name:      "goroutines",
 	}, func() float64 {
 		return float64(runtime.NumGoroutine())
@@ -118,17 +118,18 @@ func GoRoutine(project string) prometheus.GaugeFunc {
 }
 
 // 注释 https://blog.csdn.net/m0_38132420/article/details/71699815
-func GoMem(project string) *gaugeVecFuncCollector {
+func GoMem(project string) *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
-		Namespace:   project,
+		Namespace: project,
 		Name:      "process_mem",
 	}, []string{"cat"}, func() (lvs []LV) {
 		lvs = []LV{}
 		memstat := &runtime.MemStats{}
 		runtime.ReadMemStats(memstat)
-		lvs = append(lvs, LV{Lbs: []string{"sys"}, V: float64(memstat.Sys)})                    //服务现在系统使用的内存
-		lvs = append(lvs, LV{Lbs: []string{"alloc"}, V: float64(memstat.Alloc)})                //golang语言框架堆空间分配的字节数
-		lvs = append(lvs, LV{Lbs: []string{"total_alloc"}, V: float64(memstat.TotalAlloc)})     //从服务开始运行至今分配器为分配的堆空间总和，只有增加，释放的时候不减少
+		lvs = append(lvs, LV{Lbs: []string{"sys"}, V: float64(memstat.Sys)})                //服务现在系统使用的内存
+		lvs = append(lvs, LV{Lbs: []string{"alloc"}, V: float64(memstat.Alloc)})            //golang语言框架堆空间分配的字节数
+		lvs = append(lvs, LV{Lbs: []string{"total_alloc"}, V: float64(memstat.TotalAlloc)}) //从服务开始运行至今分配器为分配的堆空间总和，只有增加，
+		//释放的时候不减少
 		lvs = append(lvs, LV{Lbs: []string{"frees"}, V: float64(memstat.Frees)})                //服务回收的heap objects的字节数
 		lvs = append(lvs, LV{Lbs: []string{"heap_alloc"}, V: float64(memstat.HeapAlloc)})       //服务分配的堆内存字节数
 		lvs = append(lvs, LV{Lbs: []string{"heap_sys"}, V: float64(memstat.HeapSys)})           //系统分配的作为运行栈的内存
@@ -148,22 +149,22 @@ func GoMem(project string) *gaugeVecFuncCollector {
 	})
 }
 
-func GoGCTime(project string) *gaugeVecFuncCollector {
+func GoGCTime(project string) *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
-		Namespace:   project,
+		Namespace: project,
 		Name:      "gc_time",
-	}, []string{"quantile"},func() []LV {
+	}, []string{"quantile"}, func() []LV {
 		gst := debug.GCStats{}
 		debug.ReadGCStats(&gst)
 		lvs := []LV{}
-		for k, v:= range gst.PauseQuantiles {
+		for k, v := range gst.PauseQuantiles {
 			lvs = append(lvs, LV{Lbs: []string{fmt.Sprint(k)}, V: v.Seconds()})
 		}
 		return lvs
 	})
 }
 
-func UrlTTL(project string) *prometheus.HistogramVec {
+func URLTTL(project string) *prometheus.HistogramVec {
 	return prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace:   project,
 		Name:        "http_handler_ttl",
@@ -179,7 +180,7 @@ func UrlConnection(project string) *prometheus.GaugeVec {
 	}, []string{"url", "method"})
 }
 
-func RedisConnection(project string, dbname string, client *redis.Pool) *gaugeVecFuncCollector {
+func RedisConnection(project string, dbname string, client *redis.Pool) *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   project,
 		Subsystem:   dbname,
@@ -199,7 +200,7 @@ func RedisConnection(project string, dbname string, client *redis.Pool) *gaugeVe
 	})
 }
 
-func RedisWaitCount(project string, dbname string, client *redis.Pool) prometheus.GaugeFunc{
+func RedisWaitCount(project string, dbname string, client *redis.Pool) prometheus.GaugeFunc {
 	return prometheus.NewGaugeFunc(prometheus.GaugeOpts{
 		Namespace:   project,
 		Subsystem:   dbname,
@@ -213,7 +214,7 @@ func RedisWaitCount(project string, dbname string, client *redis.Pool) prometheu
 	})
 }
 
-func RedisWaitDuration(project string, dbname string, client *redis.Pool) prometheus.GaugeFunc{
+func RedisWaitDuration(project string, dbname string, client *redis.Pool) prometheus.GaugeFunc {
 	return prometheus.NewGaugeFunc(prometheus.GaugeOpts{
 		Namespace:   project,
 		Subsystem:   dbname,
@@ -230,7 +231,7 @@ func RedisWaitDuration(project string, dbname string, client *redis.Pool) promet
 // https://orangematter.solarwinds.com/2018/05/22/new-stats-exposed-in-gos-database-sql-package/
 
 // The number of connections.
-func DbConnection(project string, dbname string, client *sql.DB) *gaugeVecFuncCollector {
+func DbConnection(project string, dbname string, client *sql.DB) *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   project,
 		Subsystem:   dbname,
