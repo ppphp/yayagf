@@ -3,11 +3,12 @@ package maotai
 
 import (
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
 	"gitlab.papegames.com/fengche/yayagf/pkg/prom"
-	"net/http"
-	"time"
 )
 
 type MaoTai struct {
@@ -55,8 +56,8 @@ func (m *MaoTai) HEAD(relativePath string, handlers ...gin.HandlerFunc) gin.IRou
 func New(project string) *MaoTai {
 	m := &MaoTai{}
 
-	m.UrlConn = prom.UrlConnection(project)
-	m.TTLHist = prom.UrlTTL(project)
+	m.UrlConn = prom.URLConnection(project)
+	m.TTLHist = prom.URLTTL(project)
 
 	m.Engine = gin.New()
 	return m
@@ -65,8 +66,8 @@ func New(project string) *MaoTai {
 func Default(project string) *MaoTai {
 	m := &MaoTai{}
 
-	m.UrlConn = prom.UrlConnection(project)
-	m.TTLHist = prom.UrlTTL(project)
+	m.UrlConn = prom.URLConnection(project)
+	m.TTLHist = prom.URLTTL(project)
 
 	m.Engine = gin.Default()
 	return m

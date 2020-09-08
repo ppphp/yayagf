@@ -3,69 +3,73 @@ package prom
 import "testing"
 
 func TestSysCPU(t *testing.T) {
-	SysCPU("test")
+	SysCPU()
 }
 
 func TestSysMem(t *testing.T) {
-	SysMem("test")
+	SysMem()
 }
 
 func TestSysDisk(t *testing.T) {
-	SysDisk("test")
+	SysDisk()
 }
 
 func TestSysLoad(t *testing.T) {
-	SysLoad("test")
+	SysLoad()
 }
 
 func TestGoRoutine(t *testing.T) {
-	GoRoutine("test")
+	GoRoutine()
 }
 
 func TestGoMem(t *testing.T) {
-	GoMem("test")
+	GoMem()
 }
 
 func TestGoGCTime(t *testing.T) {
-	GoGCTime("test")
+	GoGCTime()
 }
 
 func TestRedisConnection(t *testing.T) {
-	RedisConnection("test", "test", nil)
+	RedisConnection("test", nil)
 }
 
 func TestRedisWaitDuration(t *testing.T) {
-	RedisWaitDuration("test", "test", nil)
+	RedisWaitDuration("test", nil)
 }
 
 func TestRedisWaitCount(t *testing.T) {
-	RedisWaitCount("test", "test", nil)
+	RedisWaitCount("test", nil)
 }
 
 func TestUrlTTL(t *testing.T) {
-	UrlTTL("test")
+	URLTTL()
 }
 
 func TestUrlConnection(t *testing.T) {
-	UrlConnection("test")
+	URLConnection()
 }
 
 func TestDbConnection(t *testing.T) {
-	DbConnection("test", "test", nil)
+	DbConnection("test", nil)
 }
 
 func TestDBWaitCount(t *testing.T) {
-	DBWaitCount("test", "test", nil)
+	DBWaitCount("test", nil)
 }
 
 func TestDBWaitDuration(t *testing.T) {
-	DBWaitDuration("test", "test", nil)
+	DBWaitDuration("test", nil)
 }
 
 func TestCallHTTPConnection(t *testing.T) {
-	CallHTTPConnection("test", "test")
+	CallHTTPConnection()
 }
 
 func TestCallHTTPTTL(t *testing.T) {
-	CallHTTPTTL("test", "test")
+	CallHTTPTTL()
+}
+
+func TestAll(t *testing.T) {
+
 }

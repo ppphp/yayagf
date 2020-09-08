@@ -1,22 +1,27 @@
+// 测量命名规则：
+// 通用label: service_name
+// 字段名称：按照功能等级划分，系统、运行时、存储、调用、服务
+// 专用label：功能内部的平级监控
 package prom
 
 import (
 	"database/sql"
 	"fmt"
+	"runtime"
+	"runtime/debug"
+
 	"github.com/gomodule/redigo/redis"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/mem"
-	"runtime"
-	"runtime/debug"
 )
 
-func SysCPU(project string) *GaugeVecFuncCollector {
+func SysCPU() *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
-		Namespace:   project,
-		Name:        "system_cpu",
+		Namespace:   "system",
+		Name:        "cpu",
 		ConstLabels: map[string]string{},
 	}, []string{"num"}, func() []LV {
 		fs, err := cpu.Percent(0, true)
@@ -31,10 +36,10 @@ func SysCPU(project string) *GaugeVecFuncCollector {
 	})
 }
 
-func SysMem(project string) *GaugeVecFuncCollector {
+func SysMem() *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
-		Namespace:   project,
-		Name:        "system_mem",
+		Namespace:   "system",
+		Name:        "mem",
 		ConstLabels: map[string]string{},
 	}, []string{"cat"}, func() (lvs []LV) {
 		lvs = []LV{}
@@ -57,10 +62,10 @@ func SysMem(project string) *GaugeVecFuncCollector {
 	})
 }
 
-func SysDisk(project string) *GaugeVecFuncCollector {
+func SysDisk() *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
-		Namespace:   project,
-		Name:        "system_disk",
+		Namespace:   "system",
+		Name:        "disk",
 		ConstLabels: map[string]string{},
 	}, []string{"path", "status"}, func() []LV {
 		ps, err := disk.Partitions(false)
@@ -83,10 +88,10 @@ func SysDisk(project string) *GaugeVecFuncCollector {
 	})
 }
 
-func SysLoad(project string) *GaugeVecFuncCollector {
+func SysLoad() *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
-		Namespace:   project,
-		Name:        "system_load",
+		Namespace:   "system",
+		Name:        "load_average",
 		ConstLabels: map[string]string{},
 	}, []string{"cat"}, func() (lvs []LV) {
 		lvs = []LV{}
@@ -108,9 +113,9 @@ func SysLoad(project string) *GaugeVecFuncCollector {
 	})
 }
 
-func GoRoutine(project string) prometheus.GaugeFunc {
+func GoRoutine() prometheus.GaugeFunc {
 	return prometheus.NewGaugeFunc(prometheus.GaugeOpts{
-		Namespace: project,
+		Namespace: "runtime",
 		Name:      "goroutines",
 	}, func() float64 {
 		return float64(runtime.NumGoroutine())
@@ -118,10 +123,10 @@ func GoRoutine(project string) prometheus.GaugeFunc {
 }
 
 // 注释 https://blog.csdn.net/m0_38132420/article/details/71699815
-func GoMem(project string) *GaugeVecFuncCollector {
+func GoMem() *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
-		Namespace: project,
-		Name:      "process_mem",
+		Namespace: "runtime",
+		Name:      "mem",
 	}, []string{"cat"}, func() (lvs []LV) {
 		lvs = []LV{}
 		memstat := &runtime.MemStats{}
@@ -149,9 +154,9 @@ func GoMem(project string) *GaugeVecFuncCollector {
 	})
 }
 
-func GoGCTime(project string) *GaugeVecFuncCollector {
+func GoGCTime() *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
-		Namespace: project,
+		Namespace: "runtime",
 		Name:      "gc_time",
 	}, []string{"quantile"}, func() []LV {
 		gst := debug.GCStats{}
@@ -164,136 +169,128 @@ func GoGCTime(project string) *GaugeVecFuncCollector {
 	})
 }
 
-func URLTTL(project string) *prometheus.HistogramVec {
+func URLTTL() *prometheus.HistogramVec {
 	return prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Namespace:   project,
-		Name:        "http_handler_ttl",
+		Namespace:   "service",
+		Name:        "url_ttl",
 		ConstLabels: map[string]string{},
 	}, []string{"url", "method", "ret"})
 }
 
-func UrlConnection(project string) *prometheus.GaugeVec {
+func URLConnection() *prometheus.GaugeVec {
 	return prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace:   project,
+		Namespace:   "service",
 		Name:        "http_connections",
 		ConstLabels: map[string]string{},
 	}, []string{"url", "method"})
 }
 
-func RedisConnection(project string, dbname string, client *redis.Pool) *GaugeVecFuncCollector {
+func RedisConnection(dbname string, client *redis.Pool) *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
-		Namespace:   project,
-		Subsystem:   dbname,
-		Name:        "redis_connection",
+		Namespace:   "redis",
+		Name:        "redis_connections",
 		ConstLabels: map[string]string{},
-	}, []string{"type"}, func() []LV {
+	}, []string{"dbname", "type"}, func() []LV {
 		if client == nil {
 			return nil
 		}
 		lvs := []LV{
 			// The number of active connections.
-			{[]string{"active"}, float64(client.Stats().ActiveCount)},
+			{[]string{dbname, "active"}, float64(client.Stats().ActiveCount)},
 			// The number of open connections that are currently idle.
-			{[]string{"idle"}, float64(client.Stats().IdleCount)},
+			{[]string{dbname, "idle"}, float64(client.Stats().IdleCount)},
 		}
 		return lvs
 	})
 }
 
-func RedisWaitCount(project string, dbname string, client *redis.Pool) prometheus.GaugeFunc {
-	return prometheus.NewGaugeFunc(prometheus.GaugeOpts{
-		Namespace:   project,
-		Subsystem:   dbname,
-		Name:        "redis_wait_count",
+func RedisWaitCount(dbname string, client *redis.Pool) *GaugeVecFuncCollector {
+	return NewGaugeVecFunc(prometheus.GaugeOpts{
+		Namespace:   "redis",
+		Name:        "wait_count",
 		ConstLabels: map[string]string{},
-	}, func() float64 {
+	}, []string{"dbname"}, func() []LV {
 		if client == nil {
-			return 0
+			return nil
 		}
-		return float64(client.Stats().WaitCount)
+		return []LV{{[]string{dbname}, float64(client.Stats().WaitCount)}}
 	})
 }
 
-func RedisWaitDuration(project string, dbname string, client *redis.Pool) prometheus.GaugeFunc {
-	return prometheus.NewGaugeFunc(prometheus.GaugeOpts{
-		Namespace:   project,
-		Subsystem:   dbname,
-		Name:        "redis_wait_duration",
+func RedisWaitDuration(dbname string, client *redis.Pool) *GaugeVecFuncCollector {
+	return NewGaugeVecFunc(prometheus.GaugeOpts{
+		Namespace:   "redis",
+		Name:        "wait_duration",
 		ConstLabels: map[string]string{},
-	}, func() float64 {
+	}, []string{"dbname"}, func() []LV {
 		if client == nil {
-			return 0
+			return nil
 		}
-		return client.Stats().WaitDuration.Seconds()
+		return []LV{{[]string{dbname}, client.Stats().WaitDuration.Seconds()}}
 	})
 }
 
 // https://orangematter.solarwinds.com/2018/05/22/new-stats-exposed-in-gos-database-sql-package/
 
 // The number of connections.
-func DbConnection(project string, dbname string, client *sql.DB) *GaugeVecFuncCollector {
+func DbConnection(dbname string, client *sql.DB) *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
-		Namespace:   project,
-		Subsystem:   dbname,
-		Name:        "db_connection",
+		Namespace:   "db",
+		Name:        "connection",
 		ConstLabels: map[string]string{},
-	}, []string{"type"}, func() []LV {
+	}, []string{"dbname", "type"}, func() []LV {
 		lvs := []LV{
 			// The number of connections.
-			{[]string{"open"}, float64(client.Stats().OpenConnections)},
+			{[]string{dbname, "open"}, float64(client.Stats().OpenConnections)},
 			// The number of open connections that are currently idle.
-			{[]string{"idle"}, float64(client.Stats().Idle)},
+			{[]string{dbname, "idle"}, float64(client.Stats().Idle)},
 			// The number of connections actively in-use.
-			{[]string{"inuse"}, float64(client.Stats().InUse)},
+			{[]string{dbname, "inuse"}, float64(client.Stats().InUse)},
 		}
 		return lvs
 	})
 }
 
 // The total number of times a goroutine has had to wait for a connection.
-func DBWaitCount(project string, dbname string, client *sql.DB) prometheus.GaugeFunc {
-	return prometheus.NewGaugeFunc(prometheus.GaugeOpts{
-		Namespace:   project,
-		Subsystem:   dbname,
-		Name:        "db_wait_count",
+func DBWaitCount(dbname string, client *sql.DB) *GaugeVecFuncCollector {
+	return NewGaugeVecFunc(prometheus.GaugeOpts{
+		Namespace:   "db",
+		Name:        "wait_count",
 		ConstLabels: map[string]string{},
-	}, func() float64 {
+	}, []string{"dbname"}, func() []LV {
 		if client == nil {
-			return 0
+			return nil
 		}
-		return float64(client.Stats().WaitCount)
+		return []LV{{[]string{dbname}, float64(client.Stats().WaitCount)}}
 	})
 }
 
 // The cumulative amount of time goroutines have spent waiting for a connection.
-func DBWaitDuration(project string, dbname string, client *sql.DB) prometheus.GaugeFunc {
-	return prometheus.NewGaugeFunc(prometheus.GaugeOpts{
-		Namespace:   project,
-		Subsystem:   dbname,
-		Name:        "db_wait_duration",
+func DBWaitDuration(dbname string, client *sql.DB) *GaugeVecFuncCollector {
+	return NewGaugeVecFunc(prometheus.GaugeOpts{
+		Namespace:   "db",
+		Name:        "wait_duration",
 		ConstLabels: map[string]string{},
-	}, func() float64 {
+	}, []string{"dbname"}, func() []LV {
 		if client == nil {
-			return 0
+			return nil
 		}
-		return client.Stats().WaitDuration.Seconds()
+		return []LV{{[]string{dbname}, client.Stats().WaitDuration.Seconds()}}
 	})
 }
 
-func CallHTTPConnection(project string, name string) *prometheus.GaugeVec {
+func CallHTTPConnection() *prometheus.GaugeVec {
 	return prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace:   project,
-		Subsystem:   name,
+		Namespace:   "call",
 		Name:        "http_connections",
 		ConstLabels: map[string]string{},
-	}, []string{"url", "method"})
+	}, []string{"service", "url", "method"})
 }
 
-func CallHTTPTTL(project string, name string) *prometheus.HistogramVec {
+func CallHTTPTTL() *prometheus.HistogramVec {
 	return prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Namespace:   project,
-		Subsystem:   name,
+		Namespace:   "call",
 		Name:        "http_ttl",
 		ConstLabels: map[string]string{},
-	}, []string{"url", "method", "code", "ret"})
+	}, []string{"service", "url", "method", "code", "ret"})
 }
