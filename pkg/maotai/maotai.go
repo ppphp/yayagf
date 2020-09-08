@@ -53,11 +53,11 @@ func (m *MaoTai) HEAD(relativePath string, handlers ...gin.HandlerFunc) gin.IRou
 	return m.Engine.HEAD(relativePath, handlers...)
 }
 
-func New(project string) *MaoTai {
+func New() *MaoTai {
 	m := &MaoTai{}
 
-	m.UrlConn = prom.URLConnection(project)
-	m.TTLHist = prom.URLTTL(project)
+	m.UrlConn = prom.URLConnection()
+	m.TTLHist = prom.URLTTL()
 
 	m.Engine = gin.New()
 	return m
@@ -66,8 +66,8 @@ func New(project string) *MaoTai {
 func Default(project string) *MaoTai {
 	m := &MaoTai{}
 
-	m.UrlConn = prom.URLConnection(project)
-	m.TTLHist = prom.URLTTL(project)
+	m.UrlConn = prom.URLConnection()
+	m.TTLHist = prom.URLTTL()
 
 	m.Engine = gin.Default()
 	return m
