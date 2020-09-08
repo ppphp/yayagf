@@ -26,8 +26,9 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/swaggo/swag v1.6.7
 	gitlab.papegames.com/fringe/quartz v0.0.0-20200103072440-229d00f9ada6
-	golang.org/x/sys v0.0.0-20200831180312-196b9ba8737a // indirect
-	golang.org/x/tools v0.0.0-20200903185744-af4cc2cd812e
+	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
+	golang.org/x/sys v0.0.0-20200908134130-d2e65c121b96 // indirect
+	golang.org/x/tools v0.0.0-20200904185747-39188db58858
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
