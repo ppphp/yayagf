@@ -7,6 +7,7 @@ package prom
 import (
 	"database/sql"
 	"fmt"
+	"net/url"
 	"runtime"
 	"runtime/debug"
 
@@ -106,6 +107,10 @@ func SysLoad() *GaugeVecFuncCollector {
 		if err != nil {
 			return
 		}
+
+		// /proc/stat
+		// prossesses procs_running procs_blocked
+		// 参考：http://www.linuxhowtos.org/System/procstat.htm
 		lvs = append(lvs, LV{Lbs: []string{"misc_total"}, V: float64(m.ProcsTotal)})
 		lvs = append(lvs, LV{Lbs: []string{"misc_running"}, V: float64(m.ProcsRunning)})
 		lvs = append(lvs, LV{Lbs: []string{"misc_blocked"}, V: float64(m.ProcsBlocked)})
@@ -127,7 +132,7 @@ func GoMem() *GaugeVecFuncCollector {
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace: "runtime",
 		Name:      "mem",
-	}, []string{"cat"}, func() (lvs []LV) {
+	}, []string{"cat"}, func() []LV {
 		lvs = []LV{}
 		memstat := &runtime.MemStats{}
 		runtime.ReadMemStats(memstat)
@@ -233,7 +238,11 @@ func RedisWaitDuration(dbname string, client *redis.Pool) *GaugeVecFuncCollector
 // https://orangematter.solarwinds.com/2018/05/22/new-stats-exposed-in-gos-database-sql-package/
 
 // The number of connections.
-func DbConnection(dbname string, client *sql.DB) *GaugeVecFuncCollector {
+func DbConnection(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
+	dburl, err := url.Parse(dbAddr)
+	if err == nil {
+		dbAddr = dburl.Host
+	}
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   "db",
 		Name:        "connection",
@@ -241,18 +250,22 @@ func DbConnection(dbname string, client *sql.DB) *GaugeVecFuncCollector {
 	}, []string{"dbname", "type"}, func() []LV {
 		lvs := []LV{
 			// The number of connections.
-			{[]string{dbname, "open"}, float64(client.Stats().OpenConnections)},
+			{[]string{dbAddr, "open"}, float64(client.Stats().OpenConnections)},
 			// The number of open connections that are currently idle.
-			{[]string{dbname, "idle"}, float64(client.Stats().Idle)},
+			{[]string{dbAddr, "idle"}, float64(client.Stats().Idle)},
 			// The number of connections actively in-use.
-			{[]string{dbname, "inuse"}, float64(client.Stats().InUse)},
+			{[]string{dbAddr, "inuse"}, float64(client.Stats().InUse)},
 		}
 		return lvs
 	})
 }
 
 // The total number of times a goroutine has had to wait for a connection.
-func DBWaitCount(dbname string, client *sql.DB) *GaugeVecFuncCollector {
+func DBWaitCount(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
+	dburl, err := url.Parse(dbAddr)
+	if err == nil {
+		dbAddr = dburl.Host
+	}
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   "db",
 		Name:        "wait_count",
@@ -261,12 +274,16 @@ func DBWaitCount(dbname string, client *sql.DB) *GaugeVecFuncCollector {
 		if client == nil {
 			return nil
 		}
-		return []LV{{[]string{dbname}, float64(client.Stats().WaitCount)}}
+		return []LV{{[]string{dbAddr}, float64(client.Stats().WaitCount)}}
 	})
 }
 
 // The cumulative amount of time goroutines have spent waiting for a connection.
-func DBWaitDuration(dbname string, client *sql.DB) *GaugeVecFuncCollector {
+func DBWaitDuration(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
+	dburl, err := url.Parse(dbAddr)
+	if err == nil {
+		dbAddr = dburl.Host
+	}
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   "db",
 		Name:        "wait_duration",
@@ -275,7 +292,7 @@ func DBWaitDuration(dbname string, client *sql.DB) *GaugeVecFuncCollector {
 		if client == nil {
 			return nil
 		}
-		return []LV{{[]string{dbname}, client.Stats().WaitDuration.Seconds()}}
+		return []LV{{[]string{dbAddr}, client.Stats().WaitDuration.Seconds()}}
 	})
 }
 
