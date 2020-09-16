@@ -253,12 +253,35 @@ func DbConnection(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
 		ConstLabels: map[string]string{},
 	}, []string{"dbname", "type"}, func() []LV {
 		lvs := []LV{
+			// max connections.
+			{[]string{dbAddr, "max"}, float64(client.Stats().MaxOpenConnections)},
 			// The number of connections.
 			{[]string{dbAddr, "open"}, float64(client.Stats().OpenConnections)},
 			// The number of open connections that are currently idle.
 			{[]string{dbAddr, "idle"}, float64(client.Stats().Idle)},
 			// The number of connections actively in-use.
 			{[]string{dbAddr, "inuse"}, float64(client.Stats().InUse)},
+		}
+		return lvs
+	})
+}
+
+// The number of closed connections.
+func DbClose(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
+	dburl, err := url.Parse(dbAddr)
+	if err == nil {
+		dbAddr = dburl.Host
+	}
+	return NewGaugeVecFunc(prometheus.GaugeOpts{
+		Namespace:   "db",
+		Name:        "close",
+		ConstLabels: map[string]string{},
+	}, []string{"dbname", "type"}, func() []LV {
+		lvs := []LV{
+			// max connections.
+			{[]string{dbAddr, "idle"}, float64(client.Stats().MaxIdleClosed)},
+			// The number of connections.
+			{[]string{dbAddr, "time"}, float64(client.Stats().MaxLifetimeClosed)},
 		}
 		return lvs
 	})
