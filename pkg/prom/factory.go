@@ -133,28 +133,32 @@ func GoMem() *GaugeVecFuncCollector {
 		Namespace: "runtime",
 		Name:      "mem",
 	}, []string{"cat"}, func() []LV {
-		lvs = []LV{}
+		lvs := []LV{}
 		memstat := &runtime.MemStats{}
 		runtime.ReadMemStats(memstat)
-		lvs = append(lvs, LV{Lbs: []string{"sys"}, V: float64(memstat.Sys)})                //服务现在系统使用的内存
-		lvs = append(lvs, LV{Lbs: []string{"alloc"}, V: float64(memstat.Alloc)})            //golang语言框架堆空间分配的字节数
-		lvs = append(lvs, LV{Lbs: []string{"total_alloc"}, V: float64(memstat.TotalAlloc)}) //从服务开始运行至今分配器为分配的堆空间总和，只有增加，
-		//释放的时候不减少
-		lvs = append(lvs, LV{Lbs: []string{"frees"}, V: float64(memstat.Frees)})                //服务回收的heap objects的字节数
-		lvs = append(lvs, LV{Lbs: []string{"heap_alloc"}, V: float64(memstat.HeapAlloc)})       //服务分配的堆内存字节数
-		lvs = append(lvs, LV{Lbs: []string{"heap_sys"}, V: float64(memstat.HeapSys)})           //系统分配的作为运行栈的内存
-		lvs = append(lvs, LV{Lbs: []string{"heap_idle"}, V: float64(memstat.HeapIdle)})         //申请但是未分配的堆内存或者回收了的堆内存（空闲）字节数
-		lvs = append(lvs, LV{Lbs: []string{"heap_inuse"}, V: float64(memstat.HeapInuse)})       //正在使用的堆内存字节数
-		lvs = append(lvs, LV{Lbs: []string{"heap_released"}, V: float64(memstat.HeapReleased)}) //返回给OS的堆内存，类似C/C++中的free。
-		lvs = append(lvs, LV{Lbs: []string{"stack_inuse"}, V: float64(memstat.StackInuse)})     //正在使用的栈字节数
-		lvs = append(lvs, LV{Lbs: []string{"stack_sys"}, V: float64(memstat.StackSys)})         //系统分配的作为运行栈的内存
-		lvs = append(lvs, LV{Lbs: []string{"mspan_inuse"}, V: float64(memstat.MSpanInuse)})     // mspan正在使用的
-		lvs = append(lvs, LV{Lbs: []string{"mspan_sys"}, V: float64(memstat.MSpanSys)})         // mspan分配的的
-		lvs = append(lvs, LV{Lbs: []string{"mcache_inuse"}, V: float64(memstat.MCacheInuse)})   // mcache结构体申请的字节数
-		lvs = append(lvs, LV{Lbs: []string{"mcache_sys"}, V: float64(memstat.MCacheSys)})       // MCache分配的的
-		lvs = append(lvs, LV{Lbs: []string{"buck_hash_sys"}, V: float64(memstat.BuckHashSys)})  // 这是啥？
-		lvs = append(lvs, LV{Lbs: []string{"gc_sys"}, V: float64(memstat.GCSys)})               // GC分配的的
-		lvs = append(lvs, LV{Lbs: []string{"other_sys"}, V: float64(memstat.OtherSys)})         //golang系统架构占用的额外空间
+		lvs = append(lvs, LV{Lbs: []string{"alloc"}, V: float64(memstat.Alloc)})                            //golang语言框架堆空间分配的字节数
+		lvs = append(lvs, LV{Lbs: []string{"total_alloc"}, V: float64(memstat.TotalAlloc)})                 //从服务开始运行至今分配器为分配的堆空间总和，只有增加，释放的时候不减少
+		lvs = append(lvs, LV{Lbs: []string{"sys"}, V: float64(memstat.Sys)})                                //服务现在在操作系统使用的内存，等于后面的XSYS之和
+		lvs = append(lvs, LV{Lbs: []string{"lookups"}, V: float64(memstat.Lookups)})                        //运行至今查看指针的次数
+		lvs = append(lvs, LV{Lbs: []string{"mallocs"}, V: float64(memstat.Mallocs)})                        //运行至今分配的对象数
+		lvs = append(lvs, LV{Lbs: []string{"frees"}, V: float64(memstat.Frees)})                            //运行至今释放的对象数
+		lvs = append(lvs, LV{Lbs: []string{"heap_alloc"}, V: float64(memstat.HeapAlloc)})                   //服务分配的堆内存字节数
+		lvs = append(lvs, LV{Lbs: []string{"heap_sys"}, V: float64(memstat.HeapSys)})                       //系统分配的作为运行堆的内存
+		lvs = append(lvs, LV{Lbs: []string{"heap_idle"}, V: float64(memstat.HeapIdle)})                     //申请但是未分配的堆内存或者回收了的堆内存（空闲）字节数
+		lvs = append(lvs, LV{Lbs: []string{"heap_inuse"}, V: float64(memstat.HeapInuse)})                   //正在使用的堆内存字节数
+		lvs = append(lvs, LV{Lbs: []string{"heap_released"}, V: float64(memstat.HeapReleased)})             //返回给OS的堆内存，类似C/C++中的free。
+		lvs = append(lvs, LV{Lbs: []string{"stack_inuse"}, V: float64(memstat.StackInuse)})                 //正在使用的栈字节数
+		lvs = append(lvs, LV{Lbs: []string{"stack_sys"}, V: float64(memstat.StackSys)})                     //系统分配的作为运行栈的内存
+		lvs = append(lvs, LV{Lbs: []string{"mspan_inuse"}, V: float64(memstat.MSpanInuse)})                 // mspan正在使用的
+		lvs = append(lvs, LV{Lbs: []string{"mspan_sys"}, V: float64(memstat.MSpanSys)})                     // mspan分配的的
+		lvs = append(lvs, LV{Lbs: []string{"mcache_inuse"}, V: float64(memstat.MCacheInuse)})               // mcache结构体申请的字节数
+		lvs = append(lvs, LV{Lbs: []string{"mcache_sys"}, V: float64(memstat.MCacheSys)})                   // MCache分配的的
+		lvs = append(lvs, LV{Lbs: []string{"buck_hash_sys"}, V: float64(memstat.BuckHashSys)})              // 这是啥？
+		lvs = append(lvs, LV{Lbs: []string{"gc_sys"}, V: float64(memstat.GCSys)})                           // GC分配的的
+		lvs = append(lvs, LV{Lbs: []string{"other_sys"}, V: float64(memstat.OtherSys)})                     //golang系统架构占用的额外空间
+		lvs = append(lvs, LV{Lbs: []string{"next_gc"}, V: float64(memstat.NextGC)})                         //下一次gc的目标空间
+		lvs = append(lvs, LV{Lbs: []string{"pause_total"}, V: float64(memstat.PauseTotalNs)})               //gc累计的ns
+		lvs = append(lvs, LV{Lbs: []string{"pause"}, V: float64(memstat.PauseNs[(memstat.NumGC+255)%256])}) //上一次gc的时间
 		return lvs
 	})
 }
