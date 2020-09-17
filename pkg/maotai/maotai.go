@@ -85,7 +85,8 @@ func NikkiSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.
 	return func(c *gin.Context) {
 		var ret int
 		var msg string
-		mp, mret := map[string]interface{}{}, map[string]interface{}{}
+		var mp map[string]interface{}
+		mret := map[string]interface{}{}
 		m.URLConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(1)
 		defer func(t time.Time) {
 			m.TTLHist.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Observe(time.Since(t).Seconds())
@@ -106,7 +107,8 @@ func TDSSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.H)
 	return func(c *gin.Context) {
 		var ret int
 		var msg string
-		mp, mret := map[string]interface{}{}, map[string]interface{}{}
+		var mp map[string]interface{}
+		mret := map[string]interface{}{}
 		m.URLConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(1)
 		defer func(t time.Time) {
 			m.TTLHist.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Observe(time.Since(t).Seconds())
