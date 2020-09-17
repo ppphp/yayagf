@@ -246,7 +246,7 @@ func RedisWaitDuration(dbname string, client *redis.Pool) *GaugeVecFuncCollector
 func DbConnection(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
 	dburl, err := mysql.ParseDSN(dbAddr)
 	if err == nil {
-		dbAddr = dburl.Net
+		dbAddr = dburl.Addr
 	}
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   "db",
@@ -271,7 +271,7 @@ func DbConnection(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
 func DbClose(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
 	dburl, err := mysql.ParseDSN(dbAddr)
 	if err == nil {
-		dbAddr = dburl.Net
+		dbAddr = dburl.Addr
 	}
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   "db",
@@ -292,7 +292,7 @@ func DbClose(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
 func DBWaitCount(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
 	dburl, err := mysql.ParseDSN(dbAddr)
 	if err == nil {
-		dbAddr = dburl.Net
+		dbAddr = dburl.Addr
 	}
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   "db",
@@ -310,7 +310,7 @@ func DBWaitCount(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
 func DBWaitDuration(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
 	dburl, err := mysql.ParseDSN(dbAddr)
 	if err == nil {
-		dbAddr = dburl.Net
+		dbAddr = dburl.Addr
 	}
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   "db",
