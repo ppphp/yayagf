@@ -7,10 +7,10 @@ package prom
 import (
 	"database/sql"
 	"fmt"
-	"net/url"
 	"runtime"
 	"runtime/debug"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/gomodule/redigo/redis"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/shirou/gopsutil/cpu"
@@ -183,6 +183,7 @@ func URLTTL() *prometheus.HistogramVec {
 		Namespace:   "service",
 		Name:        "url_ttl",
 		ConstLabels: map[string]string{},
+		Buckets:     []float64{0.001, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 0.7, 1, 1.5, 2},
 	}, []string{"url", "method", "ret"})
 }
 
@@ -243,9 +244,9 @@ func RedisWaitDuration(dbname string, client *redis.Pool) *GaugeVecFuncCollector
 
 // The number of connections.
 func DbConnection(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
-	dburl, err := url.Parse(dbAddr)
+	dburl, err := mysql.ParseDSN(dbAddr)
 	if err == nil {
-		dbAddr = dburl.Host
+		dbAddr = dburl.Net
 	}
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   "db",
@@ -268,9 +269,9 @@ func DbConnection(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
 
 // The number of closed connections.
 func DbClose(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
-	dburl, err := url.Parse(dbAddr)
+	dburl, err := mysql.ParseDSN(dbAddr)
 	if err == nil {
-		dbAddr = dburl.Host
+		dbAddr = dburl.Net
 	}
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   "db",
@@ -289,9 +290,9 @@ func DbClose(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
 
 // The total number of times a goroutine has had to wait for a connection.
 func DBWaitCount(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
-	dburl, err := url.Parse(dbAddr)
+	dburl, err := mysql.ParseDSN(dbAddr)
 	if err == nil {
-		dbAddr = dburl.Host
+		dbAddr = dburl.Net
 	}
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   "db",
@@ -307,9 +308,9 @@ func DBWaitCount(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
 
 // The cumulative amount of time goroutines have spent waiting for a connection.
 func DBWaitDuration(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
-	dburl, err := url.Parse(dbAddr)
+	dburl, err := mysql.ParseDSN(dbAddr)
 	if err == nil {
-		dbAddr = dburl.Host
+		dbAddr = dburl.Net
 	}
 	return NewGaugeVecFunc(prometheus.GaugeOpts{
 		Namespace:   "db",
