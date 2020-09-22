@@ -81,7 +81,7 @@ func Default(project string) *MaoTai {
 	return m
 }
 
-func NikkiSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.H)) func(*gin.Context) {
+func NikkiSerializer(m *MaoTai, controller func(*Context) (int, string, gin.H)) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var ret int
 		var msg string
@@ -92,7 +92,7 @@ func NikkiSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.
 			m.TTLHist.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Observe(time.Since(t).Seconds())
 			m.URLConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(-1)
 		}(time.Now())
-		ret, msg, mp = controller(c)
+		ret, msg, mp = controller(&Context{Context: c})
 		for k, v := range mp {
 			mret[k] = v
 		}
@@ -103,7 +103,7 @@ func NikkiSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.
 	}
 }
 
-func TDSSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.H)) func(*gin.Context) {
+func TDSSerializer(m *MaoTai, controller func(*Context) (int, string, gin.H)) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var ret int
 		var msg string
@@ -114,7 +114,7 @@ func TDSSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.H)
 			m.TTLHist.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Observe(time.Since(t).Seconds())
 			m.URLConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(-1)
 		}(time.Now())
-		ret, msg, mp = controller(c)
+		ret, msg, mp = controller(&Context{Context: c})
 		for k, v := range mp {
 			mret[k] = v
 		}
@@ -125,7 +125,7 @@ func TDSSerializer(m *MaoTai, controller func(*gin.Context) (int, string, gin.H)
 	}
 }
 
-func PlainSerializer(m *MaoTai, controller func(*gin.Context) (int, string, interface{})) func(*gin.Context) {
+func PlainSerializer(m *MaoTai, controller func(*Context) (int, string, interface{})) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var ret int
 		var mp interface{}
@@ -134,7 +134,7 @@ func PlainSerializer(m *MaoTai, controller func(*gin.Context) (int, string, inte
 			m.TTLHist.WithLabelValues(c.Request.URL.Path, c.Request.Method, fmt.Sprint(ret)).Observe(time.Since(t).Seconds())
 			m.URLConn.WithLabelValues(c.Request.URL.Path, c.Request.Method).Add(-1)
 		}(time.Now())
-		ret, _, mp = controller(c)
+		_, _, mp = controller(&Context{Context: c})
 		c.JSON(http.StatusOK, mp)
 	}
 }
