@@ -31,5 +31,3 @@ require (
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200605160147-a5ece683394c // indirect
 )
-
-replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
