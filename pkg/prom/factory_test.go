@@ -3,6 +3,7 @@ package prom
 import (
 	"net/http"
 	"net/http/httptest"
+	"runtime"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -88,6 +89,7 @@ func TestAll(t *testing.T) {
 	defer c.Close()
 	// c, _ := model.Open("mysql", "test:test@(0.0.0.0:3306)/test")
 	p := &redis.Pool{}
+	runtime.GC()
 	prometheus.MustRegister(
 		SysCPU(),
 		SysMem(),
@@ -99,11 +101,19 @@ func TestAll(t *testing.T) {
 		RedisConnection("test", p),
 		RedisWaitDuration("test", p),
 		RedisWaitCount("test", p),
+		RedisConnection("e", nil),
+		RedisWaitDuration("e", nil),
+		RedisWaitCount("e", nil),
 		URLTTL(),
 		URLConnection(),
 		DbConnection("test", c),
+		DbClose("test", c),
 		DBWaitCount("test", c),
 		DBWaitDuration("test", c),
+		DbConnection("e", nil),
+		DbClose("e", nil),
+		DBWaitCount("e", nil),
+		DBWaitDuration("e", nil),
 		CallHTTPConnection(),
 		CallHTTPTTL(),
 	)
