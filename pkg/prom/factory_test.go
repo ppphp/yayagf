@@ -1,6 +1,16 @@
 package prom
 
-import "testing"
+import (
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/gomodule/redigo/redis"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/stretchr/testify/assert"
+)
 
 func TestSysCPU(t *testing.T) {
 	SysCPU()
@@ -71,5 +81,36 @@ func TestCallHTTPTTL(t *testing.T) {
 }
 
 func TestAll(t *testing.T) {
+	c, _, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer c.Close()
+	// c, _ := model.Open("mysql", "test:test@(0.0.0.0:3306)/test")
+	p := &redis.Pool{}
+	prometheus.MustRegister(
+		SysCPU(),
+		SysMem(),
+		SysDisk(),
+		SysLoad(),
+		GoRoutine(),
+		GoMem(),
+		GoGCTime(),
+		RedisConnection("test", p),
+		RedisWaitDuration("test", p),
+		RedisWaitCount("test", p),
+		URLTTL(),
+		URLConnection(),
+		DbConnection("test", c),
+		DBWaitCount("test", c),
+		DBWaitDuration("test", c),
+		CallHTTPConnection(),
+		CallHTTPTTL(),
+	)
 
+	rr := httptest.NewRecorder()
+	r, err := http.NewRequest(http.MethodGet, "http://0.0.0.0:8080/metrics", nil)
+	assert.NoError(t, err)
+	promhttp.Handler().ServeHTTP(rr, r)
+	assert.NotEqual(t, "", rr.Result())
 }
