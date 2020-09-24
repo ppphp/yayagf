@@ -66,6 +66,11 @@ func TestDbConnection(t *testing.T) {
 	DbConnection("root:root@(127.0.0.1:3306)/test?parseTime=true&loc=Local&charset=utf8", nil)
 }
 
+func TestDbClose(t *testing.T) {
+	DbClose("test", nil)
+	DbClose("root:root@(127.0.0.1:3306)/test?parseTime=true&loc=Local&charset=utf8", nil)
+}
+
 func TestDBWaitCount(t *testing.T) {
 	DBWaitCount("test", nil)
 	DBWaitCount("root:root@(127.0.0.1:3306)/test?parseTime=true&loc=Local&charset=utf8", nil)
