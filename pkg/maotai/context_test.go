@@ -22,7 +22,7 @@ func TestNikkiSerializer(t *testing.T) {
 	r := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(r)
 	c.Request, _ = http.NewRequest(http.MethodGet, "http://0.0.0.0", nil)
-	NikkiSerializer(d, func(c *Context) (int, string, gin.H) { return 0, "", nil })(c)
+	NikkiSerializer(d, func(c *Context) (int, string, gin.H) { return 0, "", gin.H{"a": "b"} })(c)
 	assert.NotEmpty(t, r.Result())
 }
 
@@ -40,7 +40,7 @@ func TestTDSSerializer(t *testing.T) {
 	r := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(r)
 	c.Request, _ = http.NewRequest(http.MethodGet, "http://0.0.0.0", nil)
-	TDSSerializer(d, func(c *Context) (int, string, gin.H) { return 0, "", nil })(c)
+	TDSSerializer(d, func(c *Context) (int, string, gin.H) { return 0, "", gin.H{"a": "b"} })(c)
 	assert.NotEmpty(t, r.Result())
 }
 
