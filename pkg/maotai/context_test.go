@@ -10,8 +10,8 @@ import (
 func TestContext(t *testing.T) {
 	c := &Context{Context: &gin.Context{}}
 	func() {
-		defer func() { recover() }()
-		c.Error(nil)
+		defer func() { _ = recover() }()
+		_ = c.Error(nil)
 	}()
-	c.Error(fmt.Errorf("what"))
+	_ = c.Error(fmt.Errorf("what"))
 }
