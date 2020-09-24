@@ -253,6 +253,10 @@ func DbConnection(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
 		Name:        "connection",
 		ConstLabels: map[string]string{},
 	}, []string{"dbname", "type"}, func() []LV {
+		if client == nil {
+			return nil
+		}
+
 		lvs := []LV{
 			// max connections.
 			{[]string{dbAddr, "max"}, float64(client.Stats().MaxOpenConnections)},
@@ -278,6 +282,9 @@ func DbClose(dbAddr string, client *sql.DB) *GaugeVecFuncCollector {
 		Name:        "close",
 		ConstLabels: map[string]string{},
 	}, []string{"dbname", "type"}, func() []LV {
+		if client == nil {
+			return nil
+		}
 		lvs := []LV{
 			// max connections.
 			{[]string{dbAddr, "idle"}, float64(client.Stats().MaxIdleClosed)},

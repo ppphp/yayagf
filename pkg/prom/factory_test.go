@@ -63,14 +63,17 @@ func TestUrlConnection(t *testing.T) {
 
 func TestDbConnection(t *testing.T) {
 	DbConnection("test", nil)
+	DbConnection("root:root@(127.0.0.1:3306)/test?parseTime=true&loc=Local&charset=utf8", nil)
 }
 
 func TestDBWaitCount(t *testing.T) {
 	DBWaitCount("test", nil)
+	DBWaitCount("root:root@(127.0.0.1:3306)/test?parseTime=true&loc=Local&charset=utf8", nil)
 }
 
 func TestDBWaitDuration(t *testing.T) {
 	DBWaitDuration("test", nil)
+	DBWaitDuration("root:root@(127.0.0.1:3306)/test?parseTime=true&loc=Local&charset=utf8", nil)
 }
 
 func TestCallHTTPConnection(t *testing.T) {
@@ -82,45 +85,72 @@ func TestCallHTTPTTL(t *testing.T) {
 }
 
 func TestAll(t *testing.T) {
-	c, _, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
-	defer c.Close()
-	// c, _ := model.Open("mysql", "test:test@(0.0.0.0:3306)/test")
-	p := &redis.Pool{}
-	runtime.GC()
-	prometheus.MustRegister(
-		SysCPU(),
-		SysMem(),
-		SysDisk(),
-		SysLoad(),
-		GoRoutine(),
-		GoMem(),
-		GoGCTime(),
-		RedisConnection("test", p),
-		RedisWaitDuration("test", p),
-		RedisWaitCount("test", p),
-		// RedisConnection("e", nil),
-		// RedisWaitDuration("e", nil),
-		// RedisWaitCount("e", nil),
-		URLTTL(),
-		URLConnection(),
-		DbConnection("test", c),
-		DbClose("test", c),
-		DBWaitCount("test", c),
-		DBWaitDuration("test", c),
-		// DbConnection("e", nil),
-		// DbClose("e", nil),
-		// DBWaitCount("e", nil),
-		// DBWaitDuration("e", nil),
-		CallHTTPConnection(),
-		CallHTTPTTL(),
-	)
+	t.Run("all", func(t *testing.T) {
+		c, _, err := sqlmock.New()
+		if err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+		defer c.Close()
+		p := &redis.Pool{}
+		runtime.GC()
+		reg := prometheus.NewRegistry()
 
-	rr := httptest.NewRecorder()
-	r, err := http.NewRequest(http.MethodGet, "http://0.0.0.0:8080/metrics", nil)
-	assert.NoError(t, err)
-	promhttp.Handler().ServeHTTP(rr, r)
-	assert.NotEqual(t, "", rr.Result())
+		reg.MustRegister(
+			SysCPU(),
+			SysMem(),
+			SysDisk(),
+			SysLoad(),
+			GoRoutine(),
+			GoMem(),
+			GoGCTime(),
+			RedisConnection("test", p),
+			RedisWaitDuration("test", p),
+			RedisWaitCount("test", p),
+			// RedisConnection("e", nil),
+			// RedisWaitDuration("e", nil),
+			// RedisWaitCount("e", nil),
+			URLTTL(),
+			URLConnection(),
+			DbConnection("test", c),
+			DbClose("test", c),
+			DBWaitCount("test", c),
+			DBWaitDuration("test", c),
+			// DbConnection("e", nil),
+			// DbClose("e", nil),
+			// DBWaitCount("e", nil),
+			// DBWaitDuration("e", nil),
+			CallHTTPConnection(),
+			CallHTTPTTL(),
+		)
+
+		rr := httptest.NewRecorder()
+		r, err := http.NewRequest(http.MethodGet, "http://0.0.0.0:8080/metrics", nil)
+		assert.NoError(t, err)
+		promhttp.InstrumentMetricHandler(
+			reg, promhttp.HandlerFor(reg, promhttp.HandlerOpts{}),
+		).ServeHTTP(rr, r)
+		assert.NotEqual(t, "", rr.Result())
+	})
+
+	t.Run("nil", func(t *testing.T) {
+		reg := prometheus.NewRegistry()
+
+		reg.MustRegister(
+			RedisConnection("e", nil),
+			RedisWaitDuration("e", nil),
+			RedisWaitCount("e", nil),
+			DbConnection("e", nil),
+			DbClose("e", nil),
+			DBWaitCount("e", nil),
+			DBWaitDuration("e", nil),
+		)
+
+		rr := httptest.NewRecorder()
+		r, err := http.NewRequest(http.MethodGet, "http://0.0.0.0:8080/metrics", nil)
+		assert.NoError(t, err)
+		promhttp.InstrumentMetricHandler(
+			reg, promhttp.HandlerFor(reg, promhttp.HandlerOpts{}),
+		).ServeHTTP(rr, r)
+		assert.NotEqual(t, "", rr.Result())
+	})
 }
