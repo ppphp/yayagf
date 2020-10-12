@@ -17,6 +17,7 @@ import (
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/mem"
+	"gitlab.papegames.com/fengche/yayagf/pkg/meta"
 )
 
 func SysCPU() *GaugeVecFuncCollector {
@@ -345,4 +346,27 @@ func CallHTTPTTL() *prometheus.HistogramVec {
 		Name:        "http_ttl",
 		ConstLabels: map[string]string{},
 	}, []string{"service", "url", "method", "code", "ret"})
+}
+
+// copy from prometheus/prometheus
+func BuildInfo() prometheus.Collector {
+	return prometheus.NewGaugeFunc(
+		prometheus.GaugeOpts{
+			Name: "build_info",
+			Help: "A metric with a constant '1' value labeled by version, revision, branch, and goversion from which program was built.",
+			ConstLabels: prometheus.Labels{
+				"GoOS":       meta.Get().GoOS,
+				"GoVersion":  meta.Get().GoVersion,
+				"GoArch":     meta.Get().GoArch,
+				"GoCompiler": meta.Get().GoCompiler,
+				"Commit":     meta.Get().Commit,
+				"Version":    meta.Get().Version,
+				"MD5":        meta.Get().MD5,
+				"Uptime":     fmt.Sprint(meta.Get().Uptime.Unix()),
+				"Mtime":      fmt.Sprint(meta.Get().Mtime.Unix()),
+				"Local":      meta.Get().Local,
+			},
+		},
+		func() float64 { return 1 },
+	)
 }

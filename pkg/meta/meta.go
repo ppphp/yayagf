@@ -49,20 +49,23 @@ var local = func() string {
 // 一个构建期注入的meta信息结构体
 type Meta struct {
 	// binary自带信息
-	GoOS        string
-	GoVersion   string
-	GoArch      string
-	GoCompiler  string
+
+	GoOS        string // go运行系统
+	GoVersion   string // go版本
+	GoArch      string // go架构
+	GoCompiler  string // go编译器
 	GoBuildInfo *debug.BuildInfo
 
-	MD5    string
-	Uptime time.Time
-	Mtime  time.Time
-	Local  string
+	MD5    string    // md5归纳
+	Uptime time.Time // 启动时间
+	Mtime  time.Time // 二进制修改时间
+	Local  string    // 内网ip
+
 	// 注入
-	BuildAt string
-	Commit  string
-	Version string
+
+	BuildAt string // 构建于
+	Commit  string // 提交
+	Version string // 大版本
 }
 
 func Get() Meta {
