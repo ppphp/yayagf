@@ -8,9 +8,9 @@ yet another yet another go web framework, my practice
 
 it is a 缝合怪 of some tool
 - http: gin-gonic/gin
-- monitor: prometheus/prometheus
+- monitor: prometheus/client_golang
 - database: facebook/ent
-- cli: urfave/cli (WIP)
+- cli: alecthomas/kingpin (WIP)
 
 ###### sonar
 [![Bugs](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=bugs)](http://192.168.0.97:9000/dashboard?id=yayagf)

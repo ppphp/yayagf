@@ -4,9 +4,10 @@ package cli
 
 import (
 	"fmt"
-	"gitlab.papegames.com/fengche/yayagf/pkg/meta"
 	"os"
 	"strings"
+
+	"gitlab.papegames.com/fengche/yayagf/pkg/meta"
 )
 
 type CommandFactory func() (*Command, error)
@@ -84,16 +85,10 @@ func (c *Command) parseArgs(args []string) {
 	}
 }
 
-// 根command，当然也可以用来做普通command，就是个例子
+// 根command，加入一些二进制相关的帮助函数
 type App struct {
 	Name string
-	Meta meta.Meta
 	*Command
-}
-
-func NewApp(name, version string) *App {
-	a := &App{Name: name, Meta: meta.Get(), Command: &Command{}}
-	return a
 }
 
 func (a *App) Run() (int, error) {
@@ -108,5 +103,6 @@ func (a *App) RunArgs(args []string) (int, error) {
 }
 
 func (a *App) PrintMeta() string {
-	return fmt.Sprintf("%v %v, digested %v built by %v %v on %v %v at %v with intranet %v", a.Name, a.Meta.Version, a.Meta.MD5, a.Meta.GoCompiler, a.Meta.GoVersion, a.Meta.GoOS, a.Meta.GoArch, a.Meta.BuildAt, a.Meta.Local)
+	md := meta.Get()
+	return fmt.Sprintf("%v %v, digested %v built by %v %v on %v %v at %v with intranet %v", a.Name, md.Version, md.MD5, md.GoCompiler, md.GoVersion, md.GoOS, md.GoArch, md.BuildAt, md.Local)
 }

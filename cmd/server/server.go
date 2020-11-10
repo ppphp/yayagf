@@ -8,17 +8,18 @@ import (
 	"os/exec"
 	"time"
 
+	"gitlab.papegames.com/fengche/yayagf/internal/build"
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
 	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
-	"gitlab.papegames.com/fringe/quartz"
+	"gitlab.papegames.com/fengche/yayagf/pkg/watcher"
 )
 
 func CommandFactory() (*cli.Command, error) {
 	c := &cli.Command{
 		Run: func(args []string, flags map[string]string) (int, error) {
 			type Command struct {
-				watcher *quartz.Quartz
+				watcher *watcher.Watcher
 				pwd     string
 				cmd     *exec.Cmd
 			}
@@ -27,20 +28,16 @@ func CommandFactory() (*cli.Command, error) {
 				log.Printf("pwd error: %v", err.Error())
 				return 1, err
 			}
-			watcher, err := quartz.NewQuartz(pwd, time.Second)
+			watch, err := watcher.NewWatcher(pwd, time.Second)
 			if err != nil {
-				return 1, err
+				log.Fatal(err)
 			}
-			c := &Command{watcher: watcher, pwd: pwd}
+			c := &Command{watcher: watch, pwd: pwd}
 			root, err := file.GetAppRoot()
 			if err != nil {
 				log.Printf("GetAppRoot error: %v", err.Error())
 				return 1, err
 			}
-			// specify build params
-			_ = os.Setenv("GOPROXY", "https://goproxy.io")
-			_ = os.Setenv("GOSUMDB", "off")
-			_ = os.Setenv("GOPRIVATE", "gitlab.papegames.com/*")
 
 			// begin watch
 			_ = os.Chdir(root)
@@ -49,7 +46,7 @@ func CommandFactory() (*cli.Command, error) {
 			}
 			defer c.watcher.Stop()
 			lastName := ""
-			go func() { c.watcher.Event <- "" }()
+			go func() { c.watcher.Event <- watcher.Event{} }()
 			for {
 				select {
 				case event, ok := <-c.watcher.Event:
@@ -58,15 +55,12 @@ func CommandFactory() (*cli.Command, error) {
 					}
 					log.Printf("event: %v\n", event)
 
-					f, err := ioutil.TempFile("/tmp", "*")
+					f, err := build.BuildBinary()
 					if err != nil {
-					}
-					f.Close()
-					var o, e bytes.Buffer
-					if err := command.DoCommand("go", []string{"build", "-o", f.Name(), "./"}, &o, &e); err != nil {
-						log.Printf("build to %v err: %v, err: %v, out: %v\n", f.Name(), err, e.String(), o.String())
+						log.Println(err.Error())
 						continue
 					}
+
 					if c.cmd != nil && c.cmd.ProcessState != nil && !c.cmd.ProcessState.Exited() {
 						f1, err1 := ioutil.ReadFile(f.Name())
 						if err1 != nil {

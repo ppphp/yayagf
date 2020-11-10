@@ -58,7 +58,7 @@ func (m *MaoTai) HEAD(relativePath string, handlers ...gin.HandlerFunc) gin.IRou
 func New() *MaoTai {
 	m := &MaoTai{}
 
-	m.Cli = cli.NewApp("", "")
+	m.Cli = &cli.App{Name: "", Command: &cli.Command{}}
 
 	m.URLConn = prom.URLConnection()
 	m.TTLHist = prom.URLTTL()
@@ -71,7 +71,7 @@ func New() *MaoTai {
 func Default(project string) *MaoTai {
 	m := &MaoTai{}
 
-	m.Cli = cli.NewApp(project, "")
+	m.Cli = &cli.App{Name: project, Command: &cli.Command{}}
 
 	m.URLConn = prom.URLConnection()
 	m.TTLHist = prom.URLTTL()

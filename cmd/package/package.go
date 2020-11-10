@@ -1,7 +1,6 @@
 package _package
 
 import (
-	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -37,14 +36,12 @@ func CommandFactory() (*cli.Command, error) {
 			pubS := string(pubB)
 			os.Setenv("pub", pubS)
 
-			out, errs := &bytes.Buffer{}, &bytes.Buffer{}
-
-			if err := command.DoCommand("docker", []string{"build", "-t", fmt.Sprintf("docker.papegames.com/%v", name), ".", "--build-arg", "pri", "--build-arg", "pub"}, out, errs); err != nil {
-				log.Fatalf("docker build failed: %v", errs.String())
+			if err, _, errs := command.DoCommand2("docker", "build", "-t", fmt.Sprintf("docker.papegames.com/%v", name), ".", "--build-arg", "pri", "--build-arg", "pub"); err != nil {
+				log.Fatalf("docker build failed: %v", errs)
 				return 1, err
 			}
-			if err := command.DoCommand("docker", []string{"save", fmt.Sprintf("docker.papegames.com/%v", name), "-o", fmt.Sprintf("%v.tar", name)}, out, errs); err != nil {
-				log.Fatalf("docker save error: %v", errs.String())
+			if err, _, errs := command.DoCommand2("docker", "save", fmt.Sprintf("docker.papegames.com/%v", name), "-o", fmt.Sprintf("%v.tar", name)); err != nil {
+				log.Fatalf("docker save error: %v", errs)
 				return 1, err
 			}
 

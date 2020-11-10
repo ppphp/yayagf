@@ -1,13 +1,12 @@
 package new
 
 import (
-	"bytes"
 	"fmt"
-	"gitlab.papegames.com/fengche/yayagf/internal/blueprint"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
+	"gitlab.papegames.com/fengche/yayagf/internal/blueprint"
 	"gitlab.papegames.com/fengche/yayagf/internal/command"
 	"gitlab.papegames.com/fengche/yayagf/internal/log"
 	"gitlab.papegames.com/fengche/yayagf/internal/swagger"
@@ -40,13 +39,13 @@ func CommandFactory() (*cli.Command, error) {
 			}
 
 			log.Printf("init mod")
-			if err := command.DoCommand("go", []string{"mod", "init", mod}, nil, nil); err != nil {
-				log.Println("go mod failed")
+			if err, o, e := command.DoCommand2("go", "mod", "init", mod); err != nil {
+				log.Printf("go mod failed %v %v\n", o, e)
 				return 1, err
 			}
 
 			log.Printf("create %v", filepath.Join(dir, "main.go"))
-			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "main.go"), MainGo, struct{Mod string}{mod}); err != nil {
+			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "main.go"), MainGo, struct{ Mod string }{mod}); err != nil {
 				log.Println(err.Error())
 				return 1, err
 			}
@@ -68,23 +67,22 @@ port=8080
 				return 1, err
 			}
 
-			out, errs := &bytes.Buffer{}, &bytes.Buffer{}
 			log.Printf("init swagger")
 			if err := swagger.GenerateSwagger(); err != nil {
-				log.Fatalf("swag failed %v", errs.String())
+				log.Fatalf("swag failed %v", err)
 				return 1, err
 			}
 
 			log.Printf("init git")
-			if err := command.DoCommand("git", []string{"init"}, out, errs); err != nil {
-				log.Fatalf("git failed %v", errs.String())
+			if err, _, errs := command.DoCommand2("git", "init"); err != nil {
+				log.Fatalf("git failed %v", errs)
 				return 1, err
 			}
 			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, ".gitignore"), `
 {{.Name}}
 {{.Name}}.tar
-`, struct {Name string}{name}); err != nil {
-				log.Fatalf("gitignore failed %v", errs.String())
+`, struct{ Name string }{name}); err != nil {
+				log.Fatalf("gitignore failed %v", err)
 				return 1, err
 			}
 
@@ -117,12 +115,12 @@ COPY --from=back /main/main .
 CMD ["/main/main"]
 
 `)), 0644); err != nil {
-				log.Fatalf("docker failed %v", errs.String())
+				log.Fatalf("docker failed %v", err)
 				return 1, err
 			}
 
 			if err := ioutil.WriteFile(filepath.Join(dir, "README.md"), []byte("\n"), 0644); err != nil {
-				log.Fatalf("readme failed %v", errs.String())
+				log.Fatalf("readme failed %v", err)
 				return 1, err
 			}
 
@@ -187,7 +185,7 @@ func main() {
 }
 `
 
-	RouterGo=`
+	RouterGo = `
 package router
 
 import (
@@ -198,7 +196,7 @@ func AddRoute(r *gin.Engine) {
 }
 `
 
-	ConfigGo=`
+	ConfigGo = `
 package config
 
 import (

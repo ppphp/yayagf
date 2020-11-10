@@ -20,18 +20,6 @@ func GoCommand(bin string, args []string, out io.Writer, err io.Writer) *exec.Cm
 	return cmd
 }
 
-func DoCommand(bin string, args []string, out io.Writer, err io.Writer) error {
-	cmd := exec.Command(bin, args...)
-	cmd.Stdout = out
-	cmd.Stderr = err
-
-	if err := cmd.Run(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func DoCommand2(bin string, args ...string) (error, string, string) {
 	out, errs := &bytes.Buffer{}, &bytes.Buffer{}
 	cmd := exec.Command(bin, args...)

@@ -1,3 +1,4 @@
+// The composer of subcommands, using gitlab.papegames/fengche/yayagf/pkg/cli
 package cmd
 
 import (
@@ -15,7 +16,7 @@ import (
 )
 
 func Main() int {
-	c := cli.NewApp("yayagf", "HEAD")
+	c := &cli.App{Name: "yayagf", Command: &cli.Command{}}
 
 	if len(os.Args) > 0 {
 		c.Args = os.Args[1:]
@@ -26,7 +27,7 @@ func Main() int {
 		//"interactive": interactive.CommandFactory,
 		"new":     new.CommandFactory,
 		"package": _package.CommandFactory,
-		"server":  server.CommandFactory,
+		"server":  server.CommandFactory, "s": server.CommandFactory,
 		"version": version.CommandFactory,
 	}
 	exitStatus, err := c.Run()
