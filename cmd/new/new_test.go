@@ -1,13 +1,14 @@
 package new
 
 import (
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	assert "github.com/stretchr/testify/require"
 )
 
 func TestCommandFactory(t *testing.T) {
-	c , err := CommandFactory()
+	c, err := CommandFactory()
 	assert.NoError(t, err)
 	assert.NoError(t, os.MkdirAll("testdata", 0755))
 	assert.NoError(t, os.Chdir("testdata"))

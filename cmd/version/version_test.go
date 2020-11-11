@@ -3,7 +3,7 @@ package version
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	assert "github.com/stretchr/testify/require"
 )
 
 func TestCommandFactory(t *testing.T) {

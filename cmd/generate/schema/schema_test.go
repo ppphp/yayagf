@@ -1,9 +1,10 @@
 package schema
 
 import (
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	assert "github.com/stretchr/testify/require"
 )
 
 func TestCommandFactory(t *testing.T) {
