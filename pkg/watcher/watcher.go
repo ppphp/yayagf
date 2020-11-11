@@ -67,49 +67,54 @@ func (q *Watcher) Begin() error {
 	return nil
 }
 
+func traversePath(root string, lastUpdate time.Time) (int64, string, bool, error) {
+	var size int64
+	updatedPath := ""
+	updated := false
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
+		if updated {
+			return nil
+		}
+		if info.IsDir() {
+			if isIgnoreDir(info.Name()) {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if isIgnoreFile(info.Name()) {
+			return nil
+		}
+		size += info.Size()
+
+		if info.ModTime().After(lastUpdate) {
+			updated = true
+			updatedPath = path
+		}
+		return nil
+	})
+	return size, updatedPath, updated, err
+}
+
 func (q *Watcher) loop(ctx context.Context) {
 	t := time.NewTimer(q.interval)
 	lastUpdate := time.Now()
-	updated := true
 	var lastSize int64
 	for {
 		select {
 		case tk := <-t.C:
-			var size int64
-			updatedPath := ""
-			if err := filepath.Walk(q.root, func(path string, info os.FileInfo, err error) error {
-				if err != nil {
-					return nil
-				}
-				if updated {
-					return nil
-				}
-				if info.IsDir() {
-					if isIgnoreDir(info.Name()) {
-						return filepath.SkipDir
-					}
-					return nil
-				}
-				if isIgnoreFile(info.Name()) {
-					return nil
-				}
-				size += info.Size()
-
-				if info.ModTime().After(lastUpdate) {
-					updated = true
-					updatedPath = path
-					lastUpdate = tk
-				}
-				return nil
-			}); err != nil {
+			size, updatedPath, updated, err := traversePath(q.root, lastUpdate)
+			if err != nil {
 				log.Printf("%v\n", err.Error())
 			}
 			if updated {
 				q.Event <- Event{Action: Update, FilePath: updatedPath}
+				lastUpdate = tk
 			} else if size < lastSize {
 				q.Event <- Event{Action: Delete, FilePath: ""}
 			}
-			updated = false
 			lastSize = size
 			t.Reset(q.interval)
 		case <-ctx.Done():
