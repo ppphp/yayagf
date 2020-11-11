@@ -41,3 +41,14 @@ func TestWatcher(t *testing.T) {
 		require.NoErrorf(t, err, "cannot remove: %v", err)
 	}
 }
+
+func TestIsIgnoreFile(t *testing.T) {
+	require.Equalf(t, false, isIgnoreFile("a.go"), "a.go should not be ignored")
+	require.Equalf(t, true, isIgnoreFile(".go"), ".go should be ignored")
+	require.Equalf(t, true, isIgnoreFile("a"), "a should be ignored")
+}
+
+func TestIsIgnoreDir(t *testing.T) {
+	require.Equalf(t, false, isIgnoreDir("a"), "a should not be ignored")
+	require.Equalf(t, true, isIgnoreDir(".git"), ".git should be ignored")
+}
