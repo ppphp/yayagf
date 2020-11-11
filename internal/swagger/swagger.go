@@ -27,7 +27,7 @@ func GenerateSwagger() error {
 
 	p := swag.New()
 
-	if err := p.ParseAPI(root, "main.go"); err != nil {
+	if err := p.ParseAPI(root, "main.go", 100); err != nil {
 		return err
 	}
 
