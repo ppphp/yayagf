@@ -20,7 +20,7 @@ func GoCommand(bin string, args []string, out io.Writer, err io.Writer) *exec.Cm
 	return cmd
 }
 
-func DoCommand2(bin string, args ...string) (error, string, string) {
+func DoCommand(bin string, args ...string) (error, string, string) {
 	out, errs := &bytes.Buffer{}, &bytes.Buffer{}
 	cmd := exec.Command(bin, args...)
 	cmd.Stdout = out

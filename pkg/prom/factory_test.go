@@ -10,7 +10,7 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	assert "github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSysCPU(t *testing.T) {
@@ -130,11 +130,11 @@ func TestAll(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 		r, err := http.NewRequest(http.MethodGet, "http://0.0.0.0:8080/metrics", nil)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		promhttp.InstrumentMetricHandler(
 			reg, promhttp.HandlerFor(reg, promhttp.HandlerOpts{}),
 		).ServeHTTP(rr, r)
-		assert.NotEqual(t, "", rr.Result())
+		require.NotEqual(t, "", rr.Result())
 	})
 
 	t.Run("nil", func(t *testing.T) {
@@ -152,10 +152,10 @@ func TestAll(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 		r, err := http.NewRequest(http.MethodGet, "http://0.0.0.0:8080/metrics", nil)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		promhttp.InstrumentMetricHandler(
 			reg, promhttp.HandlerFor(reg, promhttp.HandlerOpts{}),
 		).ServeHTTP(rr, r)
-		assert.NotEqual(t, "", rr.Result())
+		require.NotEqual(t, "", rr.Result())
 	})
 }

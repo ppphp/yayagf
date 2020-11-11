@@ -22,7 +22,7 @@ func BuildBinary() (*os.File, error) {
 		return nil, err
 	}
 	f.Close()
-	if err, o, e := command.DoCommand2("go", "build", "-o", f.Name(), "./"); err != nil {
+	if err, o, e := command.DoCommand("go", "build", "-o", f.Name(), "./"); err != nil {
 		log.Printf("build to %v err: %v, err: %v, out: %v\n", f.Name(), err, e, o)
 		return nil, err
 	}

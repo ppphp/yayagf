@@ -6,15 +6,15 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	assert "github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNew(t *testing.T) {
-	assert.NotNil(t, New())
+	require.NotNil(t, New())
 }
 
 func TestDefault(t *testing.T) {
-	assert.NotNil(t, Default("test"))
+	require.NotNil(t, Default("test"))
 }
 
 func TestNikkiSerializer(t *testing.T) {
@@ -23,7 +23,7 @@ func TestNikkiSerializer(t *testing.T) {
 	c, _ := gin.CreateTestContext(r)
 	c.Request, _ = http.NewRequest(http.MethodGet, "http://0.0.0.0", nil)
 	NikkiSerializer(d, func(c *Context) (int, string, gin.H) { return 0, "", gin.H{"a": "b"} })(c)
-	assert.NotEmpty(t, r.Result())
+	require.NotEmpty(t, r.Result())
 }
 
 func TestPlainSerializer(t *testing.T) {
@@ -32,7 +32,7 @@ func TestPlainSerializer(t *testing.T) {
 	c, _ := gin.CreateTestContext(r)
 	c.Request, _ = http.NewRequest(http.MethodGet, "http://0.0.0.0", nil)
 	PlainSerializer(d, func(c *Context) (int, string, interface{}) { return 0, "", nil })(c)
-	assert.NotEmpty(t, r.Result())
+	require.NotEmpty(t, r.Result())
 }
 
 func TestTDSSerializer(t *testing.T) {
@@ -41,7 +41,7 @@ func TestTDSSerializer(t *testing.T) {
 	c, _ := gin.CreateTestContext(r)
 	c.Request, _ = http.NewRequest(http.MethodGet, "http://0.0.0.0", nil)
 	TDSSerializer(d, func(c *Context) (int, string, gin.H) { return 0, "", gin.H{"a": "b"} })(c)
-	assert.NotEmpty(t, r.Result())
+	require.NotEmpty(t, r.Result())
 }
 
 func TestMethod(t *testing.T) {

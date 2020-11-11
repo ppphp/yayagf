@@ -39,7 +39,7 @@ func CommandFactory() (*cli.Command, error) {
 			}
 
 			log.Printf("init mod")
-			if err, o, e := command.DoCommand2("go", "mod", "init", mod); err != nil {
+			if err, o, e := command.DoCommand("go", "mod", "init", mod); err != nil {
 				log.Printf("go mod failed %v %v\n", o, e)
 				return 1, err
 			}
@@ -74,7 +74,7 @@ port=8080
 			}
 
 			log.Printf("init git")
-			if err, _, errs := command.DoCommand2("git", "init"); err != nil {
+			if err, _, errs := command.DoCommand("git", "init"); err != nil {
 				log.Fatalf("git failed %v", errs)
 				return 1, err
 			}

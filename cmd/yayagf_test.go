@@ -3,10 +3,10 @@ package cmd
 import (
 	"testing"
 
-	assert "github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMain(t *testing.T) {
 	got := Main()
-	assert.Equal(t, got, 1)
+	require.Equal(t, got, 1)
 }

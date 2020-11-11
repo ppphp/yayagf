@@ -4,13 +4,13 @@ import (
 	"os"
 	"testing"
 
-	assert "github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGenerateSwagger(t *testing.T) {
 
-	assert.NoError(t, os.Chdir("testdata"))
-	assert.NoError(t, GenerateSwagger())
-	assert.NoError(t, os.Chdir("../"))
-	assert.Error(t, GenerateSwagger())
+	require.NoError(t, os.Chdir("testdata"))
+	require.NoError(t, GenerateSwagger())
+	require.NoError(t, os.Chdir("../"))
+	require.Error(t, GenerateSwagger())
 }

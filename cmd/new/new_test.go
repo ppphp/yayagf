@@ -4,19 +4,19 @@ import (
 	"os"
 	"testing"
 
-	assert "github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCommandFactory(t *testing.T) {
 	c, err := CommandFactory()
-	assert.NoError(t, err)
-	assert.NoError(t, os.MkdirAll("testdata", 0755))
-	assert.NoError(t, os.Chdir("testdata"))
+	require.NoError(t, err)
+	require.NoError(t, os.MkdirAll("testdata", 0755))
+	require.NoError(t, os.Chdir("testdata"))
 	i, err := c.Run(nil, nil)
-	assert.NoError(t, err)
-	assert.NotEqual(t, i, 0)
+	require.NoError(t, err)
+	require.NotEqual(t, i, 0)
 	_, err = c.Run([]string{"a/b"}, nil)
-	assert.NoError(t, err)
-	assert.NoError(t, os.Chdir("../"))
-	assert.NoError(t, os.RemoveAll("./b"))
+	require.NoError(t, err)
+	require.NoError(t, os.Chdir("../"))
+	require.NoError(t, os.RemoveAll("./b"))
 }
