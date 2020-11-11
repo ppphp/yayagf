@@ -33,7 +33,7 @@ golangci-lint:
 go-test:
   stage: test
   script:
-    - go test -race -cover -v . ./... -json -coverprofile=covprofile > test.json
+    - go test -race -cover -v . ./... -json -coverprofile=covprofile | tee test.json
     - go tool cover -func=./covprofile -o ./total.txt
     - cat total.txt|grep total
   artifacts:
