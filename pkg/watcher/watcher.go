@@ -4,6 +4,7 @@ package watcher
 import (
 	"context"
 	"errors"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -76,7 +77,7 @@ func (q *Watcher) loop(ctx context.Context) {
 		case tk := <-t.C:
 			var size int64
 			updatedPath := ""
-			filepath.Walk(q.root, func(path string, info os.FileInfo, err error) error {
+			if err := filepath.Walk(q.root, func(path string, info os.FileInfo, err error) error {
 				if err != nil {
 					return nil
 				}
@@ -100,7 +101,9 @@ func (q *Watcher) loop(ctx context.Context) {
 					lastUpdate = tk
 				}
 				return nil
-			})
+			}); err != nil {
+				log.Printf("%v\n", err.Error())
+			}
 			if updated {
 				q.Event <- Event{Action: Update, FilePath: updatedPath}
 			} else if size < lastSize {
