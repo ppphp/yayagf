@@ -43,8 +43,8 @@ go-test:
 sonar_analyze:
   stage: sonar
   script:
-    - wget -q http://192.168.0.97:8000/sonar-scanner.tar.gz
-    - tar -xf sonar-scanner.tar.gz
+    - wget -q http://192.168.0.97:8000/sonar-scanner-4.5.0.2216.tar.gz
+    - tar -xf sonar-scanner-4.5.0.2216.tar.gz
     - "./sonar-scanner/bin/sonar-scanner \
       -Dsonar.host.url=http://192.168.0.97:9000 \
       -Dsonar.sources=. \
