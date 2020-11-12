@@ -16,15 +16,15 @@ func init() {
 }
 
 // BuildBinary build a binary in tmp
-func BuildBinary() (*os.File, error) {
+func BuildBinary() (string, error) {
 	f, err := ioutil.TempFile("", "*") // linux is /tmp/xxxx
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	f.Close()
 	if err, o, e := command.DoCommand("go", "build", "-o", f.Name(), "./"); err != nil {
 		log.Printf("build to %v err: %v, err: %v, out: %v\n", f.Name(), err, e, o)
-		return nil, err
+		return "", err
 	}
-	return f, nil
+	return f.Name(), nil
 }

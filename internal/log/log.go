@@ -24,6 +24,6 @@ func Errorf(format string, args ...interface{}) {
 	Logger.Errorf(format, args...)
 }
 
-func Fatalf(format string, args ...interface{}) {
-	Logger.Fatalf(format, args...)
-}
+// func Fatalf(format string, args ...interface{}) {
+// 	Logger.Fatalf(format, args...)
+// }

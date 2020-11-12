@@ -21,10 +21,6 @@ func GenerateSwagger() error {
 		return err
 	}
 
-	if _, err := os.Stat(root); os.IsNotExist(err) {
-		return fmt.Errorf("dir: %s is not exist", root)
-	}
-
 	p := swag.New()
 
 	if err := p.ParseAPI(root, "main.go", 100); err != nil {

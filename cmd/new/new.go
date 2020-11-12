@@ -69,20 +69,20 @@ port=8080
 
 			log.Printf("init swagger")
 			if err := swagger.GenerateSwagger(); err != nil {
-				log.Fatalf("swag failed %v", err)
+				log.Errorf("swag failed %v", err)
 				return 1, err
 			}
 
 			log.Printf("init git")
 			if err, _, errs := command.DoCommand("git", "init"); err != nil {
-				log.Fatalf("git failed %v", errs)
+				log.Errorf("git failed %v", errs)
 				return 1, err
 			}
 			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, ".gitignore"), `
 {{.Name}}
 {{.Name}}.tar
 `, struct{ Name string }{name}); err != nil {
-				log.Fatalf("gitignore failed %v", err)
+				log.Errorf("gitignore failed %v", err)
 				return 1, err
 			}
 
@@ -115,12 +115,12 @@ COPY --from=back /main/main .
 CMD ["/main/main"]
 
 `)), 0644); err != nil {
-				log.Fatalf("docker failed %v", err)
+				log.Errorf("docker failed %v", err)
 				return 1, err
 			}
 
 			if err := ioutil.WriteFile(filepath.Join(dir, "README.md"), []byte("\n"), 0644); err != nil {
-				log.Fatalf("readme failed %v", err)
+				log.Errorf("readme failed %v", err)
 				return 1, err
 			}
 

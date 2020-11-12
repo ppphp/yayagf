@@ -19,4 +19,5 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/swaggo/swag v1.6.9
 	golang.org/x/tools v0.0.0-20200904185747-39188db58858
+	gotest.tools v2.2.0+incompatible
 )
