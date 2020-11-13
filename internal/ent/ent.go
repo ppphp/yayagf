@@ -71,9 +71,9 @@ var DefaultConfig = &packages.Config{Mode: packages.NeedName}
 func GenerateCRUDFiles(mod, path, target string, template []string) error {
 	type idType field.Type
 	var (
-		storage  string
-		cfg      gen.Config
-		idtype   = idType(field.TypeInt)
+		storage string
+		cfg     gen.Config
+		idtype  = idType(field.TypeInt)
 	)
 	storage = "sql"
 	opts := []entc.Option{entc.Storage(storage)}
@@ -89,7 +89,7 @@ func GenerateCRUDFiles(mod, path, target string, template []string) error {
 	}
 	cfg.Package = pkgPath
 	cfg.IDType = &field.TypeInfo{Type: field.Type(idtype)}
-	cfg.Package = filepath.Join(mod, "app", "crud") // TODO: well test
+	cfg.Package = filepath.Join(mod, "app", "crud")
 	if err := entc.Generate(path, &cfg, opts...); err != nil {
 		return err
 	}

@@ -30,7 +30,7 @@ func ServeStaticDirectory(dir string) ([]Handler, error) {
 			path: strings.TrimPrefix(path, dir),
 			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Add("Content-Type", m)
-				w.Write(d)
+				_, _ = w.Write(d)
 			})},
 		)
 		return nil

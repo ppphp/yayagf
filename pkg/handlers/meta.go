@@ -15,6 +15,6 @@ func MountMetaHandlerToGin(r gin.IRouter) {
 		path: "/",
 		handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			m, _ := json.Marshal(meta.Get())
-			w.Write(m)
+			_, _ = w.Write(m)
 		})}}.MountToEndpoint(r)
 }

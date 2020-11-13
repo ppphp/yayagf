@@ -13,7 +13,7 @@ func GoCommand(bin string, args []string, out io.Writer, err io.Writer) *exec.Cm
 	cmd.Stderr = err
 
 	go func() {
-		cmd.Run()
+		_ = cmd.Run()
 	}()
 	time.Sleep(time.Second)
 
