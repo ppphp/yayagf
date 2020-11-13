@@ -47,45 +47,39 @@ func CommandFactory() (*cli.Command, error) {
 			defer c.watcher.Stop()
 			lastName := ""
 			go func() { c.watcher.Event <- watcher.Event{} }()
-			for {
-				select {
-				case event, ok := <-c.watcher.Event:
-					if !ok {
+			for event := range c.watcher.Event {
+				log.Printf("event: %v\n", event)
+
+				fname, err := build.BuildBinary()
+				if err != nil {
+					log.Println(err.Error())
+					continue
+				}
+
+				if c.cmd != nil && c.cmd.ProcessState != nil && !c.cmd.ProcessState.Exited() {
+					f1, err1 := ioutil.ReadFile(fname)
+					if err1 != nil {
 						continue
 					}
-					log.Printf("event: %v\n", event)
-
-					f, err := build.BuildBinary()
-					if err != nil {
-						log.Println(err.Error())
-						continue
-					}
-
-					if c.cmd != nil && c.cmd.ProcessState != nil && !c.cmd.ProcessState.Exited() {
-						f1, err1 := ioutil.ReadFile(f.Name())
-						if err1 != nil {
+					if lastName != "" {
+						f2, err2 := ioutil.ReadFile(lastName)
+						if err2 != nil {
 							continue
 						}
-						if lastName != "" {
-							f2, err2 := ioutil.ReadFile(lastName)
-							if err2 != nil {
-								continue
-							}
-							if bytes.Equal(f1, f2) {
-								continue
-							}
-						}
-						lastName = f.Name()
-					}
-					if c.cmd != nil && c.cmd.Process != nil {
-						if err := c.cmd.Process.Kill(); err != nil {
-							log.Printf("kill %v err: %v", c.cmd.Process.Pid, err)
+						if bytes.Equal(f1, f2) {
+							continue
 						}
 					}
-					c.cmd = command.GoCommand(f.Name(), nil, os.Stdout, os.Stderr)
+					lastName = fname
 				}
+				if c.cmd != nil && c.cmd.Process != nil {
+					if err := c.cmd.Process.Kill(); err != nil {
+						log.Printf("kill %v err: %v", c.cmd.Process.Pid, err)
+					}
+				}
+				c.cmd = command.GoCommand(fname, nil, os.Stdout, os.Stderr)
 			}
-
+			return 0, nil
 		},
 	}
 	return c, nil
