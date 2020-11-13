@@ -16,7 +16,7 @@ stages:
 vet:
   stage: lint
   script:
-    - go vet -n ./... 2> vet
+    - go vet -n ./... 2>&1| tee vet
   artifacts:
     paths:
       - vet

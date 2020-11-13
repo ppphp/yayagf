@@ -3,6 +3,7 @@ package server
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -16,6 +17,7 @@ func TestCommandFactory(t *testing.T) {
 		require.NoError(t, err)
 		require.NotEqual(t, i, 0)
 	}()
+	time.Sleep(10 * time.Millisecond)
 
 	_, err = os.Create("a.go")
 	require.NoError(t, err)

@@ -19,3 +19,13 @@ func TestMountHealthHandlerToGin(t *testing.T) {
 
 	require.NotNil(t, resp.Body.String())
 }
+
+func TestHealthHandlerToGin(t *testing.T) {
+
+	req, _ := http.NewRequest("GET", "/health/", nil)
+	resp := httptest.NewRecorder()
+	healthHandler[0].handler.ServeHTTP(resp, req)
+	require.NotNil(t, healthHandler[0].GetHTTPHandler())
+
+	require.NotNil(t, resp.Body.String())
+}

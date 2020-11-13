@@ -89,6 +89,10 @@ func TestCallHTTPTTL(t *testing.T) {
 	CallHTTPTTL()
 }
 
+func TestBuildInfo(t *testing.T) {
+	BuildInfo()
+}
+
 func TestAll(t *testing.T) {
 	t.Run("all", func(t *testing.T) {
 		c, _, err := sqlmock.New()
