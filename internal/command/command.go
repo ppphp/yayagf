@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io"
 	"os/exec"
-	"time"
 )
 
 func GoCommand(bin string, args []string, out io.Writer, err io.Writer) *exec.Cmd {
@@ -12,10 +11,12 @@ func GoCommand(bin string, args []string, out io.Writer, err io.Writer) *exec.Cm
 	cmd.Stdout = out
 	cmd.Stderr = err
 
+	start := make(chan struct{})
 	go func() {
+		close(start)
 		_ = cmd.Run()
 	}()
-	time.Sleep(time.Second)
+	<-start
 
 	return cmd
 }

@@ -2,6 +2,7 @@ package server
 
 import (
 	"os"
+	"os/exec"
 	"testing"
 	"time"
 
@@ -21,4 +22,10 @@ func TestCommandFactory(t *testing.T) {
 
 	_, err = os.Create("a.go")
 	require.NoError(t, err)
+}
+
+func TestKill(t *testing.T) {
+	cmd := exec.Command("sleep", "0.01")
+	require.NoError(t, cmd.Start())
+	require.NoError(t, kill(cmd))
 }

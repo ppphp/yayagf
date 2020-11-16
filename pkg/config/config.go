@@ -36,7 +36,7 @@ func LoadEnv(conf interface{}) {
 		if ok && v != "" {
 			switch val.Type().Field(i).Type.Kind() {
 			case reflect.Struct:
-				// TODO
+				panic("shall not ")
 			case reflect.String:
 				val.Field(i).SetString(v)
 			case reflect.Int:

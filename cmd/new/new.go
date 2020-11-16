@@ -14,80 +14,80 @@ import (
 )
 
 func CommandFactory() (*cli.Command, error) {
-	c := &cli.Command{
-		Run: func(args []string, flags map[string]string) (int, error) {
-			if len(args) == 0 {
-				fmt.Println("no project name")
-				return 1, nil
-			}
-			namespace, name := filepath.Split(args[0])
-			mod := filepath.Join(namespace, name)
-			dir, err := filepath.Abs(filepath.Clean(name))
-			if err != nil {
-				fmt.Println(err.Error())
-				return 1, err
-			}
-			log.Printf("create %v", dir)
-			if err := os.MkdirAll(dir, os.ModePerm); err != nil {
-				fmt.Println(err.Error())
-				return 1, err
-			}
-			log.Printf("chdir %v", dir)
-			if err := os.Chdir(dir); err != nil {
-				fmt.Println(err.Error())
-				return 1, err
-			}
+	return &cli.Command{Run: runNew}, nil
+}
 
-			log.Printf("init mod")
-			if err, o, e := command.DoCommand("go", "mod", "init", mod); err != nil {
-				log.Printf("go mod failed %v %v\n", o, e)
-				return 1, err
-			}
+func runNew(args []string, flags map[string]string) (int, error) {
+	if len(args) == 0 {
+		fmt.Println("no project name")
+		return 1, nil
+	}
+	namespace, name := filepath.Split(args[0])
+	mod := filepath.Join(namespace, name)
+	dir, err := filepath.Abs(filepath.Clean(name))
+	if err != nil {
+		log.Errorf("abs(%v) failed %v", name, err)
+		return 1, err
+	}
+	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+		log.Errorf("create (%v) failed %v", dir, err)
+		return 1, err
+	}
+	if err := os.Chdir(dir); err != nil {
+		log.Errorf("chdir (%v) failed %v", dir, err)
+		return 1, err
+	}
 
-			log.Printf("create %v", filepath.Join(dir, "main.go"))
-			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "main.go"), MainGo, struct{ Mod string }{mod}); err != nil {
-				log.Println(err.Error())
-				return 1, err
-			}
-			log.Printf("create %v", filepath.Join(dir, "app", "router", "router.go"))
-			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "app", "router", "router.go"), RouterGo, nil); err != nil {
-				log.Println(err.Error())
-				return 1, err
-			}
+	log.Printf("init project")
+	if err, o, e := command.DoCommand("go", "mod", "init", mod); err != nil {
+		log.Errorf("go mod failed %v %v\n", o, e)
+		return 1, err
+	}
 
-			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "app", "config", "config.go"), ConfigGo, nil); err != nil {
-				log.Println(err.Error())
-				return 1, err
-			}
-			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "conf.toml"), `
+	log.Printf("create %v", filepath.Join(dir, "main.go"))
+	if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "main.go"), MainGo, struct{ Mod string }{mod}); err != nil {
+		log.Println(err.Error())
+		return 1, err
+	}
+	log.Printf("create %v", filepath.Join(dir, "app", "router", "router.go"))
+	if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "app", "router", "router.go"), RouterGo, nil); err != nil {
+		log.Println(err.Error())
+		return 1, err
+	}
+
+	if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "app", "config", "config.go"), ConfigGo, nil); err != nil {
+		log.Println(err.Error())
+		return 1, err
+	}
+	if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "conf.toml"), `
 db=""
 port=8080
 `, nil); err != nil {
-				log.Println(err.Error())
-				return 1, err
-			}
+		log.Println(err.Error())
+		return 1, err
+	}
 
-			log.Printf("init swagger")
-			if err := swagger.GenerateSwagger(); err != nil {
-				log.Errorf("swag failed %v", err)
-				return 1, err
-			}
+	log.Printf("init swagger")
+	if err := swagger.GenerateSwagger(); err != nil {
+		log.Errorf("swag failed %v", err)
+		return 1, err
+	}
 
-			log.Printf("init git")
-			if err, _, errs := command.DoCommand("git", "init"); err != nil {
-				log.Errorf("git failed %v", errs)
-				return 1, err
-			}
-			if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, ".gitignore"), `
+	log.Printf("init git")
+	if err, _, errs := command.DoCommand("git", "init"); err != nil {
+		log.Errorf("git failed %v", errs)
+		return 1, err
+	}
+	if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, ".gitignore"), `
 {{.Name}}
 {{.Name}}.tar
 `, struct{ Name string }{name}); err != nil {
-				log.Errorf("gitignore failed %v", err)
-				return 1, err
-			}
+		log.Errorf("gitignore failed %v", err)
+		return 1, err
+	}
 
-			log.Printf("init docker")
-			if err := ioutil.WriteFile(filepath.Join(dir, "Dockerfile"), []byte(fmt.Sprintf(`
+	log.Printf("init docker")
+	if err := ioutil.WriteFile(filepath.Join(dir, "Dockerfile"), []byte(fmt.Sprintf(`
 FROM golang as back
 
 ENV GOPROXY=https://goproxy.io
@@ -115,19 +115,16 @@ COPY --from=back /main/main .
 CMD ["/main/main"]
 
 `)), 0644); err != nil {
-				log.Errorf("docker failed %v", err)
-				return 1, err
-			}
-
-			if err := ioutil.WriteFile(filepath.Join(dir, "README.md"), []byte("\n"), 0644); err != nil {
-				log.Errorf("readme failed %v", err)
-				return 1, err
-			}
-
-			return 0, nil
-		},
+		log.Errorf("docker failed %v", err)
+		return 1, err
 	}
-	return c, nil
+
+	if err := ioutil.WriteFile(filepath.Join(dir, "README.md"), []byte("\n"), 0644); err != nil {
+		log.Errorf("readme failed %v", err)
+		return 1, err
+	}
+
+	return 0, nil
 }
 
 const (
