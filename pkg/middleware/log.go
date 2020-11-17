@@ -49,10 +49,6 @@ func Errorf(format string, args ...interface{}) {
 	entries().Errorf(format, args...)
 }
 
-func Fatalf(format string, args ...interface{}) {
-	entries().Fatalf(format, args...)
-}
-
 func Infof(format string, args ...interface{}) {
 	entries().Infof(format, args...)
 }
