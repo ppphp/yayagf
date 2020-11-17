@@ -19,7 +19,7 @@ func CommandFactory() (*cli.Command, error) {
 
 func runNew(args []string, flags map[string]string) (int, error) {
 	if len(args) == 0 {
-		fmt.Println("no project name")
+		log.Errorf("no project name")
 		return 1, nil
 	}
 	namespace, name := filepath.Split(args[0])

@@ -1,8 +1,8 @@
 package config
 
 import (
+	"errors"
 	"io/ioutil"
-	"log"
 	"os"
 	"reflect"
 	"strconv"
@@ -11,10 +11,12 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+var ErrorNoToml = errors.New("toml not found")
+
 func LoadTomlFile(name string, conf interface{}) error {
 	f, err := os.Open(name)
 	if err != nil {
-		log.Println("conf.toml, not found")
+		return ErrorNoToml
 	} else {
 		defer f.Close()
 		b, err := ioutil.ReadAll(f)
@@ -36,7 +38,7 @@ func LoadEnv(conf interface{}) {
 		if ok && v != "" {
 			switch val.Type().Field(i).Type.Kind() {
 			case reflect.Struct:
-				panic("shall not ")
+				panic("shall not")
 			case reflect.String:
 				val.Field(i).SetString(v)
 			case reflect.Int:
@@ -50,7 +52,7 @@ func LoadEnv(conf interface{}) {
 // only support ini like config
 func LoadConfig(conf interface{}) error {
 	if err := LoadTomlFile("conf.toml", conf); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	LoadEnv(conf)
