@@ -9,15 +9,12 @@ import (
 
 func TestNewRotationWriter(t *testing.T) {
 
-	_, err := NewRotationWriter("/", NextNsecond)
+	_, err := NewRotationWriter("/", HundredMilliSecond)
 	require.Error(t, err)
 
-	r, err := NewRotationWriter("./log", NextNsecond)
+	r, err := NewRotationWriter("./testdata/log", HundredMilliSecond)
 	require.NoError(t, err)
 	_, err = r.Write([]byte("aaa\n"))
 	require.NoError(t, err)
-}
-
-func TestNextHour(t *testing.T) {
-	require.NotNil(t, NextHour(time.Now()))
+	time.Sleep(time.Second)
 }
