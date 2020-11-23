@@ -3,6 +3,7 @@ module gitlab.papegames.com/fengche/yayagf
 go 1.13
 
 require (
+	gitee.com/gricks/logrus v1.7.0
 	github.com/BurntSushi/toml v0.3.1
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
