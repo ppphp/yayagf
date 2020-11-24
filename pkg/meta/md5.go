@@ -13,9 +13,6 @@ func CalculateSelfMD5() (string, error) {
 		return "", err
 	}
 	h := md5.New()
-	_, err = h.Write(bs)
-	if err != nil {
-		return "", err
-	}
+	_, _ = h.Write(bs) // md5 write never return err
 	return hex.EncodeToString(h.Sum(nil)), nil
 }

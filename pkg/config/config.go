@@ -14,19 +14,16 @@ import (
 var ErrorNoToml = errors.New("toml not found")
 
 func LoadTomlFile(name string, conf interface{}) error {
-	f, err := os.Open(name)
+
+	b, err := ioutil.ReadFile(name)
 	if err != nil {
 		return ErrorNoToml
-	} else {
-		defer f.Close()
-		b, err := ioutil.ReadAll(f)
-		if err != nil {
-			return err
-		}
-		if err := toml.Unmarshal(b, conf); err != nil {
-			return err
-		}
 	}
+
+	if err := toml.Unmarshal(b, conf); err != nil {
+		return err
+	}
+
 	return nil
 }
 
