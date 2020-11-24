@@ -16,7 +16,7 @@ func TestNewRotationWriter(t *testing.T) {
 	require.NoError(t, err)
 	_, err = r.Write([]byte("aaa\n"))
 	require.NoError(t, err)
-	time.Sleep(2 * time.Second)
+	time.Sleep(3 * time.Second)
 }
 
 func TestHour(t *testing.T) {
