@@ -16,7 +16,7 @@ func (c *Context) Error(err error) error {
 	if err == nil {
 		panic("err is nil")
 	}
-	_, file, line, _ := runtime.Caller(2)
+	_, file, line, _ := runtime.Caller(1)
 	err1 := &gin.Error{Err: fmt.Errorf("%v:%v (%w)", file, line, err), Type: gin.ErrorTypePrivate}
 	c.Errors = append(c.Errors, err1)
 	return err

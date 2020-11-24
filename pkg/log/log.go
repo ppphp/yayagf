@@ -2,7 +2,6 @@ package log
 
 import (
 	"fmt"
-	"os"
 	"runtime"
 
 	"github.com/sirupsen/logrus"
@@ -10,14 +9,7 @@ import (
 
 // 简单的config，复杂的做不来
 
-var logger *logrus.Logger
-
-func init() {
-	logger = logrus.New()
-	logger.SetOutput(os.Stdout)
-	logger.SetLevel(logrus.DebugLevel)
-	logger.SetFormatter(&logrus.JSONFormatter{})
-}
+var logger = logrus.New()
 
 func entries() *logrus.Entry {
 	fun, filename, line, _ := runtime.Caller(2)
