@@ -46,7 +46,7 @@ func LoadEnv(conf interface{}) {
 	}
 }
 
-// only support ini like config
+// only support ini like config in env and no lock
 func LoadConfig(conf interface{}) error {
 	if err := LoadTomlFile("conf.toml", conf); err != nil {
 		return err
