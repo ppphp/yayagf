@@ -43,7 +43,7 @@ const jenkinsTemplate = `
 pipeline {
     agent any
     tools {
-        go 'Go 1.13'
+        go 'Go 1.14'
     }
 
     stages {
@@ -72,12 +72,26 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'GOPROXY=https://goproxy.io GOSUMDB=off GOPRIVATE=gitlab.papegames.com/* go build -a'
+                sh 'GOPROXY=https://goproxy.io GOSUMDB=off GOPRIVATE=gitlab.papegames.com/* go build -a -o {{.BinName}}'
             }
             post {
                 failure {
-                    dingTalk accessToken: 'https://oapi.dingtalk.com/robot/send?access_token=90009a26b4bb8aadef33a1fee8062da3837af3b032a1f3a4494afed203f8707b', jenkinsUrl: 'http://192.168.0.97:10086/',
-                            message: "TDS {{.BinName}}测试环境 构建失败", notifyPeople: 'Jenkins'
+		    dingtalk (
+			robot: '06f37cd7-c5ad-41b4-8042-b96ddb6c0992',
+			type: 'MARKDOWN',
+			at: ["15921542429"],
+			title: 'build failure',
+			text: ["TDS {{.BinName}}测试环境 构建失败"],
+		    )
+                }
+                fixed {
+		    dingtalk (
+			robot: '06f37cd7-c5ad-41b4-8042-b96ddb6c0992',
+			type: 'MARKDOWN',
+			at: ["15921542429"],
+			title: 'build failure',
+			text: ["TDS {{.BinName}}测试环境 构建又好了"],
+		    )
                 }
             }
         }
@@ -92,35 +106,26 @@ pipeline {
             }
             post {
                 failure {
-                    dingTalk accessToken: 'https://oapi.dingtalk.com/robot/send?access_token=90009a26b4bb8aadef33a1fee8062da3837af3b032a1f3a4494afed203f8707b', jenkinsUrl: 'http://192.168.0.97:10086/',
-                            message: "TDS {{.BinName}}测试环境 部署失败", notifyPeople: 'Jenkins'
+		    dingtalk (
+			robot: '06f37cd7-c5ad-41b4-8042-b96ddb6c0992',
+			type: 'MARKDOWN',
+			at: ["15921542429"],
+			title: 'build failure',
+			text: ["TDS {{.BinName}}测试环境 部署失败"],
+		    )
+                }
+                fixed {
+		    dingtalk (
+			robot: '06f37cd7-c5ad-41b4-8042-b96ddb6c0992',
+			type: 'MARKDOWN',
+			at: ["15921542429"],
+			title: 'build failure',
+			text: ["TDS {{.BinName}}测试环境 部署又好了"],
+		    )
                 }
             }
         }
 
-        stage("Quality Gate") {
-            when{ equals actual: gitlabActionType, expected: "PUSH" }
-            environment {
-                scannerHome = tool 'ci_server_scanner'
-            }
-            steps {
-                script{
-                    withSonarQubeEnv('ci_server') {
-                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=gift_svr"
-                    }
-                }
-                sleep(10)
-                timeout(time: 10, unit: 'SECONDS') {
-                    waitForQualityGate abortPipeline: false
-                }
-            }
-            post {
-                failure {
-                    dingTalk accessToken: 'https://oapi.dingtalk.com/robot/send?access_token=90009a26b4bb8aadef33a1fee8062da3837af3b032a1f3a4494afed203f8707b', jenkinsUrl: 'http://192.168.0.97:10086/',
-                            message: "TDS {{.BinName}} 代码太烂了", notifyPeople: 'Jenkins'
-                }
-            }
-        }
         stage('Package') {
             when{ equals actual: gitlabActionType, expected: "TAG_PUSH" }
             steps {
@@ -137,13 +142,22 @@ pipeline {
             }
             post {
                 success {
-                	 dingTalk accessToken: 'https://oapi.dingtalk.com/robot/send?access_token=90009a26b4bb8aadef33a1fee8062da3837af3b032a1f3a4494afed203f8707b', jenkinsUrl: 'http://192.168.0.97:10086/',
-                     		 message: "TDS {{.BinName}}最新tag: ${tag}", notifyPeople: 'Jenkins'
-
+		    dingtalk (
+			robot: '06f37cd7-c5ad-41b4-8042-b96ddb6c0992',
+			type: 'MARKDOWN',
+			at: ["15921542429"],
+			title: 'TDS {{.BinName}} Tag Done',
+			text: ["TDS {{.BinName}}最新tag: ${tag}, md5: ${md5}"],
+		    )
                 }
                 failure {
-                    dingTalk accessToken: 'https://oapi.dingtalk.com/robot/send?access_token=90009a26b4bb8aadef33a1fee8062da3837af3b032a1f3a4494afed203f8707b', jenkinsUrl: 'http://192.168.0.97:10086/',
-                            message: "TDS {{.BinName}} ${tag} 打包失败", notifyPeople: 'Jenkins'
+		    dingtalk (
+			robot: '06f37cd7-c5ad-41b4-8042-b96ddb6c0992',
+			type: 'MARKDOWN',
+			at: ["15921542429"],
+			title: 'TDS {{.BinName}} Tag Failure',
+			text: ["TDS {{.BinName}} ${tag} 打包失败"],
+		    )
                 }
             }
         }
