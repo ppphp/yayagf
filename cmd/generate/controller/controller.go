@@ -2,6 +2,7 @@ package controller
 
 import (
 	"bytes"
+	"gitlab.papegames.com/fengche/yayagf/internal/file"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -18,7 +19,7 @@ func CommandFactory() (*cli.Command, error) {
 				log.Printf("get project name failed: %v", err.Error())
 				return 1, err
 			}
-			tmpl, err := template.New("controller").Parse(jenkinsTemplate)
+			tmpl, err := template.New("controller").Parse(controllerTemplate)
 			if err != nil {
 				log.Printf("jenkinsTemplate parse failed: %v", err.Error())
 				return 1, err

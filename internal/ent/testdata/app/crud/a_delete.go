@@ -16,14 +16,13 @@ import (
 // ADelete is the builder for deleting a A entity.
 type ADelete struct {
 	config
-	hooks      []Hook
-	mutation   *AMutation
-	predicates []predicate.A
+	hooks    []Hook
+	mutation *AMutation
 }
 
 // Where adds a new predicate to the delete builder.
 func (a *ADelete) Where(ps ...predicate.A) *ADelete {
-	a.predicates = append(a.predicates, ps...)
+	a.mutation.predicates = append(a.mutation.predicates, ps...)
 	return a
 }
 
@@ -75,7 +74,7 @@ func (a *ADelete) sqlExec(ctx context.Context) (int, error) {
 			},
 		},
 	}
-	if ps := a.predicates; len(ps) > 0 {
+	if ps := a.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)

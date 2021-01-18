@@ -16,14 +16,13 @@ import (
 // AUpdate is the builder for updating A entities.
 type AUpdate struct {
 	config
-	hooks      []Hook
-	mutation   *AMutation
-	predicates []predicate.A
+	hooks    []Hook
+	mutation *AMutation
 }
 
 // Where adds a new predicate for the builder.
 func (a *AUpdate) Where(ps ...predicate.A) *AUpdate {
-	a.predicates = append(a.predicates, ps...)
+	a.mutation.predicates = append(a.mutation.predicates, ps...)
 	return a
 }
 
@@ -45,7 +44,7 @@ func (a *AUpdate) Mutation() *AMutation {
 	return a.mutation
 }
 
-// Save executes the query and returns the number of rows/vertices matched by this operation.
+// Save executes the query and returns the number of nodes affected by the update operation.
 func (a *AUpdate) Save(ctx context.Context) (int, error) {
 	var (
 		err      error
@@ -107,7 +106,7 @@ func (a *AUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			},
 		},
 	}
-	if ps := a.predicates; len(ps) > 0 {
+	if ps := a.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)

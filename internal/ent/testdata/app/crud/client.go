@@ -138,7 +138,7 @@ func (c *AClient) Create() *ACreate {
 	return &ACreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// BulkCreate returns a builder for creating a bulk of A entities.
+// CreateBulk returns a builder for creating a bulk of A entities.
 func (c *AClient) CreateBulk(builders ...*ACreate) *ACreateBulk {
 	return &ACreateBulk{config: c.config, builders: builders}
 }

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"sync"
 	"testdata/app/crud/a"
+	"testdata/app/crud/predicate"
 
 	"github.com/facebook/ent"
 )
@@ -35,6 +36,7 @@ type AMutation struct {
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*A, error)
+	predicates    []predicate.A
 }
 
 var _ ent.Mutation = (*AMutation)(nil)
@@ -42,7 +44,7 @@ var _ ent.Mutation = (*AMutation)(nil)
 // aOption allows to manage the mutation configuration using functional options.
 type aOption func(*AMutation)
 
-// newAMutation creates new mutation for $n.Name.
+// newAMutation creates new mutation for A.
 func newAMutation(c config, op Op, opts ...aOption) *AMutation {
 	m := &AMutation{
 		config:        c,

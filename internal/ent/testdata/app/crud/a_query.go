@@ -21,7 +21,6 @@ type AQuery struct {
 	limit      *int
 	offset     *int
 	order      []OrderFunc
-	unique     []string
 	predicates []predicate.A
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -86,8 +85,8 @@ func (a *AQuery) FirstID(ctx context.Context) (id int, err error) {
 	return ids[0], nil
 }
 
-// FirstXID is like FirstID, but panics if an error occurs.
-func (a *AQuery) FirstXID(ctx context.Context) int {
+// FirstIDX is like FirstID, but panics if an error occurs.
+func (a *AQuery) FirstIDX(ctx context.Context) int {
 	id, err := a.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -218,12 +217,14 @@ func (a *AQuery) ExistX(ctx context.Context) bool {
 // Clone returns a duplicate of the query builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
 func (a *AQuery) Clone() *AQuery {
+	if a == nil {
+		return nil
+	}
 	return &AQuery{
 		config:     a.config,
 		limit:      a.limit,
 		offset:     a.offset,
 		order:      append([]OrderFunc{}, a.order...),
-		unique:     append([]string{}, a.unique...),
 		predicates: append([]predicate.A{}, a.predicates...),
 		// clone intermediate query.
 		sql:  a.sql.Clone(),
