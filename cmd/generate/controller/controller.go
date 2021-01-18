@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -22,9 +23,10 @@ func CommandFactory() (*cli.Command, error) {
 			}
 			tmpl, err := template.New("controller").Parse(controllerTemplate)
 			if err != nil {
-				log.Printf("jenkinsTemplate parse failed: %v", err.Error())
+				log.Printf("controller parse failed: %v", err.Error())
 				return 1, err
 			}
+			_ = os.MkdirAll(filepath.Join(root, "app", "controller"), 0755)
 			for _, a := range args {
 				b := bytes.Buffer{}
 				if err := tmpl.Execute(&b, struct {

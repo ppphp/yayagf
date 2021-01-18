@@ -2,6 +2,7 @@ package generate
 
 import (
 	"gitlab.papegames.com/fengche/yayagf/cmd/generate/ci"
+	"gitlab.papegames.com/fengche/yayagf/cmd/generate/controller"
 	"gitlab.papegames.com/fengche/yayagf/cmd/generate/curd"
 	"gitlab.papegames.com/fengche/yayagf/cmd/generate/doc"
 	"gitlab.papegames.com/fengche/yayagf/cmd/generate/job"
@@ -18,6 +19,7 @@ func CommandFactory() (*cli.Command, error) {
 			"doc": doc.CommandFactory, "docs": doc.CommandFactory,
 			"ci":  ci.CommandFactory,
 			"job": job.CommandFactory,
+			"controller": controller.CommandFactory, "c": controller.CommandFactory,
 		},
 	}
 	return c, nil
