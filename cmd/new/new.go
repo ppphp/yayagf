@@ -59,10 +59,13 @@ func runNew(args []string, flags map[string]string) (int, error) {
 		log.Println(err.Error())
 		return 1, err
 	}
-	if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "conf.toml"), `
+	if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, "conf.toml"), fmt.Sprintf(`
 db=""
 port=8080
-`, nil); err != nil {
+[log]
+filename="./log/%v.log"
+level=5
+`, name), nil); err != nil {
 		log.Println(err.Error())
 		return 1, err
 	}
@@ -132,11 +135,14 @@ const (
 package main
 
 import (
+	"fmt"
 	"github.com/gin-contrib/cors"
 	// {{.Mod}}/app/crud"
+	"gitlab.papegames.com/fengche/yayagf/pkg/handlers"
+	"gitlab.papegames.com/fengche/yayagf/pkg/log"
 	// "gitlab.papegames.com/fengche/yayagf/pkg/model"
+	"gitlab.papegames.com/fengche/yayagf/pkg/prom"
 	"github.com/gin-gonic/gin"
-	"log"
 	"{{.Mod}}/app/router"
 	"{{.Mod}}/app/config"
 )
@@ -144,32 +150,41 @@ import (
 // @version master
 // @description This is a {{.Mod}} server
 
-// @contact.name your name
+// @contact.name 风车
 // @contact.url https://{{.Mod}}
-// @contact.email your email
+// @contact.email liukaiwen@papegames.net
 
 // @host localhost:8080
 // @BasePath /api/v1
 
 func main() {
-	r := gin.Default()
-
-	r.Use(cors.Default())
-
-	router.AddRoute(r)
-
 	if err := config.LoadConfig(); err != nil {
-		log.Fatal(err)
+		log.Errorf("load config failed (%v)", err)
+		return
 	}
 
-	//drv, err := model.Open("mysql", config.GetConfig().DB)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
+	log.Tweak(config.GetConfig().Log)
+	gin.DefaultWriter = log.GetLogger().Out
+	r := maotai.Default("giftsvr")
+	router.RegisterRouter(r)
+
+	drv, err := model.Open("mysql", config.GetConfig().DB)
+	if err != nil {
+		log.Errorf("create sql driver failed (%v)", err)
+		return
+	}
 	//crud.C = crud.NewClient(crud.Driver(drv))
 	//if err := crud.C.Schema.Create(context.Background()); err != nil {
 	//	log.Fatal(err)
 	//}
+	handlers.MountALotOfThingToEndpoint(r.Group("admin"),
+		handlers.WithMetric(r.TTLHist, r.URLConn,
+			prom.SysCPU(), prom.SysMem(), prom.SysDisk(), prom.SysLoad(), prom.GoRoutine(), prom.GoMem(),
+			prom.DbConnection(config.GetConfig().DB, drv.DB()), prom.DBWaitCount(config.GetConfig().DB, drv.DB()),
+			prom.DBWaitDuration(config.GetConfig().DB, drv.DB()), prom.DbClose(config.GetConfig().DB, drv.DB()),
+			prom.BuildInfo()),
+		handlers.WithSwagger(doc.Swagger),
+	)
 
 	if err := r.Run(fmt.Sprintf(":%v", config.GetConfig().Port)); err != nil {
 		log.Fatal(err)
@@ -177,24 +192,30 @@ func main() {
 }
 `
 
-	RouterGo = `
-package router
+	RouterGo = `package router
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
+	"gitlab.papegames.com/fengche/yayagf/pkg/log"
+	"gitlab.papegames.com/fengche/yayagf/pkg/maotai"
+	"gitlab.papegames.com/fengche/yayagf/pkg/middleware"
 )
 
-func AddRoute(r *gin.Engine) {
+func RegisterRouter(r *maotai.MaoTai) {
+	r.Use(cors.Default())
+	api := r.Group("/")
+	api.Use(middleware.Ginrus(log.GetLogger()))
+
 }
 `
 
-	ConfigGo = `
-package config
+	ConfigGo = `package config
 
 import (
-	"gitlab.papegames.com/fengche/yayagf/pkg/config"
-	"log"
 	"sync"
+
+	"gitlab.papegames.com/fengche/yayagf/pkg/config"
+	"gitlab.papegames.com/fengche/yayagf/pkg/log"
 )
 
 var lock sync.RWMutex
@@ -202,6 +223,7 @@ var lock sync.RWMutex
 type Config struct {
 	DB   string
 	Port int
+	Log  log.Config
 }
 
 var conf = new(Config)
@@ -210,13 +232,12 @@ var conf = new(Config)
 func LoadConfig() error {
 	lock.Lock()
 	defer lock.Unlock()
-	if err := config.LoadTomlFile("conf.toml", conf); err != nil {
-		log.Fatal(err)
+	if err := config.LoadConfig("conf.toml", conf); err != nil {
+		return err
 	}
 
-	config.LoadEnv(conf)
+	log.Infof("%v", conf)
 
-	log.Println(conf)
 	return nil
 }
 

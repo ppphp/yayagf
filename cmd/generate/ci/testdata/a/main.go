@@ -4,28 +4,24 @@ package main
 import (
 	"fmt"
 	"github.com/gin-contrib/cors"
-	// "a/app/crud"
+	// a/app/crud"
 	// "gitlab.papegames.com/fengche/yayagf/pkg/model"
 	"github.com/gin-gonic/gin"
 	"log"
 	"a/app/router"
 	"a/app/config"
 )
+// @title "a API
+// @version master
+// @description This is a a server
 
-// @title Swagger Example API
-// @version 1.0
-// @description This is a sample server Petstore server.
-// @termsOfService http://swagger.io/terms/
+// @contact.name your name
+// @contact.url https://a
+// @contact.email your email
 
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
+// @host localhost:8080
+// @BasePath /api/v1
 
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host petstore.swagger.io
-// @BasePath /v2
 func main() {
 	r := gin.Default()
 
@@ -37,7 +33,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Uncomment the following code to simplify db
 	//drv, err := model.Open("mysql", config.GetConfig().DB)
 	//if err != nil {
 	//	log.Fatal(err)
