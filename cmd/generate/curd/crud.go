@@ -24,7 +24,7 @@ func CommandFactory() (*cli.Command, error) {
 				templates = append(templates, template)
 			}
 			_, debug := flags["d"]
-			if debug == false {
+			if !debug {
 				_, debug = flags["debug"]
 			}
 			if debug {

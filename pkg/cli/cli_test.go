@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
@@ -9,8 +10,9 @@ func TestApp(t *testing.T) {
 	a.PrintMeta()
 }
 
-func TestCommand(t *testing.T){
+func TestCommand(t *testing.T) {
 	a := &App{"test", &Command{}}
 	a.RawArgs = []string{"--version"}
-	a.Run()
+	_, err := a.Run()
+	require.NoError(t, err)
 }
