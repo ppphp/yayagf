@@ -1,6 +1,0 @@
-
-db=""
-port=8080
-[log]
-filename="./log/b.log"
-level=5
