@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"log"
 
-	"testdata/app/crud/migrate"
+	"test.com/testdata/app/crud/migrate"
 
-	"testdata/app/crud/a"
+	"test.com/testdata/app/crud/a"
 
 	"github.com/facebook/ent/dialect"
 	"github.com/facebook/ent/dialect/sql"

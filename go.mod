@@ -13,10 +13,9 @@ require (
 	github.com/gomodule/redigo v1.8.3
 	github.com/lib/pq v1.9.0
 	github.com/prometheus/client_golang v1.9.0
-	github.com/shirou/gopsutil v3.20.10+incompatible
+	github.com/shirou/gopsutil v3.20.12+incompatible
 	github.com/sirupsen/logrus v1.7.0
-	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/swag v1.7.0
-	golang.org/x/tools v0.0.0-20210104081019-d8d6ddbec6ee
+	golang.org/x/tools v0.1.0
 )

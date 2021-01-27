@@ -68,28 +68,20 @@ func ({{ . }}) Indexes() []ent.Index {
 
 var DefaultConfig = &packages.Config{Mode: packages.NeedName}
 
+// cmd/internal/base/base.go
 func GenerateCRUDFiles(mod, path, target string, template []string) error {
-	type idType field.Type
-	var (
-		storage string
-		cfg     gen.Config
-		idtype  = idType(field.TypeInt)
-	)
-	storage = "sql"
-	opts := []entc.Option{entc.Storage(storage)}
+	cfg := gen.Config{Target: target, IDType: &field.TypeInfo{Type: field.TypeInt}, Package: filepath.Join(mod, "app", "crud")}
+	opts := []entc.Option{entc.Storage("sql")}
 	for _, tmpl := range template {
 		opts = append(opts, entc.TemplateDir(tmpl))
 	}
 	// If the target directory is not inferred from
 	// the schema path, resolve its package path.
-	cfg.Target = target
 	pkgPath, err := PkgPath(DefaultConfig, cfg.Target)
 	if err != nil {
 		return err
 	}
 	cfg.Package = pkgPath
-	cfg.IDType = &field.TypeInfo{Type: field.Type(idtype)}
-	cfg.Package = filepath.Join(mod, "app", "crud")
 	if err := entc.Generate(path, &cfg, opts...); err != nil {
 		return err
 	}

@@ -13,14 +13,25 @@ import (
 type CommandFactory func() (*Command, error)
 
 type Command struct {
-	// 非常有用，关键中的关键
+	// 注册的入口
 	Commands map[string]CommandFactory
-	// 普通的args
-	Args []string
-	// 普通的flags
-	Flags map[string]string
+	// 输入的参数，字符串数组
+	RawArgs []string
 	// 运行函数，mute when subcommand exists
 	Run func(args []string, flags map[string]string) (int, error)
+
+	// 单步解析的参数
+	// 当前的操作
+	oneStepCommand string
+	// 操作之前的flags
+	oneStepFlags map[string]string
+	// 当前剩下的参数
+	oneStepOtherArgs []string
+
+	// 剩下一起解析的参数
+	allCommands []string
+	// 操作之前的flags
+	allFlags map[string]string
 }
 
 // whole lifetime for a command, preserve for hooks or something else
@@ -28,16 +39,18 @@ func (c *Command) exec(cargs []string) (int, error) {
 	c.parseArgs(cargs)
 
 	if c.Commands == nil {
-		return c.Run(c.Args, c.Flags)
+		if c.Run != nil {
+			return c.Run(c.allCommands, c.allFlags)
+		}
+		return 1, nil
 	}
 
-	if len(c.Args) == 0 {
+	if len(c.RawArgs) == 0 {
 		s, ok := c.Commands[""]
 		if !ok {
 			if c.Run != nil {
-				return c.Run(c.Args, c.Flags)
+				return c.Run(c.allCommands, c.allFlags)
 			}
-
 			return 1, nil
 		}
 
@@ -47,10 +60,10 @@ func (c *Command) exec(cargs []string) (int, error) {
 			return 1, err
 		}
 
-		return f.exec(c.Args[1:])
+		return f.exec(c.RawArgs[1:])
 	}
 
-	s, ok := c.Commands[c.Args[0]]
+	s, ok := c.Commands[c.oneStepCommand]
 
 	if !ok {
 		// preserve for help function
@@ -63,24 +76,50 @@ func (c *Command) exec(cargs []string) (int, error) {
 		return 1, err
 	}
 
-	return f.exec(c.Args[1:])
+	return f.exec(c.oneStepOtherArgs)
 }
 
+// with root command
 func (c *Command) parseArgs(args []string) {
-	c.Flags = map[string]string{}
+	c.RawArgs = args
+	c.oneStepFlags = map[string]string{}
+	c.oneStepOtherArgs = []string{}
+
+	foundCommand := false
+	for i := range args {
+		if foundCommand {
+			c.oneStepOtherArgs = append(c.oneStepOtherArgs, args[i])
+		} else {
+			if !strings.HasPrefix(args[i], "-") {
+				c.oneStepCommand = args[i]
+				foundCommand = true
+				continue
+			}
+
+			f := strings.SplitN(strings.TrimLeft(args[i], "-"), "=", 2)
+
+			if len(f) == 1 {
+				c.oneStepFlags[f[0]] = ""
+			} else {
+				c.oneStepFlags[f[0]] = f[1]
+			}
+		}
+	}
+
+	c.allFlags = map[string]string{}
+	c.allCommands = []string{}
 
 	for i := range args {
-		if !strings.HasPrefix(args[i], "-") {
-			c.Args = append([]string{}, args[i:]...)
-			return
-		}
+		if strings.HasPrefix(args[i], "-") {
+			f := strings.SplitN(strings.TrimLeft(args[i], "-"), "=", 2)
 
-		f := strings.SplitN(strings.TrimPrefix(args[i], "-"), "=", 2)
-
-		if len(f) == 1 {
-			c.Flags[f[0]] = ""
+			if len(f) == 1 {
+				c.allFlags[f[0]] = ""
+			} else {
+				c.allFlags[f[0]] = f[1]
+			}
 		} else {
-			c.Flags[f[0]] = f[1]
+			c.allCommands = append(c.allCommands, args[i])
 		}
 	}
 }

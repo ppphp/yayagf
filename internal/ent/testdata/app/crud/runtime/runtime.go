@@ -2,4 +2,4 @@
 
 package runtime
 
-// The schema-stitching logic is generated in testdata/app/crud/runtime.go
+// The schema-stitching logic is generated in test.com/testdata/app/crud/runtime.go

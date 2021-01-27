@@ -19,7 +19,7 @@ func Main() int {
 	c := &cli.App{Name: "yayagf", Command: &cli.Command{}}
 
 	if len(os.Args) > 0 {
-		c.Args = os.Args[1:]
+		c.RawArgs = os.Args[1:]
 	}
 
 	c.Commands = map[string]cli.CommandFactory{

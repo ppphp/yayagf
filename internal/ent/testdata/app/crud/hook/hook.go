@@ -5,7 +5,8 @@ package hook
 import (
 	"context"
 	"fmt"
-	"testdata/app/crud"
+
+	"test.com/testdata/app/crud"
 )
 
 // The AFunc type is an adapter to allow the use of ordinary

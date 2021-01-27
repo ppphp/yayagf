@@ -4,9 +4,10 @@ package enttest
 
 import (
 	"context"
-	"testdata/app/crud"
+
+	"test.com/testdata/app/crud"
 	// required by schema hooks.
-	_ "testdata/app/crud/runtime"
+	_ "test.com/testdata/app/crud/runtime"
 
 	"github.com/facebook/ent/dialect/sql/schema"
 )

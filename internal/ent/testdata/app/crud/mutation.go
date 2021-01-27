@@ -6,8 +6,9 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"testdata/app/crud/a"
-	"testdata/app/crud/predicate"
+
+	"test.com/testdata/app/crud/a"
+	"test.com/testdata/app/crud/predicate"
 
 	"github.com/facebook/ent"
 )

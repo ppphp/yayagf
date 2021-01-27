@@ -5,12 +5,12 @@ package crud
 import (
 	"context"
 	"fmt"
-	"testdata/app/crud/a"
-	"testdata/app/crud/predicate"
 
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/facebook/ent/dialect/sql/sqlgraph"
 	"github.com/facebook/ent/schema/field"
+	"test.com/testdata/app/crud/a"
+	"test.com/testdata/app/crud/predicate"
 )
 
 // AUpdate is the builder for updating A entities.

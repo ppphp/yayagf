@@ -3,9 +3,8 @@
 package a
 
 import (
-	"testdata/app/crud/predicate"
-
 	"github.com/facebook/ent/dialect/sql"
+	"test.com/testdata/app/crud/predicate"
 )
 
 // ID filters vertices based on their identifier.

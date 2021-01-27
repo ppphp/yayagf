@@ -2,8 +2,8 @@ package curd
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/pflag"
 	"gitlab.papegames.com/fengche/yayagf/internal/log"
+	"os"
 	"path/filepath"
 
 	"gitlab.papegames.com/fengche/yayagf/internal/ent"
@@ -15,21 +15,26 @@ import (
 func CommandFactory() (*cli.Command, error) {
 	c := &cli.Command{
 		Run: func(args []string, flags map[string]string) (int, error) {
-			templates := []string{}
-			debug := false
-			pf := pflag.NewFlagSet("", pflag.PanicOnError)
-			pf.BoolVarP(&debug, "debug", "d", false, "")
-			pf.StringArrayVarP(&templates, "template", "t", nil, "")
-			if err := pf.Parse(args); err != nil {
-				panic(err)
+			template := flags["t"]
+			if template == "" {
+				template = flags["template"]
 			}
-			log.Debugf("%v", templates)
+			templates := []string{}
+			if template != "" {
+				templates = append(templates, template)
+			}
+			_, debug := flags["d"]
+			if debug == false {
+				_, debug = flags["debug"]
+			}
 			if debug {
 				log.Logger.SetReportCaller(true)
 				log.Logger.SetLevel(logrus.DebugLevel)
 			}
 
-			log.Debugf("%v", args)
+			if debug {
+				log.Printf("%v", args)
+			}
 			root, err := file.GetAppRoot()
 			if err != nil {
 				log.Printf("get project name failed: %v", err.Error())
@@ -38,6 +43,14 @@ func CommandFactory() (*cli.Command, error) {
 			mod, err := file.GetMod(root)
 			if err != nil {
 				return 1, err
+			}
+			if st, err := os.Stat(filepath.Join(root, "app", "schema", "template")); err == nil {
+				if st.IsDir() {
+					templates = append(templates, filepath.Join(root, "app", "schema", "template"))
+				}
+			}
+			if debug {
+				log.Printf("%v", templates)
 			}
 			if err := ent.GenerateCRUDFiles(mod, filepath.Join(root, "app", "schema"), filepath.Join(root, "app", "crud"), templates); err != nil {
 				return 1, err

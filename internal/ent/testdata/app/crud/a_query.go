@@ -7,12 +7,12 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"testdata/app/crud/a"
-	"testdata/app/crud/predicate"
 
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/facebook/ent/dialect/sql/sqlgraph"
 	"github.com/facebook/ent/schema/field"
+	"test.com/testdata/app/crud/a"
+	"test.com/testdata/app/crud/predicate"
 )
 
 // AQuery is the builder for querying A entities.
