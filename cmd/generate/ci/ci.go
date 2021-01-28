@@ -136,8 +136,9 @@ pipeline {
                      }
                      now = sh(returnStdout: true, script: "date '+%Y-%m-%d-%H-%M-%S'").trim()
                      fname = "{{.BinName}}-${tag}_${now}.tar.gz"
-                     sh("tar -czf ${fname} {{.BinName}} webui/dist/webui")
+                     sh("tar -czf ${fname} {{.BinName}}")
                      sh "scp ${fname} admin@192.168.0.11:/volume1/SDK/tds/"
+		             md5 = sh(script: "md5sum ${fname}", returnStdout: true).trim()
                 }
             }
             post {

@@ -31,7 +31,7 @@ func CommandFactory() (*cli.Command, error) {
 				b := bytes.Buffer{}
 				if err := tmpl.Execute(&b, struct {
 					Lower, Capital string
-				}{strings.ToLower(a), strings.ToTitle(a)}); err != nil {
+				}{strings.ToLower(a), strings.Title(strings.ToLower(a))}); err != nil {
 					log.Printf("jenkinsTemplate parse failed: %v", err.Error())
 					return 1, err
 				}
