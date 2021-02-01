@@ -1,14 +1,16 @@
-
 package main
 
 import (
+	"fmt"
+
 	"github.com/gin-contrib/cors"
 	// a/app/crud"
 	// "gitlab.papegames.com/fengche/yayagf/pkg/model"
-	"github.com/gin-gonic/gin"
-	"log"
-	"a/app/router"
 	"a/app/config"
+	"a/app/router"
+	"log"
+
+	"github.com/gin-gonic/gin"
 )
 
 // @title Swagger Example API

@@ -24,6 +24,5 @@ func (A) Edges() []ent.Edge {
 
 // Indexes of the A.
 func (A) Indexes() []ent.Index {
-    return []ent.Index{}
+	return []ent.Index{}
 }
-

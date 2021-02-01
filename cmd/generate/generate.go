@@ -16,7 +16,7 @@ func CommandFactory() (*cli.Command, error) {
 			"model": schema.CommandFactory,
 			"crud":  curd.CommandFactory, "curd": curd.CommandFactory,
 			"doc": doc.CommandFactory, "docs": doc.CommandFactory,
-			"ci":  ci.CommandFactory,
+			"ci":         ci.CommandFactory,
 			"controller": controller.CommandFactory, "c": controller.CommandFactory,
 		},
 	}

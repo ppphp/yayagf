@@ -22,7 +22,7 @@ func (h Handlers) MountToEndpoint(r gin.IRouter) {
 
 type MountOption struct {
 	swagger string
-	metric []prometheus.Collector
+	metric  []prometheus.Collector
 }
 
 func WithMetric(collectors ...prometheus.Collector) *MountOption {
@@ -39,14 +39,14 @@ func MountALotOfThingToEndpoint(r gin.IRouter, options ...*MountOption) {
 	swagger := ""
 	for _, o := range options {
 		collectors = append(collectors, o.metric...)
-		if o.swagger!= "" {
+		if o.swagger != "" {
 			swagger = o.swagger
 		}
 	}
 	MountPProfHandlerToGin(r.Group("/pprof"))
 	MountMetaHandlerToGin(r.Group("/meta"))
 	MountPromHandlerToGin(r.Group("/metrics"), collectors...)
-	if swagger!= "" {
+	if swagger != "" {
 		MountSwaggerStringToGin(swagger, r.Group("/swagger.json"))
 	}
 	MountHealthHandlerToGin(r.Group("/health"))

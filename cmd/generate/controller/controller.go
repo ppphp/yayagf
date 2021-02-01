@@ -2,13 +2,14 @@ package controller
 
 import (
 	"bytes"
-	"gitlab.papegames.com/fengche/yayagf/internal/file"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"gitlab.papegames.com/fengche/yayagf/internal/file"
 
 	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
 )

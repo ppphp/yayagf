@@ -1,10 +1,10 @@
-
 package config
 
 import (
-	"gitlab.papegames.com/fengche/yayagf/pkg/config"
 	"log"
 	"sync"
+
+	"gitlab.papegames.com/fengche/yayagf/pkg/config"
 )
 
 var lock sync.RWMutex

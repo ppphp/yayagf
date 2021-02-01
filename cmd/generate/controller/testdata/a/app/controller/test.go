@@ -1,4 +1,9 @@
-package controller 
+package controller
+
+import (
+	"github.com/gin-gonic/gin"
+	"gitlab.papegames.com/fengche/yayagf/pkg/maotai"
+)
 
 // IndexTEST godoc
 // @Summary TEST

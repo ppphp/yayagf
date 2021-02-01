@@ -1,9 +1,10 @@
 package curd
 
 import (
-	"github.com/stretchr/testify/require"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestCommandFactory(t *testing.T) {

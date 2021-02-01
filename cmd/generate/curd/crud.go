@@ -1,10 +1,11 @@
 package curd
 
 import (
-	"github.com/sirupsen/logrus"
-	"gitlab.papegames.com/fengche/yayagf/internal/log"
 	"os"
 	"path/filepath"
+
+	"github.com/sirupsen/logrus"
+	"gitlab.papegames.com/fengche/yayagf/internal/log"
 
 	"gitlab.papegames.com/fengche/yayagf/internal/ent"
 
