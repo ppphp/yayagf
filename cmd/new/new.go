@@ -131,11 +131,11 @@ CMD ["/main/main"]
 }
 
 const (
-	MainGo = `
-package main
+	MainGo = `package main
 
 import (
 	"fmt"
+
 	"github.com/gin-contrib/cors"
 	// {{.Mod}}/app/crud"
 	"gitlab.papegames.com/fengche/yayagf/pkg/handlers"
@@ -143,8 +143,8 @@ import (
 	// "gitlab.papegames.com/fengche/yayagf/pkg/model"
 	"gitlab.papegames.com/fengche/yayagf/pkg/prom"
 	"github.com/gin-gonic/gin"
-	"{{.Mod}}/app/router"
 	"{{.Mod}}/app/config"
+	"{{.Mod}}/app/router"
 )
 // @title "{{.Mod}} API
 // @version master

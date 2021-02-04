@@ -1,12 +1,7 @@
-package controller
+package controller 
 
-import (
-	"github.com/gin-gonic/gin"
-	"gitlab.papegames.com/fengche/yayagf/pkg/maotai"
-)
-
-// IndexTEST godoc
-// @Summary TEST
+// IndexTest godoc
+// @Summary Test
 // @Tags test
 // @Accept json
 // @Produce json
@@ -14,12 +9,12 @@ import (
 // @Failure 200 {int} int 0
 // @Failure 200 {int} int 0
 // @Router /test [get]
-func IndexTEST(c *maotai.Context) (int, string, gin.H) {
+func IndexTest(c *maotai.Context) (int, string, gin.H) {
 	return 0, "", nil
 }
 
-// CreateTEST godoc
-// @Summary CreateTEST
+// CreateTest godoc
+// @Summary CreateTest
 // @Tags test
 // @Accept json
 // @Produce json
@@ -27,6 +22,6 @@ func IndexTEST(c *maotai.Context) (int, string, gin.H) {
 // @Failure 200 {int} int 0
 // @Failure 200 {int} int 0
 // @Router /test [post]
-func CreateTEST(c *maotai.Context) (int, string, gin.H) {
+func CreateTest(c *maotai.Context) (int, string, gin.H) {
 	return 0, "", nil
 }

@@ -41,6 +41,7 @@ func GenerateSwagger() error {
 
 	docFileName := path.Join(OutputDir, "docs.go")
 	if err := ioutil.WriteFile(docFileName, []byte(fmt.Sprintf(`package doc
+
 const Swagger = %s
 `, strconv.Quote(string(b)))), 0644); err != nil {
 		return err
