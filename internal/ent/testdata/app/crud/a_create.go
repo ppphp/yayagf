@@ -7,8 +7,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/facebook/ent/dialect/sql/sqlgraph"
-	"github.com/facebook/ent/schema/field"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/schema/field"
 )
 
 // ACreate is the builder for creating a A entity.
@@ -18,7 +18,7 @@ type ACreate struct {
 	hooks    []Hook
 }
 
-// SetA sets the a field.
+// SetA sets the "a" field.
 func (a *ACreate) SetA(i int) *ACreate {
 	a.mutation.SetA(i)
 	return a
@@ -116,7 +116,7 @@ func (a *ACreate) createSpec() (*A, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
-// ACreateBulk is the builder for creating a bulk of A entities.
+// ACreateBulk is the builder for creating many A entities in bulk.
 type ACreateBulk struct {
 	config
 	builders []*ACreate
@@ -173,7 +173,7 @@ func (ab *ACreateBulk) Save(ctx context.Context) ([]*A, error) {
 	return nodes, nil
 }
 
-// SaveX calls Save and panics if Save returns an error.
+// SaveX is like Save, but panics if an error occurs.
 func (ab *ACreateBulk) SaveX(ctx context.Context) []*A {
 	v, err := ab.Save(ctx)
 	if err != nil {

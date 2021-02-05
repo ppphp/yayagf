@@ -6,9 +6,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/facebook/ent/dialect/sql"
-	"github.com/facebook/ent/dialect/sql/sqlgraph"
-	"github.com/facebook/ent/schema/field"
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/schema/field"
 	"test.com/testdata/app/crud/a"
 	"test.com/testdata/app/crud/predicate"
 )
@@ -20,20 +20,20 @@ type AUpdate struct {
 	mutation *AMutation
 }
 
-// Where adds a new predicate for the builder.
+// Where adds a new predicate for the AUpdate builder.
 func (a *AUpdate) Where(ps ...predicate.A) *AUpdate {
 	a.mutation.predicates = append(a.mutation.predicates, ps...)
 	return a
 }
 
-// SetA sets the a field.
+// SetA sets the "a" field.
 func (a *AUpdate) SetA(i int) *AUpdate {
 	a.mutation.ResetA()
 	a.mutation.SetA(i)
 	return a
 }
 
-// AddA adds i to a.
+// AddA adds i to the "a" field.
 func (a *AUpdate) AddA(i int) *AUpdate {
 	a.mutation.AddA(i)
 	return a
@@ -145,14 +145,14 @@ type AUpdateOne struct {
 	mutation *AMutation
 }
 
-// SetA sets the a field.
+// SetA sets the "a" field.
 func (ao *AUpdateOne) SetA(i int) *AUpdateOne {
 	ao.mutation.ResetA()
 	ao.mutation.SetA(i)
 	return ao
 }
 
-// AddA adds i to a.
+// AddA adds i to the "a" field.
 func (ao *AUpdateOne) AddA(i int) *AUpdateOne {
 	ao.mutation.AddA(i)
 	return ao
@@ -163,7 +163,7 @@ func (ao *AUpdateOne) Mutation() *AMutation {
 	return ao.mutation
 }
 
-// Save executes the query and returns the updated entity.
+// Save executes the query and returns the updated A entity.
 func (ao *AUpdateOne) Save(ctx context.Context) (*A, error) {
 	var (
 		err  error
@@ -230,6 +230,13 @@ func (ao *AUpdateOne) sqlSave(ctx context.Context) (_node *A, err error) {
 		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing A.ID for update")}
 	}
 	_spec.Node.ID.Value = id
+	if ps := ao.mutation.predicates; len(ps) > 0 {
+		_spec.Predicate = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
 	if value, ok := ao.mutation.A(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
@@ -246,7 +253,7 @@ func (ao *AUpdateOne) sqlSave(ctx context.Context) (_node *A, err error) {
 	}
 	_node = &A{config: ao.config}
 	_spec.Assign = _node.assignValues
-	_spec.ScanValues = _node.scanValues()
+	_spec.ScanValues = _node.scanValues
 	if err = sqlgraph.UpdateNode(ctx, ao.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{a.Label}

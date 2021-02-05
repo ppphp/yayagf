@@ -10,9 +10,9 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/facebook/ent/entc"
-	"github.com/facebook/ent/entc/gen"
-	"github.com/facebook/ent/schema/field"
+	"entgo.io/ent/entc"
+	"entgo.io/ent/entc/gen"
+	"entgo.io/ent/schema/field"
 	"golang.org/x/tools/go/packages"
 )
 
@@ -42,7 +42,7 @@ func GenerateSchema(path string, names []string) error {
 var tmpl = template.Must(template.New("schema").
 	Parse(`package schema
 
-import "github.com/facebook/ent"
+import "entgo.io/ent"
 
 // {{ . }} holds the schema definition for the {{ . }} entity.
 type {{ . }} struct {

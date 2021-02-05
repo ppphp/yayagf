@@ -10,7 +10,7 @@ import (
 	"test.com/testdata/app/crud/a"
 	"test.com/testdata/app/crud/predicate"
 
-	"github.com/facebook/ent"
+	"entgo.io/ent"
 )
 
 const (
@@ -25,8 +25,7 @@ const (
 	TypeA = "A"
 )
 
-// AMutation represents an operation that mutate the As
-// nodes in the graph.
+// AMutation represents an operation that mutates the A nodes in the graph.
 type AMutation struct {
 	config
 	op            Op
@@ -42,10 +41,10 @@ type AMutation struct {
 
 var _ ent.Mutation = (*AMutation)(nil)
 
-// aOption allows to manage the mutation configuration using functional options.
+// aOption allows management of the mutation configuration using functional options.
 type aOption func(*AMutation)
 
-// newAMutation creates new mutation for A.
+// newAMutation creates new mutation for the A entity.
 func newAMutation(c config, op Op, opts ...aOption) *AMutation {
 	m := &AMutation{
 		config:        c,
@@ -59,7 +58,7 @@ func newAMutation(c config, op Op, opts ...aOption) *AMutation {
 	return m
 }
 
-// withAID sets the id field of the mutation.
+// withAID sets the ID field of the mutation.
 func withAID(id int) aOption {
 	return func(m *AMutation) {
 		var (
@@ -110,8 +109,8 @@ func (m AMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
-// ID returns the id value in the mutation. Note that, the id
-// is available only if it was provided to the builder.
+// ID returns the ID value in the mutation. Note that the ID
+// is only available if it was provided to the builder.
 func (m *AMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
@@ -119,13 +118,13 @@ func (m *AMutation) ID() (id int, exists bool) {
 	return *m.id, true
 }
 
-// SetA sets the a field.
+// SetA sets the "a" field.
 func (m *AMutation) SetA(i int) {
 	m.a = &i
 	m.adda = nil
 }
 
-// A returns the a value in the mutation.
+// A returns the value of the "a" field in the mutation.
 func (m *AMutation) A() (r int, exists bool) {
 	v := m.a
 	if v == nil {
@@ -134,13 +133,12 @@ func (m *AMutation) A() (r int, exists bool) {
 	return *v, true
 }
 
-// OldA returns the old a value of the A.
-// If the A object wasn't provided to the builder, the object is fetched
-// from the database.
-// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+// OldA returns the old "a" field's value of the A entity.
+// If the A object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *AMutation) OldA(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldA is allowed only on UpdateOne operations")
+		return v, fmt.Errorf("OldA is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
 		return v, fmt.Errorf("OldA requires an ID field in the mutation")
@@ -152,7 +150,7 @@ func (m *AMutation) OldA(ctx context.Context) (v int, err error) {
 	return oldValue.A, nil
 }
 
-// AddA adds i to a.
+// AddA adds i to the "a" field.
 func (m *AMutation) AddA(i int) {
 	if m.adda != nil {
 		*m.adda += i
@@ -161,7 +159,7 @@ func (m *AMutation) AddA(i int) {
 	}
 }
 
-// AddedA returns the value that was added to the a field in this mutation.
+// AddedA returns the value that was added to the "a" field in this mutation.
 func (m *AMutation) AddedA() (r int, exists bool) {
 	v := m.adda
 	if v == nil {
@@ -170,7 +168,7 @@ func (m *AMutation) AddedA() (r int, exists bool) {
 	return *v, true
 }
 
-// ResetA reset all changes of the "a" field.
+// ResetA resets all changes to the "a" field.
 func (m *AMutation) ResetA() {
 	m.a = nil
 	m.adda = nil
@@ -186,9 +184,9 @@ func (m *AMutation) Type() string {
 	return m.typ
 }
 
-// Fields returns all fields that were changed during
-// this mutation. Note that, in order to get all numeric
-// fields that were in/decremented, call AddedFields().
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
 func (m *AMutation) Fields() []string {
 	fields := make([]string, 0, 1)
 	if m.a != nil {
@@ -197,9 +195,9 @@ func (m *AMutation) Fields() []string {
 	return fields
 }
 
-// Field returns the value of a field with the given name.
-// The second boolean value indicates that this field was
-// not set, or was not define in the schema.
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
 func (m *AMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case a.FieldA:
@@ -208,9 +206,9 @@ func (m *AMutation) Field(name string) (ent.Value, bool) {
 	return nil, false
 }
 
-// OldField returns the old value of the field from the database.
-// An error is returned if the mutation operation is not UpdateOne,
-// or the query to the database was failed.
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
 func (m *AMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
 	case a.FieldA:
@@ -219,9 +217,9 @@ func (m *AMutation) OldField(ctx context.Context, name string) (ent.Value, error
 	return nil, fmt.Errorf("unknown A field %s", name)
 }
 
-// SetField sets the value for the given name. It returns an
-// error if the field is not defined in the schema, or if the
-// type mismatch the field type.
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
 func (m *AMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case a.FieldA:
@@ -235,8 +233,8 @@ func (m *AMutation) SetField(name string, value ent.Value) error {
 	return fmt.Errorf("unknown A field %s", name)
 }
 
-// AddedFields returns all numeric fields that were incremented
-// or decremented during this mutation.
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
 func (m *AMutation) AddedFields() []string {
 	var fields []string
 	if m.adda != nil {
@@ -245,9 +243,9 @@ func (m *AMutation) AddedFields() []string {
 	return fields
 }
 
-// AddedField returns the numeric value that was in/decremented
-// from a field with the given name. The second value indicates
-// that this field was not set, or was not define in the schema.
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
 func (m *AMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case a.FieldA:
@@ -256,9 +254,9 @@ func (m *AMutation) AddedField(name string) (ent.Value, bool) {
 	return nil, false
 }
 
-// AddField adds the value for the given name. It returns an
-// error if the field is not defined in the schema, or if the
-// type mismatch the field type.
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
 func (m *AMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case a.FieldA:
@@ -272,28 +270,27 @@ func (m *AMutation) AddField(name string, value ent.Value) error {
 	return fmt.Errorf("unknown A numeric field %s", name)
 }
 
-// ClearedFields returns all nullable fields that were cleared
-// during this mutation.
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
 func (m *AMutation) ClearedFields() []string {
 	return nil
 }
 
-// FieldCleared returns a boolean indicates if this field was
+// FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
 func (m *AMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
-// ClearField clears the value for the given name. It returns an
+// ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *AMutation) ClearField(name string) error {
 	return fmt.Errorf("unknown A nullable field %s", name)
 }
 
-// ResetField resets all changes in the mutation regarding the
-// given field name. It returns an error if the field is not
-// defined in the schema.
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
 func (m *AMutation) ResetField(name string) error {
 	switch name {
 	case a.FieldA:
@@ -303,54 +300,50 @@ func (m *AMutation) ResetField(name string) error {
 	return fmt.Errorf("unknown A field %s", name)
 }
 
-// AddedEdges returns all edge names that were set/added in this
-// mutation.
+// AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AMutation) AddedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
-// AddedIDs returns all ids (to other nodes) that were added for
-// the given edge name.
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
 func (m *AMutation) AddedIDs(name string) []ent.Value {
 	return nil
 }
 
-// RemovedEdges returns all edge names that were removed in this
-// mutation.
+// RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
-// RemovedIDs returns all ids (to other nodes) that were removed for
-// the given edge name.
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
 func (m *AMutation) RemovedIDs(name string) []ent.Value {
 	return nil
 }
 
-// ClearedEdges returns all edge names that were cleared in this
-// mutation.
+// ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
-// EdgeCleared returns a boolean indicates if this edge was
-// cleared in this mutation.
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
 func (m *AMutation) EdgeCleared(name string) bool {
 	return false
 }
 
-// ClearEdge clears the value for the given name. It returns an
-// error if the edge name is not defined in the schema.
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
 func (m *AMutation) ClearEdge(name string) error {
 	return fmt.Errorf("unknown A unique edge %s", name)
 }
 
-// ResetEdge resets all changes in the mutation regarding the
-// given edge name. It returns an error if the edge is not
-// defined in the schema.
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
 func (m *AMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown A edge %s", name)
 }

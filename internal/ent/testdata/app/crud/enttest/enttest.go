@@ -9,7 +9,7 @@ import (
 	// required by schema hooks.
 	_ "test.com/testdata/app/crud/runtime"
 
-	"github.com/facebook/ent/dialect/sql/schema"
+	"entgo.io/ent/dialect/sql/schema"
 )
 
 type (

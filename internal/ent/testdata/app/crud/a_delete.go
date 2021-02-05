@@ -6,9 +6,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/facebook/ent/dialect/sql"
-	"github.com/facebook/ent/dialect/sql/sqlgraph"
-	"github.com/facebook/ent/schema/field"
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/schema/field"
 	"test.com/testdata/app/crud/a"
 	"test.com/testdata/app/crud/predicate"
 )
@@ -20,7 +20,7 @@ type ADelete struct {
 	mutation *AMutation
 }
 
-// Where adds a new predicate to the delete builder.
+// Where adds a new predicate to the ADelete builder.
 func (a *ADelete) Where(ps ...predicate.A) *ADelete {
 	a.mutation.predicates = append(a.mutation.predicates, ps...)
 	return a

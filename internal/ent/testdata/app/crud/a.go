@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/facebook/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql"
+	"test.com/testdata/app/crud/a"
 )
 
 // A is the model entity for the A schema.
@@ -19,42 +20,53 @@ type A struct {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*A) scanValues() []interface{} {
-	return []interface{}{
-		&sql.NullInt64{}, // id
-		&sql.NullInt64{}, // a
+func (*A) scanValues(columns []string) ([]interface{}, error) {
+	values := make([]interface{}, len(columns))
+	for i := range columns {
+		switch columns[i] {
+		case a.FieldID, a.FieldA:
+			values[i] = &sql.NullInt64{}
+		default:
+			return nil, fmt.Errorf("unexpected column %q for type A", columns[i])
+		}
 	}
+	return values, nil
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the A fields.
-func (a *A) assignValues(values ...interface{}) error {
-	if m, n := len(values), len(a.Columns); m < n {
+func (a *A) assignValues(columns []string, values []interface{}) error {
+	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
-	value, ok := values[0].(*sql.NullInt64)
-	if !ok {
-		return fmt.Errorf("unexpected type %T for field id", value)
-	}
-	a.ID = int(value.Int64)
-	values = values[1:]
-	if value, ok := values[0].(*sql.NullInt64); !ok {
-		return fmt.Errorf("unexpected type %T for field a", values[0])
-	} else if value.Valid {
-		a.A = int(value.Int64)
+	for i := range columns {
+		switch columns[i] {
+		case a.FieldID:
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
+			}
+			a.ID = int(value.Int64)
+		case a.FieldA:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field a", values[i])
+			} else if value.Valid {
+				a.A = int(value.Int64)
+			}
+		}
 	}
 	return nil
 }
 
 // Update returns a builder for updating this A.
-// Note that, you need to call A.Unwrap() before calling this method, if this A
+// Note that you need to call A.Unwrap() before calling this method if this A
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (a *A) Update() *AUpdateOne {
 	return (&AClient{config: a.config}).UpdateOne(a)
 }
 
-// Unwrap unwraps the entity that was returned from a transaction after it was closed,
-// so that all next queries will be executed through the driver which created the transaction.
+// Unwrap unwraps the A entity that was returned from a transaction after it was closed,
+// so that all future queries will be executed through the driver which created the transaction.
 func (a *A) Unwrap() *A {
 	tx, ok := a.config.driver.(*txDriver)
 	if !ok {

@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/facebook/ent/dialect/sql"
-	"github.com/facebook/ent/dialect/sql/sqlgraph"
-	"github.com/facebook/ent/schema/field"
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/schema/field"
 	"test.com/testdata/app/crud/a"
 	"test.com/testdata/app/crud/predicate"
 )
@@ -21,13 +21,14 @@ type AQuery struct {
 	limit      *int
 	offset     *int
 	order      []OrderFunc
+	fields     []string
 	predicates []predicate.A
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the builder.
+// Where adds a new predicate for the AQuery builder.
 func (a *AQuery) Where(ps ...predicate.A) *AQuery {
 	a.predicates = append(a.predicates, ps...)
 	return a
@@ -51,7 +52,8 @@ func (a *AQuery) Order(o ...OrderFunc) *AQuery {
 	return a
 }
 
-// First returns the first A entity in the query. Returns *NotFoundError when no a was found.
+// First returns the first A entity from the query.
+// Returns a *NotFoundError when no A was found.
 func (a *AQuery) First(ctx context.Context) (*A, error) {
 	nodes, err := a.Limit(1).All(ctx)
 	if err != nil {
@@ -72,7 +74,8 @@ func (a *AQuery) FirstX(ctx context.Context) *A {
 	return node
 }
 
-// FirstID returns the first A id in the query. Returns *NotFoundError when no id was found.
+// FirstID returns the first A ID from the query.
+// Returns a *NotFoundError when no A ID was found.
 func (a *AQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = a.Limit(1).IDs(ctx); err != nil {
@@ -94,7 +97,9 @@ func (a *AQuery) FirstIDX(ctx context.Context) int {
 	return id
 }
 
-// Only returns the only A entity in the query, returns an error if not exactly one entity was returned.
+// Only returns a single A entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when exactly one A entity is not found.
+// Returns a *NotFoundError when no A entities are found.
 func (a *AQuery) Only(ctx context.Context) (*A, error) {
 	nodes, err := a.Limit(2).All(ctx)
 	if err != nil {
@@ -119,7 +124,9 @@ func (a *AQuery) OnlyX(ctx context.Context) *A {
 	return node
 }
 
-// OnlyID returns the only A id in the query, returns an error if not exactly one id was returned.
+// OnlyID is like Only, but returns the only A ID in the query.
+// Returns a *NotSingularError when exactly one A ID is not found.
+// Returns a *NotFoundError when no entities are found.
 func (a *AQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = a.Limit(2).IDs(ctx); err != nil {
@@ -162,7 +169,7 @@ func (a *AQuery) AllX(ctx context.Context) []*A {
 	return nodes
 }
 
-// IDs executes the query and returns a list of A ids.
+// IDs executes the query and returns a list of A IDs.
 func (a *AQuery) IDs(ctx context.Context) ([]int, error) {
 	var ids []int
 	if err := a.Select(a.FieldID).Scan(ctx, &ids); err != nil {
@@ -214,7 +221,7 @@ func (a *AQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the query builder, including all associated steps. It can be
+// Clone returns a duplicate of the AQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
 func (a *AQuery) Clone() *AQuery {
 	if a == nil {
@@ -232,7 +239,7 @@ func (a *AQuery) Clone() *AQuery {
 	}
 }
 
-// GroupBy used to group vertices by one or more fields/columns.
+// GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
@@ -254,12 +261,13 @@ func (a *AQuery) GroupBy(field string, fields ...string) *AGroupBy {
 		if err := a.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		return a.sqlQuery(), nil
+		return a.sqlQuery(ctx), nil
 	}
 	return group
 }
 
-// Select one or more fields from the given query.
+// Select allows the selection one or more fields/columns for the given query,
+// instead of selecting all fields in the entity.
 //
 // Example:
 //
@@ -272,18 +280,16 @@ func (a *AQuery) GroupBy(field string, fields ...string) *AGroupBy {
 //		Scan(ctx, &v)
 //
 func (a *AQuery) Select(field string, fields ...string) *ASelect {
-	selector := &ASelect{config: a.config}
-	selector.fields = append([]string{field}, fields...)
-	selector.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := a.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return a.sqlQuery(), nil
-	}
-	return selector
+	a.fields = append([]string{field}, fields...)
+	return &ASelect{AQuery: a}
 }
 
 func (a *AQuery) prepareQuery(ctx context.Context) error {
+	for _, f := range a.fields {
+		if !a.ValidColumn(f) {
+			return &ValidationError{Name: f, err: fmt.Errorf("crud: invalid field %q for query", f)}
+		}
+	}
 	if a.path != nil {
 		prev, err := a.path(ctx)
 		if err != nil {
@@ -299,18 +305,17 @@ func (a *AQuery) sqlAll(ctx context.Context) ([]*A, error) {
 		nodes = []*A{}
 		_spec = a.querySpec()
 	)
-	_spec.ScanValues = func() []interface{} {
+	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &A{config: a.config}
 		nodes = append(nodes, node)
-		values := node.scanValues()
-		return values
+		return node.scanValues(columns)
 	}
-	_spec.Assign = func(values ...interface{}) error {
+	_spec.Assign = func(columns []string, values []interface{}) error {
 		if len(nodes) == 0 {
 			return fmt.Errorf("crud: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
-		return node.assignValues(values...)
+		return node.assignValues(columns, values)
 	}
 	if err := sqlgraph.QueryNodes(ctx, a.driver, _spec); err != nil {
 		return nil, err
@@ -347,6 +352,15 @@ func (a *AQuery) querySpec() *sqlgraph.QuerySpec {
 		From:   a.sql,
 		Unique: true,
 	}
+	if fields := a.fields; len(fields) > 0 {
+		_spec.Node.Columns = make([]string, 0, len(fields))
+		_spec.Node.Columns = append(_spec.Node.Columns, a.FieldID)
+		for i := range fields {
+			if fields[i] != a.FieldID {
+				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
+			}
+		}
+	}
 	if ps := a.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -370,7 +384,7 @@ func (a *AQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (a *AQuery) sqlQuery() *sql.Selector {
+func (a *AQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(a.driver.Dialect())
 	t1 := builder.Table(a.Table)
 	selector := builder.Select(t1.Columns(a.Columns...)...).From(t1)
@@ -395,7 +409,7 @@ func (a *AQuery) sqlQuery() *sql.Selector {
 	return selector
 }
 
-// AGroupBy is the builder for group-by A entities.
+// AGroupBy is the group-by builder for A entities.
 type AGroupBy struct {
 	config
 	fields []string
@@ -411,7 +425,7 @@ func (ab *AGroupBy) Aggregate(fns ...AggregateFunc) *AGroupBy {
 	return ab
 }
 
-// Scan applies the group-by query and scan the result into the given value.
+// Scan applies the group-by query and scans the result into the given value.
 func (ab *AGroupBy) Scan(ctx context.Context, v interface{}) error {
 	query, err := ab.path(ctx)
 	if err != nil {
@@ -428,7 +442,8 @@ func (ab *AGroupBy) ScanX(ctx context.Context, v interface{}) {
 	}
 }
 
-// Strings returns list of strings from group-by. It is only allowed when querying group-by with one field.
+// Strings returns list of strings from group-by.
+// It is only allowed when executing a group-by query with one field.
 func (ab *AGroupBy) Strings(ctx context.Context) ([]string, error) {
 	if len(ab.fields) > 1 {
 		return nil, errors.New("crud: AGroupBy.Strings is not achievable when grouping more than 1 field")
@@ -449,7 +464,8 @@ func (ab *AGroupBy) StringsX(ctx context.Context) []string {
 	return v
 }
 
-// String returns a single string from group-by. It is only allowed when querying group-by with one field.
+// String returns a single string from a group-by query.
+// It is only allowed when executing a group-by query with one field.
 func (ab *AGroupBy) String(ctx context.Context) (_ string, err error) {
 	var v []string
 	if v, err = ab.Strings(ctx); err != nil {
@@ -475,7 +491,8 @@ func (ab *AGroupBy) StringX(ctx context.Context) string {
 	return v
 }
 
-// Ints returns list of ints from group-by. It is only allowed when querying group-by with one field.
+// Ints returns list of ints from group-by.
+// It is only allowed when executing a group-by query with one field.
 func (ab *AGroupBy) Ints(ctx context.Context) ([]int, error) {
 	if len(ab.fields) > 1 {
 		return nil, errors.New("crud: AGroupBy.Ints is not achievable when grouping more than 1 field")
@@ -496,7 +513,8 @@ func (ab *AGroupBy) IntsX(ctx context.Context) []int {
 	return v
 }
 
-// Int returns a single int from group-by. It is only allowed when querying group-by with one field.
+// Int returns a single int from a group-by query.
+// It is only allowed when executing a group-by query with one field.
 func (ab *AGroupBy) Int(ctx context.Context) (_ int, err error) {
 	var v []int
 	if v, err = ab.Ints(ctx); err != nil {
@@ -522,7 +540,8 @@ func (ab *AGroupBy) IntX(ctx context.Context) int {
 	return v
 }
 
-// Float64s returns list of float64s from group-by. It is only allowed when querying group-by with one field.
+// Float64s returns list of float64s from group-by.
+// It is only allowed when executing a group-by query with one field.
 func (ab *AGroupBy) Float64s(ctx context.Context) ([]float64, error) {
 	if len(ab.fields) > 1 {
 		return nil, errors.New("crud: AGroupBy.Float64s is not achievable when grouping more than 1 field")
@@ -543,7 +562,8 @@ func (ab *AGroupBy) Float64sX(ctx context.Context) []float64 {
 	return v
 }
 
-// Float64 returns a single float64 from group-by. It is only allowed when querying group-by with one field.
+// Float64 returns a single float64 from a group-by query.
+// It is only allowed when executing a group-by query with one field.
 func (ab *AGroupBy) Float64(ctx context.Context) (_ float64, err error) {
 	var v []float64
 	if v, err = ab.Float64s(ctx); err != nil {
@@ -569,7 +589,8 @@ func (ab *AGroupBy) Float64X(ctx context.Context) float64 {
 	return v
 }
 
-// Bools returns list of bools from group-by. It is only allowed when querying group-by with one field.
+// Bools returns list of bools from group-by.
+// It is only allowed when executing a group-by query with one field.
 func (ab *AGroupBy) Bools(ctx context.Context) ([]bool, error) {
 	if len(ab.fields) > 1 {
 		return nil, errors.New("crud: AGroupBy.Bools is not achievable when grouping more than 1 field")
@@ -590,7 +611,8 @@ func (ab *AGroupBy) BoolsX(ctx context.Context) []bool {
 	return v
 }
 
-// Bool returns a single bool from group-by. It is only allowed when querying group-by with one field.
+// Bool returns a single bool from a group-by query.
+// It is only allowed when executing a group-by query with one field.
 func (ab *AGroupBy) Bool(ctx context.Context) (_ bool, err error) {
 	var v []bool
 	if v, err = ab.Bools(ctx); err != nil {
@@ -645,22 +667,19 @@ func (ab *AGroupBy) sqlQuery() *sql.Selector {
 	return selector.Select(columns...).GroupBy(ab.fields...)
 }
 
-// ASelect is the builder for select fields of A entities.
+// ASelect is the builder for selecting fields of A entities.
 type ASelect struct {
-	config
-	fields []string
+	*AQuery
 	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	sql *sql.Selector
 }
 
-// Scan applies the selector query and scan the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (a *ASelect) Scan(ctx context.Context, v interface{}) error {
-	query, err := a.path(ctx)
-	if err != nil {
+	if err := a.prepareQuery(ctx); err != nil {
 		return err
 	}
-	a.sql = query
+	a.sql = a.AQuery.sqlQuery(ctx)
 	return a.sqlScan(ctx, v)
 }
 
@@ -671,7 +690,7 @@ func (a *ASelect) ScanX(ctx context.Context, v interface{}) {
 	}
 }
 
-// Strings returns list of strings from selector. It is only allowed when selecting one field.
+// Strings returns list of strings from a selector. It is only allowed when selecting one field.
 func (a *ASelect) Strings(ctx context.Context) ([]string, error) {
 	if len(a.fields) > 1 {
 		return nil, errors.New("crud: ASelect.Strings is not achievable when selecting more than 1 field")
@@ -692,7 +711,7 @@ func (a *ASelect) StringsX(ctx context.Context) []string {
 	return v
 }
 
-// String returns a single string from selector. It is only allowed when selecting one field.
+// String returns a single string from a selector. It is only allowed when selecting one field.
 func (a *ASelect) String(ctx context.Context) (_ string, err error) {
 	var v []string
 	if v, err = a.Strings(ctx); err != nil {
@@ -718,7 +737,7 @@ func (a *ASelect) StringX(ctx context.Context) string {
 	return v
 }
 
-// Ints returns list of ints from selector. It is only allowed when selecting one field.
+// Ints returns list of ints from a selector. It is only allowed when selecting one field.
 func (a *ASelect) Ints(ctx context.Context) ([]int, error) {
 	if len(a.fields) > 1 {
 		return nil, errors.New("crud: ASelect.Ints is not achievable when selecting more than 1 field")
@@ -739,7 +758,7 @@ func (a *ASelect) IntsX(ctx context.Context) []int {
 	return v
 }
 
-// Int returns a single int from selector. It is only allowed when selecting one field.
+// Int returns a single int from a selector. It is only allowed when selecting one field.
 func (a *ASelect) Int(ctx context.Context) (_ int, err error) {
 	var v []int
 	if v, err = a.Ints(ctx); err != nil {
@@ -765,7 +784,7 @@ func (a *ASelect) IntX(ctx context.Context) int {
 	return v
 }
 
-// Float64s returns list of float64s from selector. It is only allowed when selecting one field.
+// Float64s returns list of float64s from a selector. It is only allowed when selecting one field.
 func (a *ASelect) Float64s(ctx context.Context) ([]float64, error) {
 	if len(a.fields) > 1 {
 		return nil, errors.New("crud: ASelect.Float64s is not achievable when selecting more than 1 field")
@@ -786,7 +805,7 @@ func (a *ASelect) Float64sX(ctx context.Context) []float64 {
 	return v
 }
 
-// Float64 returns a single float64 from selector. It is only allowed when selecting one field.
+// Float64 returns a single float64 from a selector. It is only allowed when selecting one field.
 func (a *ASelect) Float64(ctx context.Context) (_ float64, err error) {
 	var v []float64
 	if v, err = a.Float64s(ctx); err != nil {
@@ -812,7 +831,7 @@ func (a *ASelect) Float64X(ctx context.Context) float64 {
 	return v
 }
 
-// Bools returns list of bools from selector. It is only allowed when selecting one field.
+// Bools returns list of bools from a selector. It is only allowed when selecting one field.
 func (a *ASelect) Bools(ctx context.Context) ([]bool, error) {
 	if len(a.fields) > 1 {
 		return nil, errors.New("crud: ASelect.Bools is not achievable when selecting more than 1 field")
@@ -833,7 +852,7 @@ func (a *ASelect) BoolsX(ctx context.Context) []bool {
 	return v
 }
 
-// Bool returns a single bool from selector. It is only allowed when selecting one field.
+// Bool returns a single bool from a selector. It is only allowed when selecting one field.
 func (a *ASelect) Bool(ctx context.Context) (_ bool, err error) {
 	var v []bool
 	if v, err = a.Bools(ctx); err != nil {
@@ -860,11 +879,6 @@ func (a *ASelect) BoolX(ctx context.Context) bool {
 }
 
 func (a *ASelect) sqlScan(ctx context.Context, v interface{}) error {
-	for _, f := range a.fields {
-		if !a.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for selection", f)}
-		}
-	}
 	rows := &sql.Rows{}
 	query, args := a.sqlQuery().Query()
 	if err := a.driver.Query(ctx, query, args, rows); err != nil {
