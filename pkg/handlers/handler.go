@@ -47,7 +47,7 @@ func MountALotOfThingToEndpoint(r gin.IRouter, options ...*MountOption) {
 	MountMetaHandlerToGin(r.Group("/meta"))
 	MountPromHandlerToGin(r.Group("/metrics"), collectors...)
 	if swagger != "" {
-		MountSwaggerStringToGin(swagger, r.Group("/swagger.json"))
+		MountSwaggerStringToGin(swagger, r)
 	}
 	MountHealthHandlerToGin(r.Group("/health"))
 }
