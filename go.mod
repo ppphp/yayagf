@@ -13,7 +13,7 @@ require (
 	github.com/gomodule/redigo v1.8.3
 	github.com/lib/pq v1.9.0
 	github.com/prometheus/client_golang v1.9.0
-	github.com/shirou/gopsutil v3.20.12+incompatible
+	github.com/shirou/gopsutil v3.21.1+incompatible
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/swag v1.7.0
