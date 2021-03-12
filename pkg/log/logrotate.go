@@ -56,6 +56,9 @@ func (r *RotationWriter) Rotate(timer Timer) {
 // generate a rotation writer, name is the prefix
 func NewRotationWriter(name string, timer Timer) (*RotationWriter, error) {
 	r := &RotationWriter{path: name}
+
+	dir := filepath.Dir(name)
+	_ = os.MkdirAll(dir, 0755)
 	f, err := os.OpenFile(name, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
 	if err != nil {
 		return nil, err
