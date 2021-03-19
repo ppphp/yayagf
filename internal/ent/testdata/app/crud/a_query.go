@@ -334,7 +334,7 @@ func (a *AQuery) sqlCount(ctx context.Context) (int, error) {
 func (a *AQuery) sqlExist(ctx context.Context) (bool, error) {
 	n, err := a.sqlCount(ctx)
 	if err != nil {
-		return false, fmt.Errorf("crud: check existence: %v", err)
+		return false, fmt.Errorf("crud: check existence: %w", err)
 	}
 	return n > 0, nil
 }

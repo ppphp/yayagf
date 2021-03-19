@@ -9,7 +9,6 @@ const (
 	FieldID = "id"
 	// FieldA holds the string denoting the a field in the database.
 	FieldA = "a"
-
 	// Table holds the table name of the a in the database.
 	Table = "as"
 )
