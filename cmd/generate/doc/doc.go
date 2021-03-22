@@ -21,7 +21,7 @@ func CommandFactory() (*cli.Command, error) {
 				log.Fatal(err)
 			}
 
-			if err := swagger.GenerateSwagger(); err != nil {
+			if err := swagger.GenerateSwagger(root); err != nil {
 				log.Fatal(err)
 			}
 

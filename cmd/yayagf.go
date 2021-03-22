@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	_init "gitlab.papegames.com/fengche/yayagf/cmd/init"
 	"gitlab.papegames.com/fengche/yayagf/cmd/version"
 
 	"gitlab.papegames.com/fengche/yayagf/cmd/generate"
@@ -26,6 +27,7 @@ func Main() int {
 		"generate": generate.CommandFactory, "g": generate.CommandFactory,
 		//"interactive": interactive.CommandFactory,
 		"new":     new.CommandFactory,
+		"init":    _init.CommandFactory,
 		"package": _package.CommandFactory,
 		"server":  server.CommandFactory, "s": server.CommandFactory,
 		"version": version.CommandFactory,

@@ -12,14 +12,9 @@ import (
 	"strconv"
 
 	"github.com/swaggo/swag"
-	"gitlab.papegames.com/fengche/yayagf/internal/file"
 )
 
-func GenerateSwagger() error {
-	root, err := file.GetAppRoot()
-	if err != nil {
-		return err
-	}
+func GenerateSwagger(root string) error {
 
 	p := swag.New()
 
