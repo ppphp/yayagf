@@ -79,6 +79,12 @@ func GetProjectInfo() ProjectInfo {
 	}
 }
 
+func ExtractMod(arg1 string) (string, string, string) {
+	namespace, name := filepath.Split(arg1)
+	mod := filepath.Join(namespace, name)
+	return mod, namespace, name
+}
+
 func InitProject(mod, dir, name string) (int, error) {
 	log.Printf("init project")
 	if err, o, e := command.DoCommand("go", "mod", "init", mod); err != nil {
@@ -130,6 +136,7 @@ level=5
 	if err := blueprint.WriteFileWithTmpl(filepath.Join(dir, ".gitignore"), `
 {{.Name}}
 {{.Name}}.tar
+*.log
 `, struct{ Name string }{name}); err != nil {
 		log.Errorf("gitignore failed %v", err)
 		return 1, err
@@ -181,14 +188,15 @@ const (
 import (
 	"fmt"
 
-	"github.com/gin-contrib/cors"
 	// {{.Mod}}/app/crud"
 	"gitlab.papegames.com/fengche/yayagf/pkg/handlers"
 	"gitlab.papegames.com/fengche/yayagf/pkg/log"
-	// "gitlab.papegames.com/fengche/yayagf/pkg/model"
+	"gitlab.papegames.com/fengche/yayagf/pkg/maotai"
+	"gitlab.papegames.com/fengche/yayagf/pkg/model"
 	"gitlab.papegames.com/fengche/yayagf/pkg/prom"
 	"github.com/gin-gonic/gin"
 	"{{.Mod}}/app/config"
+	"{{.Mod}}/app/doc"
 	"{{.Mod}}/app/router"
 )
 // @title "{{.Mod}} API
@@ -210,7 +218,7 @@ func main() {
 
 	log.Tweak(config.GetConfig().Log)
 	gin.DefaultWriter = log.GetLogger().Out
-	r := maotai.Default("giftsvr")
+	r := maotai.Default("{{.Mod}}")
 	router.RegisterRouter(r)
 
 	drv, err := model.Open("mysql", config.GetConfig().DB)
@@ -220,7 +228,8 @@ func main() {
 	}
 	//crud.C = crud.NewClient(crud.Driver(drv))
 	//if err := crud.C.Schema.Create(context.Background()); err != nil {
-	//	log.Fatal(err)
+	//	log.Errorf(err)
+	//	return
 	//}
 	handlers.MountALotOfThingToEndpoint(r.Group("admin"),
 		handlers.WithMetric(r.TTLHist, r.URLConn,
@@ -232,7 +241,8 @@ func main() {
 	)
 
 	if err := r.Run(fmt.Sprintf(":%v", config.GetConfig().Port)); err != nil {
-		log.Fatal(err)
+		log.Errorf("run app failed (%v)", err)
+		return
 	}
 }
 `
@@ -277,7 +287,7 @@ var conf = new(Config)
 func LoadConfig() error {
 	lock.Lock()
 	defer lock.Unlock()
-	if err := config.LoadConfig("conf.toml", conf); err != nil {
+	if err := config.LoadConfig(conf); err != nil {
 		return err
 	}
 

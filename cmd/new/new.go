@@ -18,8 +18,7 @@ func runNew(args []string, flags map[string]string) (int, error) {
 		log.Errorf("no project name")
 		return 1, nil
 	}
-	namespace, name := filepath.Split(args[0])
-	mod := filepath.Join(namespace, name)
+	mod, _, name := file.ExtractMod(args[0])
 	dir, err := filepath.Abs(filepath.Clean(name))
 	if err != nil {
 		log.Errorf("abs(%v) failed %v", name, err)

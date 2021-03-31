@@ -1,7 +1,7 @@
 package init
 
 import (
-	"path/filepath"
+	"os"
 
 	"gitlab.papegames.com/fengche/yayagf/internal/file"
 	"gitlab.papegames.com/fengche/yayagf/internal/log"
@@ -17,9 +17,8 @@ func runInit(args []string, flags map[string]string) (int, error) {
 		log.Errorf("no project name")
 		return 1, nil
 	}
-	namespace, name := filepath.Split(args[0])
-	mod := filepath.Join(namespace, name)
-	dir, err := filepath.Abs(filepath.Clean(name))
+	mod, _, name := file.ExtractMod(args[0])
+	dir, err := os.Getwd()
 	if err != nil {
 		log.Errorf("abs(%v) failed %v", name, err)
 		return 1, err

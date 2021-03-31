@@ -7,6 +7,7 @@ import (
 
 	_init "gitlab.papegames.com/fengche/yayagf/cmd/init"
 	"gitlab.papegames.com/fengche/yayagf/cmd/version"
+	"gitlab.papegames.com/fengche/yayagf/cmd/web"
 
 	"gitlab.papegames.com/fengche/yayagf/cmd/generate"
 	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
@@ -27,6 +28,7 @@ func Main() int {
 		"generate": generate.CommandFactory, "g": generate.CommandFactory,
 		//"interactive": interactive.CommandFactory,
 		"new":     new.CommandFactory,
+		"web":     web.CommandFactory,
 		"init":    _init.CommandFactory,
 		"package": _package.CommandFactory,
 		"server":  server.CommandFactory, "s": server.CommandFactory,

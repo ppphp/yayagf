@@ -5,7 +5,14 @@ import (
 	"runtime"
 
 	"github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 )
+
+var z, _ = zap.NewProduction()
+
+func init() {
+	z.Core().Sync()
+}
 
 // 简单的config，复杂的做不来
 
