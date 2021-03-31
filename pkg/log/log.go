@@ -11,7 +11,7 @@ import (
 var z, _ = zap.NewProduction()
 
 func init() {
-	z.Core().Sync()
+	_ = z.Core().Sync()
 }
 
 // 简单的config，复杂的做不来

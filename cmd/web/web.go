@@ -33,7 +33,7 @@ func runWeb(args []string, flags map[string]string) (int, error) {
 	}
 
 	// useless but can be here
-	blueprint.WriteFileWithTmpl(filepath.Join(root, "app", "wasm", "wasm.go"), `package wasm
+	_ = blueprint.WriteFileWithTmpl(filepath.Join(root, "app", "wasm", "wasm.go"), `package wasm
 		//const WASM = {{.Content}}
 `, struct{ Content string }{strconv.Quote(content)})
 
