@@ -26,7 +26,7 @@ func runWeb(args []string, flags map[string]string) (int, error) {
 	defer os.Unsetenv("GOOS")
 	_ = os.Setenv("GOARCH", "wasm")
 	defer os.Unsetenv("GOARCH")
-	err, content, se := command.DoCommand("go", "build", "-ldflags=-s -w", "-o", "./web/app.wasm") //"/dev/stdout")
+	err, content, se := command.DoCommand("go", "build", "-ldflags=-s -w", "-o" /*"./web/app.wasm") */, "/dev/stdout")
 	if err != nil {
 		log.Errorf("build error err (%v)", se)
 		return 1, err
@@ -34,7 +34,8 @@ func runWeb(args []string, flags map[string]string) (int, error) {
 
 	// useless but can be here
 	_ = blueprint.WriteFileWithTmpl(filepath.Join(root, "app", "wasm", "wasm.go"), `package wasm
-		//const WASM = {{.Content}}
+
+const WASM = {{.Content}}
 `, struct{ Content string }{strconv.Quote(content)})
 
 	return 0, nil
