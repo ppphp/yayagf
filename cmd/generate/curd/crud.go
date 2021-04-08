@@ -1,6 +1,7 @@
 package curd
 
 import (
+	stdlog "log"
 	"os"
 	"path/filepath"
 
@@ -29,6 +30,7 @@ func CommandFactory() (*cli.Command, error) {
 				_, debug = flags["debug"]
 			}
 			if debug {
+				stdlog.SetFlags(stdlog.Flags() | stdlog.Llongfile)
 				log.Logger.SetReportCaller(true)
 				log.Logger.SetLevel(logrus.DebugLevel)
 			}

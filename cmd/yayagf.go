@@ -2,7 +2,6 @@
 package cmd
 
 import (
-	"log"
 	"os"
 
 	_init "gitlab.papegames.com/fengche/yayagf/cmd/init"
@@ -15,6 +14,7 @@ import (
 	"gitlab.papegames.com/fengche/yayagf/cmd/new"
 	_package "gitlab.papegames.com/fengche/yayagf/cmd/package"
 	"gitlab.papegames.com/fengche/yayagf/cmd/server"
+	"gitlab.papegames.com/fengche/yayagf/internal/log"
 )
 
 func Main() int {
