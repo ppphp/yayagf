@@ -27,9 +27,9 @@ func Main() int {
 	c.Commands = map[string]cli.CommandFactory{
 		"generate": generate.CommandFactory, "g": generate.CommandFactory,
 		//"interactive": interactive.CommandFactory,
-		"new":     new.CommandFactory,
-		"web":     web.CommandFactory,
-		"init":    _init.CommandFactory,
+		"new":  new.CommandFactory,
+		"web":  web.CommandFactory,
+		"init": _init.CommandFactory, "i": _init.CommandFactory,
 		"package": _package.CommandFactory,
 		"server":  server.CommandFactory, "s": server.CommandFactory,
 		"version": version.CommandFactory,
