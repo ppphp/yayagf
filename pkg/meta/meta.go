@@ -28,15 +28,12 @@ var local = func() string {
 	}
 	for _, interfac := range locals {
 		if interfac.HardwareAddr.String() != "" {
-			if strings.HasPrefix(interfac.Name, "en") ||
-				strings.HasPrefix(interfac.Name, "eth") {
-				if addrs, err := interfac.Addrs(); err == nil {
-					for _, addr := range addrs {
-						if addr.Network() == "ip+net" {
-							pr := strings.Split(addr.String(), "/")
-							if len(pr) == 2 && len(strings.Split(pr[0], ".")) == 4 {
-								return pr[0]
-							}
+			if addrs, err := interfac.Addrs(); err == nil {
+				for _, addr := range addrs {
+					if addr.Network() == "ip+net" {
+						pr := strings.Split(addr.String(), "/")
+						if len(pr) == 2 && len(strings.Split(pr[0], ".")) == 4 {
+							return pr[0]
 						}
 					}
 				}

@@ -13,10 +13,10 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/gomodule/redigo/redis"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/shirou/gopsutil/cpu"
-	"github.com/shirou/gopsutil/disk"
-	"github.com/shirou/gopsutil/load"
-	"github.com/shirou/gopsutil/mem"
+	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v3/load"
+	"github.com/shirou/gopsutil/v3/mem"
 	"gitlab.papegames.com/fengche/yayagf/pkg/meta"
 )
 
