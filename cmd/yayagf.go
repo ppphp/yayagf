@@ -4,17 +4,17 @@ package cmd
 import (
 	"os"
 
-	_init "gitlab.papegames.com/fengche/yayagf/cmd/init"
-	"gitlab.papegames.com/fengche/yayagf/cmd/version"
-	"gitlab.papegames.com/fengche/yayagf/cmd/web"
+	_init "github.com/ppphp/yayagf/cmd/init"
+	"github.com/ppphp/yayagf/cmd/version"
+	"github.com/ppphp/yayagf/cmd/web"
 
-	"gitlab.papegames.com/fengche/yayagf/cmd/generate"
-	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
+	"github.com/ppphp/yayagf/cmd/generate"
+	"github.com/ppphp/yayagf/pkg/cli"
 
-	"gitlab.papegames.com/fengche/yayagf/cmd/new"
-	_package "gitlab.papegames.com/fengche/yayagf/cmd/package"
-	"gitlab.papegames.com/fengche/yayagf/cmd/server"
-	"gitlab.papegames.com/fengche/yayagf/internal/log"
+	"github.com/ppphp/yayagf/cmd/new"
+	_package "github.com/ppphp/yayagf/cmd/package"
+	"github.com/ppphp/yayagf/cmd/server"
+	"github.com/ppphp/yayagf/internal/log"
 )
 
 func Main() int {

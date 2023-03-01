@@ -3,8 +3,8 @@ package config
 import (
 	"sync"
 
-	"gitlab.papegames.com/fengche/yayagf/pkg/config"
-	"gitlab.papegames.com/fengche/yayagf/pkg/log"
+	"github.com/ppphp/yayagf/pkg/config"
+	"github.com/ppphp/yayagf/pkg/log"
 )
 
 var lock sync.RWMutex

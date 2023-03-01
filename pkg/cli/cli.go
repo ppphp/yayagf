@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"gitlab.papegames.com/fengche/yayagf/pkg/meta"
+	"github.com/ppphp/yayagf/pkg/meta"
 )
 
 type CommandFactory func() (*Command, error)

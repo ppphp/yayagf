@@ -1,7 +1,7 @@
 package version
 
 import (
-	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
+	"github.com/ppphp/yayagf/pkg/cli"
 )
 
 func CommandFactory() (*cli.Command, error) {

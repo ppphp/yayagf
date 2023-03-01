@@ -6,7 +6,7 @@ import (
 	"github.com/gin-contrib/cors"
 
 	// a/app/crud"
-	// "gitlab.papegames.com/fengche/yayagf/pkg/model"
+	// "github.com/ppphp/yayagf/pkg/model"
 	"a/app/config"
 	"a/app/router"
 	"log"

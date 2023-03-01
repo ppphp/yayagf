@@ -17,7 +17,7 @@ import (
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/load"
 	"github.com/shirou/gopsutil/v3/mem"
-	"gitlab.papegames.com/fengche/yayagf/pkg/meta"
+	"github.com/ppphp/yayagf/pkg/meta"
 )
 
 func SysCPU() *GaugeVecFuncCollector {

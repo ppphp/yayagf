@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
-	"gitlab.papegames.com/fengche/yayagf/pkg/prom"
+	"github.com/ppphp/yayagf/pkg/prom"
 )
 
 func TestMountPromHandlerToGin(t *testing.T) {

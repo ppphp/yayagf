@@ -17,7 +17,7 @@ func TestGetMod(t *testing.T) {
 	mod, err := GetMod(path)
 	require.NoError(t, err)
 
-	require.Equal(t, "gitlab.papegames.com/fengche/yayagf", mod)
+	require.Equal(t, "github.com/ppphp/yayagf", mod)
 }
 
 func TestGetAppRoot(t *testing.T) {

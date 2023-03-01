@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gitlab.papegames.com/fengche/yayagf/cmd"
+	"github.com/ppphp/yayagf/cmd"
 )
 
 func main() {

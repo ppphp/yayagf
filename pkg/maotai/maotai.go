@@ -8,8 +8,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
-	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
-	"gitlab.papegames.com/fengche/yayagf/pkg/prom"
+	"github.com/ppphp/yayagf/pkg/cli"
+	"github.com/ppphp/yayagf/pkg/prom"
 )
 
 type MaoTai struct {

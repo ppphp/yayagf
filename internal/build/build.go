@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"gitlab.papegames.com/fengche/yayagf/internal/command"
+	"github.com/ppphp/yayagf/internal/command"
 )
 
 func init() {

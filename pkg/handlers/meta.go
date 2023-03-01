@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.papegames.com/fengche/yayagf/pkg/meta"
+	"github.com/ppphp/yayagf/pkg/meta"
 )
 
 // 简单的meta信息暴露

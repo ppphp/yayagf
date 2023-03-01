@@ -1,6 +1,6 @@
 
-[![pipeline status](https://gitlab.papegames.com/fengche/yayagf/badges/master/pipeline.svg)](https://gitlab.papegames.com/fengche/yayagf/commits/master)
-[![coverage report](https://gitlab.papegames.com/fengche/yayagf/badges/master/coverage.svg)](https://gitlab.papegames.com/fengche/yayagf/commits/master)
+[![pipeline status](https://github.com/ppphp/yayagf/badges/master/pipeline.svg)](https://github.com/ppphp/yayagf/commits/master)
+[![coverage report](https://github.com/ppphp/yayagf/badges/master/coverage.svg)](https://github.com/ppphp/yayagf/commits/master)
 [![SQALE评级](http://192.168.0.97:9000/api/project_badges/measure?project=yayagf&metric=sqale_rating)](http://192.168.0.97:9000/dashboard?id=yayagf)
 # yayagf
 
@@ -95,7 +95,7 @@ yayagf g doc
 ```go
 package main
 import (
-    "gitlab.papegames.com/fengche/yayagf/pkg/model"
+    "github.com/ppphp/yayagf/pkg/model"
     "log"
     "yourproject/ent"
 )
@@ -121,7 +121,7 @@ func main() {
 ```go
 package main
 import (
-    "gitlab.papegames.com/fengche/yayagf/pkg/config"
+    "github.com/ppphp/yayagf/pkg/config"
     "log"
 )
 
@@ -139,7 +139,7 @@ func main() {
 ```go
 package main
 import (
-    "gitlab.papegames.com/fengche/yayagf/pkg/handlers"
+    "github.com/ppphp/yayagf/pkg/handlers"
     "log"
 )
 

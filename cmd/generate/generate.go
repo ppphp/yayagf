@@ -1,12 +1,12 @@
 package generate
 
 import (
-	"gitlab.papegames.com/fengche/yayagf/cmd/generate/ci"
-	"gitlab.papegames.com/fengche/yayagf/cmd/generate/controller"
-	"gitlab.papegames.com/fengche/yayagf/cmd/generate/curd"
-	"gitlab.papegames.com/fengche/yayagf/cmd/generate/doc"
-	"gitlab.papegames.com/fengche/yayagf/cmd/generate/schema"
-	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
+	"github.com/ppphp/yayagf/cmd/generate/ci"
+	"github.com/ppphp/yayagf/cmd/generate/controller"
+	"github.com/ppphp/yayagf/cmd/generate/curd"
+	"github.com/ppphp/yayagf/cmd/generate/doc"
+	"github.com/ppphp/yayagf/cmd/generate/schema"
+	"github.com/ppphp/yayagf/pkg/cli"
 )
 
 func CommandFactory() (*cli.Command, error) {

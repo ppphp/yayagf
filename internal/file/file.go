@@ -9,10 +9,10 @@ import (
 	"regexp"
 	"strings"
 
-	"gitlab.papegames.com/fengche/yayagf/internal/blueprint"
-	"gitlab.papegames.com/fengche/yayagf/internal/command"
-	"gitlab.papegames.com/fengche/yayagf/internal/log"
-	"gitlab.papegames.com/fengche/yayagf/internal/swagger"
+	"github.com/ppphp/yayagf/internal/blueprint"
+	"github.com/ppphp/yayagf/internal/command"
+	"github.com/ppphp/yayagf/internal/log"
+	"github.com/ppphp/yayagf/internal/swagger"
 )
 
 var ErrNoRoot = errors.New("cannot find root")
@@ -189,11 +189,11 @@ import (
 	"fmt"
 
 	// {{.Mod}}/app/crud"
-	"gitlab.papegames.com/fengche/yayagf/pkg/handlers"
-	"gitlab.papegames.com/fengche/yayagf/pkg/log"
-	"gitlab.papegames.com/fengche/yayagf/pkg/maotai"
-	"gitlab.papegames.com/fengche/yayagf/pkg/model"
-	"gitlab.papegames.com/fengche/yayagf/pkg/prom"
+	"github.com/ppphp/yayagf/pkg/handlers"
+	"github.com/ppphp/yayagf/pkg/log"
+	"github.com/ppphp/yayagf/pkg/maotai"
+	"github.com/ppphp/yayagf/pkg/model"
+	"github.com/ppphp/yayagf/pkg/prom"
 	"github.com/gin-gonic/gin"
 	"{{.Mod}}/app/config"
 	"{{.Mod}}/app/doc"
@@ -251,9 +251,9 @@ func main() {
 
 import (
 	"github.com/gin-contrib/cors"
-	"gitlab.papegames.com/fengche/yayagf/pkg/log"
-	"gitlab.papegames.com/fengche/yayagf/pkg/maotai"
-	"gitlab.papegames.com/fengche/yayagf/pkg/middleware"
+	"github.com/ppphp/yayagf/pkg/log"
+	"github.com/ppphp/yayagf/pkg/maotai"
+	"github.com/ppphp/yayagf/pkg/middleware"
 )
 
 func RegisterRouter(r *maotai.MaoTai) {
@@ -269,8 +269,8 @@ func RegisterRouter(r *maotai.MaoTai) {
 import (
 	"sync"
 
-	"gitlab.papegames.com/fengche/yayagf/pkg/config"
-	"gitlab.papegames.com/fengche/yayagf/pkg/log"
+	"github.com/ppphp/yayagf/pkg/config"
+	"github.com/ppphp/yayagf/pkg/log"
 )
 
 var lock sync.RWMutex

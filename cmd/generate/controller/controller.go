@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gitlab.papegames.com/fengche/yayagf/internal/file"
+	"github.com/ppphp/yayagf/internal/file"
 
-	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
+	"github.com/ppphp/yayagf/pkg/cli"
 )
 
 func CommandFactory() (*cli.Command, error) {

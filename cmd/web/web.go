@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"gitlab.papegames.com/fengche/yayagf/internal/blueprint"
-	"gitlab.papegames.com/fengche/yayagf/internal/command"
-	"gitlab.papegames.com/fengche/yayagf/internal/file"
-	"gitlab.papegames.com/fengche/yayagf/internal/log"
-	"gitlab.papegames.com/fengche/yayagf/pkg/cli"
+	"github.com/ppphp/yayagf/internal/blueprint"
+	"github.com/ppphp/yayagf/internal/command"
+	"github.com/ppphp/yayagf/internal/file"
+	"github.com/ppphp/yayagf/internal/log"
+	"github.com/ppphp/yayagf/pkg/cli"
 )
 
 func CommandFactory() (*cli.Command, error) {

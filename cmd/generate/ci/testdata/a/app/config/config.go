@@ -4,7 +4,7 @@ import (
 	"log"
 	"sync"
 
-	"gitlab.papegames.com/fengche/yayagf/pkg/config"
+	"github.com/ppphp/yayagf/pkg/config"
 )
 
 var lock sync.RWMutex
